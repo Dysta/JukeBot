@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "JukeBot"
+version = "0.1.0"
+description = "A music bot for Discord using Pycord"
+authors = ["Dysta <xav4098@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+mypy = "^0.910"
+black = "^21.9b0"
+Flask = "^2.0.2"
+python-dotenv = "^0.19.1"
+py-cord = {extras = ["voice"], version = "^1.7.3"}
+youtube_dl = "^2021.6.6"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.2"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
