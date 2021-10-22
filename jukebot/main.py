@@ -6,6 +6,7 @@ from jukebot import JukeBot
 import os
 
 from utility import Utiliy
+from listeners import ErrorHandler
 
 
 def main():
@@ -28,6 +29,7 @@ def main():
     # to the website that appewars when you run this repl in the monitor and it will keep your bot alive by pinging
     # the flask server enjoy!
     bot = JukeBot(command_prefix=commands.when_mentioned_or(os.environ["BOT_PREFIX"]))
+    bot.add_cog(ErrorHandler(bot))
     bot.add_cog(Utiliy(bot))
     bot.run(os.environ["BOT_TOKEN"])
 

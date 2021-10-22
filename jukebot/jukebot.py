@@ -22,4 +22,3 @@ class JukeBot(commands.Bot):
     async def on_command_error(self, ctx, exception):
         print(f"{exception=}")
         e = Embed.error_message(content=exception)
-        await ctx.send(embed=e)
