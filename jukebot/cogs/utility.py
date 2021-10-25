@@ -6,7 +6,7 @@ import discord
 from discord.ext import commands
 
 
-class Utiliy(commands.Cog):
+class Utility(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 

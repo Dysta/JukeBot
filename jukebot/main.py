@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 from jukebot import JukeBot
 import os
 
-from cogs import Utiliy
+from cogs import Utility
 from listeners import ErrorHandler
 
 
@@ -32,7 +32,7 @@ def main():
     # the flask server enjoy!
     bot = JukeBot(command_prefix=commands.when_mentioned_or(os.environ["BOT_PREFIX"]))
     bot.add_cog(ErrorHandler(bot))
-    bot.add_cog(Utiliy(bot))
+    bot.add_cog(Utility(bot))
     bot.run(os.environ["BOT_TOKEN"])
 
 
