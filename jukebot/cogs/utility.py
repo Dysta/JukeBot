@@ -10,13 +10,12 @@ class Utility(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(aliases=["h"])
-    @commands.guild_only()
-    async def help_message(self, ctx):
-        e = Embed.error_message(ctx, title="Help msg")
-        await ctx.send(embed=e)
-
-    @commands.command(aliases=["i"])
+    @commands.command(
+        aliases=["i"],
+        brief="Get info about the bot",
+        help="Get information about the bot like the ping and the uptime.",
+        usage="info",
+    )
     @commands.guild_only()
     async def info(self, ctx):
         e = Embed.info_message(ctx)
@@ -32,13 +31,17 @@ class Utility(commands.Cog):
         )
         await ctx.reply(embed=e)
 
-    @commands.command()
+    @commands.command(
+        brief="Check the bot latency",
+        help="Return the current latency of the bot.",
+        usage="ping",
+    )
     @commands.guild_only()
     async def ping(self, ctx):
         e = Embed.info_message(ctx, content=f"Pong.. {self.bot.latency * 1000:.2f}ms")
         await ctx.reply(embed=e)
 
-    @commands.command()
+    @commands.command(hidden=True)
     @commands.guild_only()
     async def kick(self, ctx, member: discord.Member):
         try:
@@ -49,16 +52,21 @@ class Utility(commands.Cog):
         except:
             await ctx.send("bot does not have the kick members permission!")
 
-    @commands.command()
+    @commands.command(
+        brief="Repeat a message", help="Repeat message", usage="echo <message>"
+    )
     @commands.guild_only()
     async def echo(self, ctx, *, args):
         await ctx.send(args)
 
-    @commands.command()
+    @commands.command(
+        brief="Display a user avatar",
+        help="Display a user avatar in a embed message.\nIf no user is provided, it will show the command invoker avatar.",
+        usage="avatar [member]",
+    )
     @commands.guild_only()
     async def avatar(self, ctx, who: typing.Optional[discord.Member] = None):
-        e = Embed.basic_message(
-            ctx, title=f"{ctx.author if who is None else who}'s avatar"
-        )
-        e.set_image(url=ctx.author.avatar_url if who is None else who.avatar_url)
+        who = ctx.author if who is None else who
+        e = Embed.basic_message(ctx, title=f"{who}'s avatar")
+        e.set_image(url=who.avatar_url)
         await ctx.send(embed=e)
