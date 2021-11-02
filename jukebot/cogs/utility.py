@@ -5,6 +5,8 @@ from embed import Embed
 import discord
 from discord.ext import commands
 
+import utils
+
 
 class Utility(commands.Cog):
     def __init__(self, bot):
@@ -21,9 +23,9 @@ class Utility(commands.Cog):
         e = Embed.info_message(ctx)
         e.add_field(name="Ping", value=f"{self.bot.latency * 1000:.2f}ms", inline=False)
         uptime = datetime.now() - self.bot.start_time
-        hours, remainder = divmod(int(uptime.total_seconds()), 3600)
-        minutes, seconds = divmod(remainder, 60)
-        days, hours = divmod(hours, 24)
+        days, hours, minutes, seconds = utils.seconds_converter(
+            int(uptime.total_seconds())
+        )
         e.add_field(
             name="Uptime",
             value=f"{days} days, {hours} hours, {minutes} minutes and {seconds} seconds",
