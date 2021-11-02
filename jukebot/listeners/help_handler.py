@@ -41,7 +41,9 @@ class HelpHandler(commands.HelpCommand):
 
         note = self.get_ending_note()
         if note:
-            help_embed.add_field(name="Note", value="\n".join(note), inline=False)
+            help_embed.add_field(
+                name=Embed.VOID_TOKEN, value="\n".join(note), inline=False
+            )
 
         await ctx.send(embed=help_embed)
 
@@ -59,7 +61,7 @@ class HelpHandler(commands.HelpCommand):
         )
         note = self.get_ending_note()
         if note:
-            cog_embed.add_field(name="Note", value=note[0], inline=False)
+            cog_embed.add_field(name=Embed.VOID_TOKEN, value=note[0], inline=False)
 
         await ctx.send(embed=cog_embed)
 

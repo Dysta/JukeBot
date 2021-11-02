@@ -2,6 +2,8 @@ import discord
 
 
 class Embed:
+    VOID_TOKEN = "\u200B"
+
     @staticmethod
     def error_message(ctx, title="", content=""):
         embed = discord.Embed(title="", description=content, color=0xDB3C30)
