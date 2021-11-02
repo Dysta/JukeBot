@@ -6,7 +6,7 @@ class Embed:
     def error_message(ctx, title="", content=""):
         embed = discord.Embed(title="", description=content, color=0xDB3C30)
         embed.set_author(
-            name="Information" if title == "" else title,
+            name="Error" if title == "" else title,
             icon_url="https://icons.iconarchive.com/icons/papirus-team/papirus-status/512/dialog-error-icon.png",
         )
         embed.set_footer(
