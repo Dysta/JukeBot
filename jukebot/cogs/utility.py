@@ -72,3 +72,8 @@ class Utility(commands.Cog):
         e = Embed.basic_message(ctx, title=f"{who}'s avatar")
         e.set_image(url=who.avatar_url)
         await ctx.send(embed=e)
+
+
+def setup(bot):
+    bot.add_cog(Utility(bot))
+    bot.help_command.cog = bot.get_cog("Utility")
