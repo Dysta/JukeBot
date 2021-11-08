@@ -4,6 +4,7 @@ import logging
 from discord.ext import commands
 
 from dotenv import load_dotenv
+from extensions import Extensions
 from jukebot import JukeBot
 import os
 
