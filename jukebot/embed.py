@@ -42,3 +42,17 @@ class Embed:
         )
 
         return embed
+
+    @staticmethod
+    def music_message(ctx, title="", content="", url=""):
+        embed = discord.Embed(title="", description=content, color=0x23C197)
+        embed.set_author(
+            name="Music" if title == "" else title,
+            url=url,
+            icon_url="https://icons.iconarchive.com/icons/papirus-team/papirus-apps/512/enjoy-music-player-icon.png",
+        )
+        embed.set_footer(
+            text=f"Requested by {ctx.author}", icon_url=f"{ctx.author.avatar_url}"
+        )
+
+        return embed
