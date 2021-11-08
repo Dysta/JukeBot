@@ -34,9 +34,13 @@ def main():
         command_prefix=commands.when_mentioned_or(os.environ["BOT_PREFIX"]),
         help_command=HelpHandler(),
     )
-    bot.add_cog(ErrorHandler(bot))
-    bot.add_cog(Utility(bot))
-    bot.help_command.cog = bot.get_cog("Utility")
+
+    for e in Extensions.all():
+        try:
+            bot.load_extension(name=f"{e['package']}.{e['name']}")
+        except commands.ExtensionNotFound as e:
+            print(e)
+
     bot.run(os.environ["BOT_TOKEN"])
 
 

@@ -17,4 +17,5 @@ class ErrorHandler(commands.Cog):
         #     pass
         #
         # e = Embed.error_message(ctx, content=error)
-        # await ctx.send(embed=e)
+def setup(bot):
+    bot.add_cog(ErrorHandler(bot))
