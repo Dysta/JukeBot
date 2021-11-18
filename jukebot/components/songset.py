@@ -6,7 +6,7 @@ from jukebot.components import Song, Request
 
 
 @dataclass
-class Playlist(abc.Collection):
+class SongSet(abc.Collection):
     songs: List[Song]
 
     def __len__(self) -> int:
@@ -25,7 +25,7 @@ class Playlist(abc.Collection):
         raise IndexError
 
     @classmethod
-    def from_request(cls, request: Request):
+    def from_request(cls, request: Request) -> 'SongSet':
         songs: List[Song] = []
         for e in request.entries:
             songs.append(Song.from_entry(e))

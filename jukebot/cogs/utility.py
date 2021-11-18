@@ -64,6 +64,11 @@ class Utility(commands.Cog):
         e.set_image(url=who.avatar_url)
         await ctx.send(embed=e)
 
+    @commands.command(hidden=True)
+    @commands.guild_only()
+    async def zizi(self, ctx: Context):
+        await ctx.reply("caca")
+
 
 def setup(bot):
     bot.add_cog(Utility(bot))
