@@ -1,10 +1,11 @@
 import discord
 import random
 
+from typing import Union
 from discord.ext.commands import Context
 
-from jukebot.components import Song
-from jukebot.components.playlist import Playlist
+from jukebot.components import Song, ResultSet
+from jukebot.components.songset import SongSet
 from jukebot.utils import converter
 
 VOID_TOKEN = "\u200B"
@@ -95,7 +96,7 @@ def music_not_found_message(ctx: Context, title="", content=""):
     return embed
 
 
-def playlist_message(ctx: Context, playlist: Playlist, title=""):
+def playlist_message(ctx: Context, playlist: Union[ResultSet, SongSet], title=""):
     content = "\n\n".join(
         [
             f":{converter.number_to_str(i)}: `{s.title} by {s.channel}` **[{s.fmt_duration}]**"

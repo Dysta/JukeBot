@@ -1,12 +1,12 @@
 import asyncio
 import os
 
+import discord
 from discord import Reaction, User
 from discord.ext import commands
 from discord.ext.commands import Context, Bot
 
-from jukebot.components import Player, Request, PlayerCollection, Song
-from jukebot.components.playlist import Playlist
+from jukebot.components import Player, Request, PlayerCollection, Song, ResultSet
 from jukebot.utils import embed, converter
 
 
@@ -19,7 +19,7 @@ class Search(commands.Cog):
         e = embed.music_search_message(ctx, title=f"Searching for {query}..")
         msg = await ctx.send(embed=e)
         req: Request = Request(f"{source}{query}")
-        await req.process()
+        await req.search()
         if not req.success:
             e = embed.music_not_found_message(
                 ctx,
@@ -28,10 +28,12 @@ class Search(commands.Cog):
             await msg.edit(embed=e)
             return
 
-        playlist: Playlist = Playlist.from_request(req)
-        e = embed.playlist_message(ctx, title=f"Result for {query}", playlist=playlist)
+        results: ResultSet = ResultSet.from_request(req)
+        e = embed.playlist_message(
+            ctx, playlist=results, title=f"Result for {query}",
+        )
         await msg.edit(embed=e)
-        for i in range(1, len(playlist) + 1):
+        for i in range(1, len(results) + 1):
             await msg.add_reaction(f"{converter.number_to_emoji(i)}")
         await msg.add_reaction(_SearchReaction.CANCEL_REACTION)
 
@@ -58,7 +60,9 @@ class Search(commands.Cog):
             await msg.edit(embed=e)
             return
 
-        song: Song = playlist[converter.emoji_to_number(reaction.emoji) - 1]
+        req: Request = Request(results[converter.emoji_to_number(reaction.emoji) - 1].url)
+        await req.process()
+        song: Song = Song.from_request(req)
         e = embed.music_message(ctx, song)
         await msg.edit(embed=e)
 
@@ -72,10 +76,13 @@ class Search(commands.Cog):
         brief="search a song on SoundCloud",
         help="search a query on SoundCloud and display the 10 first result",
         usage="<query>",
+        hidden=True
     )
     @commands.guild_only()
     async def soundcloud(self, ctx: Context, *, query: str):
-        await self._search_process(ctx, query, "scsearch:")
+        raise NotImplementedError
+        # issue with yt_dlp, scsearch never stop, even if we put the option 'playlistend'
+        # await self._search_process(ctx, query, "scsearch10:")
 
     @commands.command(
         aliases=["yt", "syt"],

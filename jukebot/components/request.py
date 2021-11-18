@@ -1,7 +1,9 @@
 import asyncio
-import yt_dlp
+import json
+import time
+from datetime import timedelta
 
-from typing import Optional, Any
+import yt_dlp
 
 # Silence useless bug reports messages
 yt_dlp.utils.bug_reports_message = lambda: ""
@@ -11,26 +13,22 @@ class Request:
     def __init__(self, query: str):
         self._query: str = query
         self._info: dict = {}
-        self._id: str = Optional[str]
-        self._title: str = Optional[str]
-        self._stream_url: str = Optional[str]
-        self._web_url: str = Optional[str]
-        self._thumbnail: str = Optional[str]
-        self._channel: str = Optional[str]
-        self._duration: int = 0
-        self._fmt_duration: str = "0:00"
         self._success: bool = False
-        self._live: Any = None
+        self._extra_info: dict = {"id": -1, "title": "Unknown", "uploader": "Unknown"}
+
+    async def search(self):
+        await self._get(process=False)
 
     async def process(self):
+        await self._get(process=True)
+
+    async def _get(self, process: bool = True):
         ytdl_kwargs = dict(
             download=False,
-            ie_key=None,
-            extra_info={},
-            process=True,
-            force_generic_extractor=False,
+            process=process,
+            extra_info=self._extra_info if not process else None,
         )
-        with yt_dlp.YoutubeDL(_RequestOption.YTDL_FORMAT_OPTION) as ytdl:
+        with yt_dlp.YoutubeDL(params=_RequestOption.YTDL_FORMAT_OPTION) as ytdl:
             ytdl.cache.remove()
 
             def downloader(**ytdl_kwargs):
@@ -74,6 +72,7 @@ class _RequestOption:
         "outtmpl": "%(extractor)s-%(id)s-%(title)s.%(ext)s",
         "restrictfilenames": True,
         "playlistend": 10,
+        "max_downloads": 10,
         "nocheckcertificate": True,
         "ignoreerrors": False,
         "logtostderr": False,
@@ -83,4 +82,5 @@ class _RequestOption:
         "source_address": "0.0.0.0",
         "usenetrc": True,
         "socket_timeout": 3,
+        # "skip_download": True,
     }
