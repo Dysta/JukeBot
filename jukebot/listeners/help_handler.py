@@ -1,7 +1,7 @@
 from discord.ext import commands
 
 import itertools
-from embed import Embed
+from jukebot.utils import embed
 
 
 class HelpHandler(commands.HelpCommand):
@@ -25,7 +25,7 @@ class HelpHandler(commands.HelpCommand):
         ctx = self.context
         bot = ctx.bot
 
-        help_embed = Embed.info_message(ctx, title="Available commands")
+        help_embed = embed.info_message(ctx, title="Available commands")
 
         def get_category(command, *, no_category="Other:"):
             cog = command.cog
@@ -42,7 +42,7 @@ class HelpHandler(commands.HelpCommand):
         note = self.get_ending_note()
         if note:
             help_embed.add_field(
-                name=Embed.VOID_TOKEN, value="\n".join(note), inline=False
+                name=embed.VOID_TOKEN, value="\n".join(note), inline=False
             )
 
         await ctx.send(embed=help_embed)
@@ -50,7 +50,7 @@ class HelpHandler(commands.HelpCommand):
     async def send_cog_help(self, cog):
         ctx = self.context
 
-        cog_embed = Embed.info_message(ctx, title="Available commands")
+        cog_embed = embed.info_message(ctx, title="Available commands")
 
         filtered = await self.filter_commands(cog.get_commands(), sort=True)
         cmds = sorted(filtered, key=lambda c: c.name)
@@ -61,14 +61,14 @@ class HelpHandler(commands.HelpCommand):
         )
         note = self.get_ending_note()
         if note:
-            cog_embed.add_field(name=Embed.VOID_TOKEN, value=note[0], inline=False)
+            cog_embed.add_field(name=embed.VOID_TOKEN, value=note[0], inline=False)
 
         await ctx.send(embed=cog_embed)
 
     async def send_command_help(self, command):
         ctx = self.context
 
-        cmd_embed = Embed.info_message(
+        cmd_embed = embed.info_message(
             ctx, title=f"Command : {command.name}", content=command.help
         )
 
@@ -76,7 +76,9 @@ class HelpHandler(commands.HelpCommand):
         cmd_embed.add_field(name="Aliases", value=f"```{aliases}```", inline=False)
 
         cmd_embed.add_field(
-            name="Usage", value=f"```{ctx.prefix}{command.usage}```", inline=False
+            name="Usage",
+            value=f"```{ctx.prefix}{command.name} {command.usage if command.usage is not None else ''}```",
+            inline=False,
         )
 
         await ctx.send(embed=cmd_embed)
