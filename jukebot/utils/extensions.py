@@ -1,9 +1,10 @@
 class Extensions:
     __list__ = [
-        {"package": "listeners", "name": "error_handler"},
-        {"package": "cogs", "name": "utility"},
-        {"package": "cogs", "name": "music"},
-        {"package": "cogs", "name": "system"},
+        {"package": "jukebot.listeners", "name": "error_handler"},
+        {"package": "jukebot.cogs", "name": "utility"},
+        {"package": "jukebot.cogs", "name": "music"},
+        {"package": "jukebot.cogs", "name": "system"},
+        {"package": "jukebot.cogs", "name": "search"},
     ]
 
     @staticmethod
