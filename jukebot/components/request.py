@@ -1,14 +1,10 @@
 import asyncio
-import concurrent.futures
-
-import youtube_dl
-import json
-import utils
+import yt_dlp
 
 from typing import Optional, Any
 
 # Silence useless bug reports messages
-youtube_dl.utils.bug_reports_message = lambda: ""
+yt_dlp.utils.bug_reports_message = lambda: ""
 
 
 class Request:
@@ -17,11 +13,12 @@ class Request:
         self._info: dict = {}
         self._id: str = Optional[str]
         self._title: str = Optional[str]
-        self._url: str = Optional[str]
+        self._stream_url: str = Optional[str]
         self._web_url: str = Optional[str]
         self._thumbnail: str = Optional[str]
         self._channel: str = Optional[str]
         self._duration: int = 0
+        self._fmt_duration: str = "0:00"
         self._success: bool = False
         self._live: Any = None
 
@@ -33,7 +30,7 @@ class Request:
             process=True,
             force_generic_extractor=False,
         )
-        with youtube_dl.YoutubeDL(_RequestOption.YTDL_FORMAT_OPTION) as ytdl:
+        with yt_dlp.YoutubeDL(_RequestOption.YTDL_FORMAT_OPTION) as ytdl:
             ytdl.cache.remove()
 
             def downloader(**ytdl_kwargs):
@@ -41,55 +38,33 @@ class Request:
 
             info = await asyncio.to_thread(downloader, **ytdl_kwargs)
 
-        with open("debug.json", "w") as f:
-            json.dump(info, f)
+        # with open("debug.json", "w") as f:
+        #     json.dump(info, f)
 
-        self._info = info["entries"][0] if "entries" in info else info
-        self._url = self._info["url"]
-        self._id = self._info.get("id", -1)
-        self._title = self._info.get("title", "Unknown")
-        self._duration = int(self._info.get("duration", 0))
-        self._thumbnail = self._info.get("thumbnail", None)
-        self._channel = self._info.get("channel", self._info.get("uploader", "Unknown"))
-        self._web_url = self._info.get("webpage_url", "")
-        self._live = self._info.get("is_live", False)
+        self._info = info
         self._success = True
+
+    def get_entries(self, number: int):
+        if "entries" in self._info:
+            try:
+                return self._info["entries"][number]
+            except KeyError:
+                raise
+        return self._info
 
     @property
     def success(self):
         return self._success
 
     @property
-    def title(self):
-        return self._title
+    def info(self):
+        return self._info
 
     @property
-    def url(self):
-        return self._url
-
-    @property
-    def duration(self):
-        return self._duration
-
-    @property
-    def web_url(self):
-        return self._web_url
-
-    @property
-    def thumbnail(self):
-        return self._thumbnail
-
-    @property
-    def id(self):
-        return self._id
-
-    @property
-    def channel(self):
-        return self._channel
-
-    @property
-    def live(self):
-        return self._live
+    def entries(self):
+        if "entries" in self._info:
+            return self._info["entries"]
+        return [self._info]
 
 
 class _RequestOption:
@@ -97,7 +72,7 @@ class _RequestOption:
         "format": "bestaudio/best",
         "outtmpl": "%(extractor)s-%(id)s-%(title)s.%(ext)s",
         "restrictfilenames": True,
-        "noplaylist": True,
+        "playlistend": 10,
         "nocheckcertificate": True,
         "ignoreerrors": False,
         "logtostderr": False,
@@ -106,4 +81,5 @@ class _RequestOption:
         "default_search": "auto",
         "source_address": "0.0.0.0",
         "usenetrc": True,
+        "socket_timeout": 3,
     }

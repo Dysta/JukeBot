@@ -1,8 +1,9 @@
-import utils
-
-from embed import Embed
 from discord.ext import commands
-from music_components import Player, Request, PlayerCollection
+from discord.ext.commands import Context
+
+from jukebot.components import Player, Request, PlayerCollection
+from jukebot.utils import embed
+from jukebot.components import Song
 
 
 class Music(commands.Cog):
@@ -14,45 +15,40 @@ class Music(commands.Cog):
         aliases=["p"],
         brief="Play a music from url or query",
         help="Play a music from the provided URL or a query",
-        usage="play [url|query_str]",
+        usage="<url|query_str>",
     )
     @commands.guild_only()
-    async def play(self, ctx, *, query: str):
-        msg = await ctx.send(f"🔎 searching for `{query}`..")
+    async def play(self, ctx: Context, *, query: str):
+        e = embed.music_search_message(ctx, title=f"Searching for {query}..")
+        msg = await ctx.send(embed=e)
         req: Request = Request(query)
         await req.process()
         if not req.success:
-            await msg.edit(content=f"❌ No match, sorry {ctx.author.mention}")
+            e = embed.music_not_found_message(
+                ctx,
+                title=f"Nothing found for {query}, sorry..",
+            )
+            await msg.edit(embed=e)
             return
 
-        e = Embed.music_message(ctx, title=req.title, url=req.web_url)
-        e.add_field(name="Channel", value=req.channel)
-        duration_str = ""
-        if req.live:
-            duration_str = "∞"
-        else:
-            time = utils.seconds_converter(req.duration)
-            duration_str = utils.convert_time_to_youtube_format(time)
-
-        e.add_field(name="Duration", value=duration_str)
-        if req.thumbnail:
-            e.set_image(url=req.thumbnail)
+        song: Song = Song.from_request(req)
+        e = embed.music_message(ctx, song)
 
         # PlayerContainer create bot if needed
         player: Player = self._players[ctx.guild.id]
-        await player.play(ctx, req)
-        await msg.edit(content="⬇ **Found this** ⬇", embed=e)
+        await player.play(ctx, song)
+        await msg.edit(embed=e)
 
     @commands.command(
         aliases=["l"],
         brief="Disconnect the bot from a voice channel",
         help="Disconnect the bot from the current connected voice channel.",
-        usage="leave",
     )
     @commands.guild_only()
-    async def leave(self, ctx):
+    async def leave(self, ctx: Context):
         if ctx.guild.id in self._players:
-            await ctx.send("Ok bye 👋")
+            e = embed.basic_message(ctx, title="Player disconnected")
+            await ctx.send(embed=e)
             await self._players[ctx.guild.id].disconnect()
             # once the bot leave, we destroy is ref from the container
             del self._players[ctx.guild.id]
@@ -62,12 +58,12 @@ class Music(commands.Cog):
     @commands.command(
         brief="Stop the current music",
         help="Stop the current music from the bot without disconnect him.",
-        usage="stop",
     )
     @commands.guild_only()
-    async def stop(self, ctx):
+    async def stop(self, ctx: Context):
         if ctx.guild.id in self._players:
-            await ctx.send("Ok 🔇")
+            e = embed.basic_message(ctx, title="Player stopped")
+            await ctx.send(embed=e)
             self._players[ctx.guild.id].stop()
         else:
             raise Exception("Player not in container")
@@ -75,12 +71,12 @@ class Music(commands.Cog):
     @commands.command(
         brief="pause the current music",
         help="pause the current music from the bot without disconnect him.",
-        usage="pause",
     )
     @commands.guild_only()
-    async def pause(self, ctx):
+    async def pause(self, ctx: Context):
         if ctx.guild.id in self._players:
-            await ctx.send("Ok ⏸")
+            e = embed.basic_message(ctx, title="Player paused")
+            await ctx.send(embed=e)
             self._players[ctx.guild.id].pause()
         else:
             raise Exception("Player not in container")
@@ -88,12 +84,12 @@ class Music(commands.Cog):
     @commands.command(
         brief="pause the current music",
         help="pause the current music from the bot without disconnect him.",
-        usage="pause",
     )
     @commands.guild_only()
-    async def resume(self, ctx):
+    async def resume(self, ctx: Context):
         if ctx.guild.id in self._players:
-            await ctx.send("Ok ▶")
+            e = embed.basic_message(ctx, title="Player resumed")
+            await ctx.send(embed=e)
             self._players[ctx.guild.id].resume()
         else:
             raise Exception("Player not in container")

@@ -1,12 +1,10 @@
 import asyncio
 import discord
-import os
 import sys
 
 from .audio_stream import AudioStream
 from collections import abc
 from enum import Enum
-from concurrent.futures import ProcessPoolExecutor
 
 
 class Player:
@@ -24,13 +22,7 @@ class Player:
         self._next = asyncio.Event()
         self._queue = asyncio.Queue()
 
-        self._volume = 1
         self._state = Player.State.IDLE
-
-    def __del__(self):
-        if self._current:
-            with ProcessPoolExecutor(max_workers=1) as ppe:
-                ppe.submit(self._current.cleanup)
 
     async def join(self, channel):
         if self.voice is None or not self.voice.is_connected():
@@ -48,7 +40,7 @@ class Player:
 
         try:
             audio = discord.FFmpegPCMAudio(
-                req.url,
+                req.stream_url,
                 executable=_PlayerOption.FFMPEG_EXECUTABLE,
                 pipe=False,
                 stderr=sys.stdout,  # None,  # subprocess.PIPE
@@ -59,11 +51,8 @@ class Player:
             print("_play_now", "The subprocess failed to be created")
             return
 
-        player = discord.PCMVolumeTransformer(audio, volume=self.volume)
-        player = AudioStream(player)
+        player = AudioStream(audio)
         player.read()
-
-        self._current = player
 
         await self.join(ctx.message.author.voice.channel)
 
@@ -71,6 +60,7 @@ class Player:
             self.voice.stop()
 
         self.voice.play(player)
+        self._current = player
 
     async def disconnect(self):
         if self.voice:
@@ -99,14 +89,6 @@ class Player:
     @voice.setter
     def voice(self, v):
         self._voice = v
-
-    @property
-    def volume(self):
-        return self._volume
-
-    @volume.setter
-    def volume(self, value: float):
-        self._volume = value
 
     @property
     def playing(self):
@@ -148,7 +130,7 @@ class PlayerCollection(abc.MutableMapping):
 
 
 class _PlayerOption:
-    FFMPEG_EXECUTABLE = "ffmpeg"
+    FFMPEG_EXECUTABLE = "./bin/ffmpeg.exe"
 
     FFMPEG_BEFORE_OPTIONS = " ".join(
         ["-reconnect 1", "-reconnect_streamed 1", "-reconnect_delay_max 3", "-nostdin"]

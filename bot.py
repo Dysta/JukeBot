@@ -1,18 +1,17 @@
 import datetime
 import logging
+import os
 
 from discord.ext import commands
 
 from dotenv import load_dotenv
-from extensions import Extensions
+from jukebot.utils import Extensions
 from jukebot import JukeBot
-import os
-
-from cogs import Utility
-from listeners import ErrorHandler, HelpHandler
+from jukebot.listeners import HelpHandler
 
 
 def main():
+    load_dotenv()
     # setting up logging
     logger = logging.getLogger("discord")
     logger.setLevel(logging.DEBUG)
@@ -26,7 +25,6 @@ def main():
     )
     logger.addHandler(handler)
 
-    load_dotenv()
     # get your bot token and create a key named `TOKEN` to the secrets panel then paste your bot token as the value.
     # to keep your bot from shutting down use https://uptimerobot.com then create a https:// monitor and put the link
     # to the website that appewars when you run this repl in the monitor and it will keep your bot alive by pinging
