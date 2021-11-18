@@ -1,5 +1,10 @@
+<div align="center">
+
+[![JukeBot](juke-logo.png)](#readme)
+</div>
+
 # JukeBot
-Discord bot using py-cord and Poetry
+Discord bot using [Pycord](https://github.com/Pycord-Development/pycord) and [Poetry](https://python-poetry.org/)
 ___
 
 ## Installation
@@ -13,4 +18,4 @@ poetry install
 Rename `.env.example` into `.env`
 
 ## Usage
-Run `poetry run python jukebot/main.py`
+Run `poetry run python bot.py`
