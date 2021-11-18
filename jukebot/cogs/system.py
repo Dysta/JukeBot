@@ -1,6 +1,6 @@
 from discord.ext import commands
 from typing import Optional
-from extensions import Extensions
+from jukebot.utils import Extensions
 
 
 class System(commands.Cog):
@@ -31,7 +31,8 @@ class System(commands.Cog):
         aliases=["rld"],
         brief="Reload a cog or all cogs",
         help="Reload the given cog. If no cog is given, reload all cogs.",
-        usage="reload <cogs_name>",
+        usage="reload [cogs_name]",
+        hidden=True,
     )
     @commands.guild_only()
     async def reload(self, ctx, cog_name: Optional[str] = None):
