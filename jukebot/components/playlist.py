@@ -1,13 +1,13 @@
 from collections import abc
 from dataclasses import dataclass
-from typing import Iterator
+from typing import Iterator, List
 
 from jukebot.components import Song, Request
 
 
 @dataclass
 class Playlist(abc.Collection):
-    songs: list[Song]
+    songs: List[Song]
 
     def __len__(self) -> int:
         return len(self.songs)
@@ -26,7 +26,7 @@ class Playlist(abc.Collection):
 
     @classmethod
     def from_request(cls, request: Request):
-        songs: list[Song] = []
+        songs: List[Song] = []
         for e in request.entries:
             songs.append(Song.from_entry(e))
 
