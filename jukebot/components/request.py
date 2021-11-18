@@ -36,7 +36,8 @@ class Request:
             def downloader(**ytdl_kwargs):
                 return ytdl.extract_info(url=self._query, **ytdl_kwargs)
 
-            info = await asyncio.to_thread(downloader, **ytdl_kwargs)
+            loop = asyncio.get_event_loop()
+            info = await loop.run_in_executor(None, lambda: downloader(**ytdl_kwargs))
 
         # with open("debug.json", "w") as f:
         #     json.dump(info, f)
