@@ -41,7 +41,7 @@ class Player:
         try:
             audio = discord.FFmpegPCMAudio(
                 req.stream_url,
-                executable=_PlayerOption.FFMPEG_EXECUTABLE,
+                executable=_PlayerOption.FFMPEG_EXECUTABLE[platform.system()],
                 pipe=False,
                 stderr=sys.stdout,  # None,  # subprocess.PIPE
                 before_options=_PlayerOption.FFMPEG_BEFORE_OPTIONS,  # "-nostdin",
@@ -130,7 +130,7 @@ class PlayerCollection(abc.MutableMapping):
 
 
 class _PlayerOption:
-    FFMPEG_EXECUTABLE = "./bin/ffmpeg.exe"
+    FFMPEG_EXECUTABLE = {"Linux": "./bin/ffmpeg", "Windows": "./bin/ffmpeg.exe"}
 
     FFMPEG_BEFORE_OPTIONS = " ".join(
         ["-reconnect 1", "-reconnect_streamed 1", "-reconnect_delay_max 3", "-nostdin"]
