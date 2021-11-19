@@ -1,7 +1,14 @@
 import asyncio
 import discord
+import platform
 import sys
 
+from typing import Optional
+
+from discord import VoiceClient, VoiceChannel
+from discord.ext.commands import Context, Bot
+
+from .song import Song
 from .audio_stream import AudioStream
 from collections import abc
 from enum import Enum
@@ -13,34 +20,35 @@ class Player:
         PLAYING = 1
         PAUSED = 2
 
-    def __init__(self, bot, guild_id: int):
-        self.bot = bot
-        self.guild_id = guild_id
+    def __init__(self, bot: Bot, guild_id: int):
+        self.bot: Bot = bot
+        self.guild_id: int = guild_id
 
-        self.voice = None
-        self._current = None
+        self._voice: Optional[VoiceClient] = None
+        self._current: Optional[VoiceClient] = None
+        self._song: Optional[Song] = None
         self._next = asyncio.Event()
         self._queue = asyncio.Queue()
 
-        self._state = Player.State.IDLE
+        self._state: Player.State = Player.State.IDLE
 
-    async def join(self, channel):
-        if self.voice is None or not self.voice.is_connected():
+    async def join(self, channel: VoiceChannel):
+        if self._voice is None or not self._voice.is_connected():
             try:
-                self.voice = await channel.connect()
+                self._voice = await channel.connect()
             except asyncio.TimeoutError:
                 return "Could not connect to the voice channel in time."
             except discord.ClientException:
                 return "Already connected to a voice channel."
-        if self.voice.channel.id != channel.id:
-            await self.voice.move_to(channel)
+        if self._voice.channel.id != channel.id:
+            await self._voice.move_to(channel)
         return True
 
-    async def play(self, ctx, req):
+    async def play(self, ctx: Context, song):
 
         try:
             audio = discord.FFmpegPCMAudio(
-                req.stream_url,
+                song.stream_url,
                 executable=_PlayerOption.FFMPEG_EXECUTABLE[platform.system()],
                 pipe=False,
                 stderr=sys.stdout,  # None,  # subprocess.PIPE
@@ -56,43 +64,48 @@ class Player:
 
         await self.join(ctx.message.author.voice.channel)
 
-        if self.voice and self.voice.is_playing():
-            self.voice.stop()
+        if self._voice and self._voice.is_playing():
+            self._voice.stop()
 
-        self.voice.play(player)
+        self._voice.play(player)
         self._current = player
+        self._song = song
 
     async def disconnect(self):
-        if self.voice:
-            await self.voice.disconnect()
+        if self._voice:
+            await self._voice.disconnect()
 
     def stop(self):
-        if self.voice:
-            self.voice.stop()
+        if self._voice:
+            self._voice.stop()
 
     def pause(self):
-        if self.voice:
-            self.voice.pause()
+        if self._voice:
+            self._voice.pause()
 
     def resume(self):
-        if self.voice:
-            self.voice.resume()
+        if self._voice:
+            self._voice.resume()
 
     @property
-    def current(self):
+    def current(self) -> Optional[AudioStream]:
         return self._current
 
     @property
-    def voice(self):
+    def voice(self) -> Optional[VoiceClient]:
         return self._voice
 
     @voice.setter
-    def voice(self, v):
+    def voice(self, v: VoiceClient):
         self._voice = v
 
     @property
-    def playing(self):
-        return self.current and self.voice
+    def playing(self) -> bool:
+        return bool(self.current and self.voice)
+
+    @property
+    def song(self):
+        return self._song
 
 
 class PlayerCollection(abc.MutableMapping):
