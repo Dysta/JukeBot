@@ -1,18 +1,17 @@
 from dataclasses import dataclass
 from typing import Optional, Any
 
-from jukebot.components import Request
+from .request import Request
 from jukebot.utils import converter
 
 
 @dataclass
 class Song:
-    id: str = Optional[str]
-    title: str = Optional[str]
-    stream_url: str = Optional[str]
-    web_url: str = Optional[str]
-    thumbnail: str = Optional[str]
-    channel: str = Optional[str]
+    title: str = "Unknown"
+    stream_url: Optional[str] = None
+    web_url: str = ""
+    thumbnail: Optional[str] = None
+    channel: str = "Unknown"
     duration: int = 0
     fmt_duration: str = "0:00"
     success: bool = False
@@ -20,7 +19,6 @@ class Song:
 
     def __init__(self, info: dict):
         self.stream_url = info["url"]
-        self.id = info.get("id", -1)
         self.title = info.get("title", "Unknown")
         self.live = info.get("is_live", False)
         self.duration = int(info.get("duration", 0)) if not self.live else 0
