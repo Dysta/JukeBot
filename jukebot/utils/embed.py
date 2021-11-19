@@ -50,7 +50,7 @@ def basic_message(ctx: Context, title="", content=""):
     return embed
 
 
-def music_message(ctx: Context, song: Song):
+def music_message(ctx: Context, song: Song, current_duration: int = 0):
     colors = [0x736DAB, 0xFFBA58]
     c = colors[random.randint(0, 1)]
     embed: discord.Embed = discord.Embed(title="", description="", color=c)
@@ -59,10 +59,18 @@ def music_message(ctx: Context, song: Song):
         url=song.web_url,
         icon_url="https://icons.iconarchive.com/icons/papirus-team/papirus-apps/512/musicbrainz-icon.png",
     )
-    embed.add_field(name="Channel", value=song.channel)
-    embed.add_field(name="Duration", value=song.fmt_duration)
+    embed.add_field(
+        name="Channel", value=song.channel, inline=bool(len(song.title) >= 40)
+    )
+    if current_duration:
+        fmt_current: str = converter.seconds_to_youtube_format(current_duration)
+        embed.add_field(
+            name="Progression", value=f"{fmt_current} / {song.fmt_duration}"
+        )
+    else:
+        embed.add_field(name="Duration", value=song.fmt_duration)
     if song.thumbnail:
-        embed.set_image(url=song.thumbnail)
+        embed.set_thumbnail(url=song.thumbnail)
     embed.set_footer(
         text=f"Requested by {ctx.author}", icon_url=f"{ctx.author.avatar_url}"
     )

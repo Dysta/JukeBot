@@ -2,6 +2,7 @@ from discord.ext import commands
 from discord.ext.commands import Context
 
 from jukebot.components import Player, Request, PlayerCollection
+from jukebot.components.audio_stream import AudioStream
 from jukebot.utils import embed
 from jukebot.components import Song
 
@@ -91,6 +92,24 @@ class Music(commands.Cog):
             e = embed.basic_message(ctx, title="Player resumed")
             await ctx.send(embed=e)
             self._players[ctx.guild.id].resume()
+        else:
+            raise Exception("Player not in container")
+
+    @commands.command(
+        aliases=["np", "now", "now_playing", "curr", "c"],
+        brief="Display the current music",
+        help="Display the current music and the progression from the bot.",
+    )
+    @commands.guild_only()
+    async def current(self, ctx: Context):
+        if ctx.guild.id in self._players:
+            player: Player = self._players[ctx.guild.id]
+            audio: AudioStream = player.current
+            song: Song = player.song
+            e = embed.music_message(
+                ctx, song=song, current_duration=int(audio.progress)
+            )
+            await ctx.send(embed=e)
         else:
             raise Exception("Player not in container")
 

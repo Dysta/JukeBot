@@ -1,11 +1,10 @@
-import discord
-from concurrent.futures import ProcessPoolExecutor
+from discord import FFmpegPCMAudio, AudioSource
 
 
-class AudioStream(discord.AudioSource):
-    def __init__(self, source):
-        self._source = source
-        self._progress = 0
+class AudioStream(AudioSource):
+    def __init__(self, source: FFmpegPCMAudio):
+        self._source: FFmpegPCMAudio = source
+        self._progress: int = 0
 
     def read(self) -> bytes:
         data = self._source.read()
