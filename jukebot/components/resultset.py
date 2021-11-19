@@ -25,7 +25,7 @@ class ResultSet(abc.Collection):
         raise IndexError
 
     @classmethod
-    def from_request(cls, request: Request) -> 'ResultSet':
+    def from_request(cls, request: Request) -> "ResultSet":
         results: List[Result] = []
         for r in request.entries:
             results.append(Result.from_entry(r))

@@ -25,7 +25,7 @@ class SongSet(abc.Collection):
         raise IndexError
 
     @classmethod
-    def from_request(cls, request: Request) -> 'SongSet':
+    def from_request(cls, request: Request) -> "SongSet":
         songs: List[Song] = []
         for e in request.entries:
             songs.append(Song.from_entry(e))
