@@ -73,8 +73,8 @@ class Search(commands.Cog):
 
     @commands.command(
         aliases=["sc", "ssc"],
-        brief="search a song on SoundCloud",
-        help="search a query on SoundCloud and display the 10 first result",
+        brief="Search a song on SoundCloud",
+        help="Search a query on SoundCloud and display the 10 first results",
         usage="<query>",
         hidden=True
     )
@@ -86,8 +86,8 @@ class Search(commands.Cog):
 
     @commands.command(
         aliases=["yt", "syt"],
-        brief="search a song on YouTube",
-        help="search a query on YouTube and display the 10 first result",
+        brief="Search a song on YouTube",
+        help="Search a query on YouTube and display the 10 first results",
         usage="<query>",
     )
     @commands.guild_only()

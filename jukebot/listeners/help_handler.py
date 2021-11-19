@@ -10,7 +10,7 @@ class HelpHandler(commands.HelpCommand):
             "aliases": ["h"],
             "brief": "Show the help message",
             "help": "Display a list of all available commands.\nCan display help for a specific category or command.",
-            "usage": "help [command_name|category_name]",
+            "usage": "[command_name|category_name]",
         }
         super().__init__(command_attrs=opts)
 

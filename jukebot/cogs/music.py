@@ -69,8 +69,8 @@ class Music(commands.Cog):
             raise Exception("Player not in container")
 
     @commands.command(
-        brief="pause the current music",
-        help="pause the current music from the bot without disconnect him.",
+        brief="Pause the current music",
+        help="Pause the current music from the bot without stop it.",
     )
     @commands.guild_only()
     async def pause(self, ctx: Context):
@@ -82,8 +82,8 @@ class Music(commands.Cog):
             raise Exception("Player not in container")
 
     @commands.command(
-        brief="pause the current music",
-        help="pause the current music from the bot without disconnect him.",
+        brief="Resume the current music",
+        help="Resume the current music from the bot.",
     )
     @commands.guild_only()
     async def resume(self, ctx: Context):
