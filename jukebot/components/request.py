@@ -1,7 +1,4 @@
 import asyncio
-import json
-import time
-from datetime import timedelta
 
 import yt_dlp
 

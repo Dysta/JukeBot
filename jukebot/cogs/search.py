@@ -1,7 +1,6 @@
 import asyncio
 import os
 
-import discord
 from discord import Reaction, User
 from discord.ext import commands
 from discord.ext.commands import Context, Bot

@@ -1,5 +1,4 @@
-import discord
-from concurrent.futures import ProcessPoolExecutor
+from discord import FFmpegPCMAudio, AudioSource
 
 
 class AudioStream(discord.AudioSource):
