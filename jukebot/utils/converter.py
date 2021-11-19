@@ -62,3 +62,9 @@ def emoji_to_number(e: str) -> int:
         "🔟": 10,
     }
     return emoji[e]
+
+
+def duration_seconds_to_progress_bar(time: int, total: int, ticks: int = 30) -> str:
+    x = int(ticks * (time / total)) if total else 0
+    line = "".join(["▬" if t != x else "🔘" for t in range(ticks)])
+    return line

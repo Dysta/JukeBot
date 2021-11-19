@@ -63,9 +63,12 @@ def music_message(ctx: Context, song: Song, current_duration: int = 0):
         name="Channel", value=song.channel, inline=bool(len(song.title) >= 40)
     )
     if current_duration:
+        line = converter.duration_seconds_to_progress_bar(
+            current_duration, song.duration
+        )
         fmt_current: str = converter.seconds_to_youtube_format(current_duration)
         embed.add_field(
-            name="Progression", value=f"{fmt_current} / {song.fmt_duration}"
+            name="Progression", value=f"`{fmt_current} {line} {song.fmt_duration}`"
         )
     else:
         embed.add_field(name="Duration", value=song.fmt_duration)
