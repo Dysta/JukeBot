@@ -6,7 +6,7 @@ import yt_dlp
 yt_dlp.utils.bug_reports_message = lambda: ""
 
 
-class Request:
+class Query:
     def __init__(self, query: str):
         self._query: str = query
         self._info: dict = {}
@@ -28,11 +28,10 @@ class Request:
         with yt_dlp.YoutubeDL(params=_RequestOption.YTDL_FORMAT_OPTION) as ytdl:
             ytdl.cache.remove()
 
-            def downloader(**ytdl_kwargs):
-                return ytdl.extract_info(url=self._query, **ytdl_kwargs)
-
             loop = asyncio.get_event_loop()
-            info = await loop.run_in_executor(None, lambda: downloader(**ytdl_kwargs))
+            info = await loop.run_in_executor(
+                None, lambda: ytdl.extract_info(url=self._query, **ytdl_kwargs)
+            )
 
         # with open("debug.json", "w") as f:
         #     json.dump(info, f)

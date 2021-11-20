@@ -2,7 +2,7 @@ from collections import abc
 from dataclasses import dataclass
 from typing import Iterator, List
 
-from jukebot.components import Result, Request
+from jukebot.components import Result, Query
 
 
 @dataclass
@@ -25,9 +25,9 @@ class ResultSet(abc.Collection):
         raise IndexError
 
     @classmethod
-    def from_request(cls, request: Request) -> "ResultSet":
+    def from_query(cls, query: Query) -> "ResultSet":
         results: List[Result] = []
-        for r in request.entries:
+        for r in query.entries:
             results.append(Result.from_entry(r))
 
         return cls(results=results)

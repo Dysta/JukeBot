@@ -5,7 +5,7 @@ from discord import Reaction, User
 from discord.ext import commands
 from discord.ext.commands import Context, Bot
 
-from jukebot.components import Player, Request, PlayerCollection, Song, ResultSet
+from jukebot.components import Player, Query, PlayerCollection, Song, ResultSet
 from jukebot.utils import embed, converter
 
 
@@ -17,9 +17,9 @@ class Search(commands.Cog):
     async def _search_process(self, ctx: Context, query: str, source: str):
         e = embed.music_search_message(ctx, title=f"Searching for {query}..")
         msg = await ctx.send(embed=e)
-        req: Request = Request(f"{source}{query}")
-        await req.search()
-        if not req.success:
+        qry: Query = Query(f"{source}{query}")
+        await qry.search()
+        if not qry.success:
             e = embed.music_not_found_message(
                 ctx,
                 title=f"Nothing found for {query}, sorry..",
@@ -27,7 +27,7 @@ class Search(commands.Cog):
             await msg.edit(embed=e)
             return
 
-        results: ResultSet = ResultSet.from_request(req)
+        results: ResultSet = ResultSet.from_query(qry)
         e = embed.playlist_message(
             ctx,
             playlist=results,
@@ -61,11 +61,9 @@ class Search(commands.Cog):
             await msg.edit(embed=e)
             return
 
-        req: Request = Request(
-            results[converter.emoji_to_number(reaction.emoji) - 1].url
-        )
-        await req.process()
-        song: Song = Song.from_request(req)
+        qry: Query = Query(results[converter.emoji_to_number(reaction.emoji) - 1].url)
+        await qry.process()
+        song: Song = Song.from_query(qry)
         e = embed.music_message(ctx, song)
         await msg.edit(embed=e)
 

@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Optional, Union
 
-from jukebot.components import Request
+from jukebot.components import Query
 from jukebot.utils import converter
 
 
@@ -27,8 +27,8 @@ class Result:
         )
 
     @classmethod
-    def from_request(cls, request: Request, entry: int = 0):
-        info = request.get_entries(entry) if "entries" in request.info else request.info
+    def from_query(cls, query: Query, entry: int = 0):
+        info = query.get_entries(entry) if "entries" in query.info else query.info
         return cls(info=info)
 
     @classmethod

@@ -1,5 +1,5 @@
 from .player import Player, PlayerCollection
-from .request import Request
+from .query import Query
 from .song import Song
 from .result import Result
 from .resultset import ResultSet

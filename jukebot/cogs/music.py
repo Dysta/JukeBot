@@ -1,7 +1,7 @@
 from discord.ext import commands
 from discord.ext.commands import Context
 
-from jukebot.components import Player, Request, PlayerCollection
+from jukebot.components import Player, Query, PlayerCollection
 from jukebot.components.audio_stream import AudioStream
 from jukebot.utils import embed
 from jukebot.components import Song
@@ -22,9 +22,9 @@ class Music(commands.Cog):
     async def play(self, ctx: Context, *, query: str):
         e = embed.music_search_message(ctx, title=f"Searching for {query}..")
         msg = await ctx.send(embed=e)
-        req: Request = Request(query)
-        await req.process()
-        if not req.success:
+        qry: Query = Query(query)
+        await qry.process()
+        if not qry.success:
             e = embed.music_not_found_message(
                 ctx,
                 title=f"Nothing found for {query}, sorry..",
@@ -32,7 +32,7 @@ class Music(commands.Cog):
             await msg.edit(embed=e)
             return
 
-        song: Song = Song.from_request(req)
+        song: Song = Song.from_query(qry)
         e = embed.music_message(ctx, song)
 
         # PlayerContainer create bot if needed
