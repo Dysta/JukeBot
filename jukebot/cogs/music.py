@@ -104,10 +104,10 @@ class Music(commands.Cog):
     async def current(self, ctx: Context):
         if ctx.guild.id in self._players:
             player: Player = self._players[ctx.guild.id]
-            audio: AudioStream = player.current
+            stream: AudioStream = player.stream
             song: Song = player.song
             e = embed.music_message(
-                ctx, song=song, current_duration=int(audio.progress)
+                ctx, song=song, current_duration=int(stream.progress)
             )
             await ctx.send(embed=e)
         else:

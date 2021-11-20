@@ -25,7 +25,7 @@ class Player:
         self.guild_id: int = guild_id
 
         self._voice: Optional[VoiceClient] = None
-        self._current: Optional[AudioStream] = None
+        self._stream: Optional[AudioStream] = None
         self._song: Optional[Song] = None
         self._next = asyncio.Event()
         self._queue = asyncio.Queue()
@@ -59,16 +59,16 @@ class Player:
             print("_play_now", "The subprocess failed to be created")
             return
 
-        player = AudioStream(audio)
-        player.read()
+        stream = AudioStream(audio)
+        stream.read()
 
         await self.join(ctx.message.author.voice.channel)
 
         if self._voice and self._voice.is_playing():
             self._voice.stop()
 
-        self._voice.play(player)
-        self._current = player
+        self._voice.play(stream)
+        self._stream = stream
         self._song = song
 
     async def disconnect(self):
@@ -88,8 +88,8 @@ class Player:
             self._voice.resume()
 
     @property
-    def current(self) -> Optional[AudioStream]:
-        return self._current
+    def stream(self) -> Optional[AudioStream]:
+        return self._stream
 
     @property
     def voice(self) -> Optional[VoiceClient]:
@@ -101,7 +101,7 @@ class Player:
 
     @property
     def playing(self) -> bool:
-        return bool(self.current and self.voice)
+        return bool(self.stream and self.voice)
 
     @property
     def song(self):
