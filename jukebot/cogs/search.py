@@ -1,7 +1,7 @@
 import asyncio
 import os
 
-from discord import Reaction, User
+from discord import Reaction, User, Message
 from discord.ext import commands
 from discord.ext.commands import Context, Bot
 
@@ -34,13 +34,11 @@ class Search(commands.Cog):
             title=f"Result for {query}",
         )
         await msg.edit(embed=e)
-        for i in range(1, len(results) + 1):
-            await msg.add_reaction(f"{converter.number_to_emoji(i)}")
-        await msg.add_reaction(_SearchReaction.CANCEL_REACTION)
+        await SearchInteraction.add_reaction_to_message(msg, len(results))
 
         def check(reaction: Reaction, user: User):
             return (
-                reaction.emoji in _SearchReaction.ALLOWED_REACTION
+                reaction.emoji in SearchInteraction.ALLOWED_REACTION
                 and user == ctx.message.author
             )
 
@@ -51,12 +49,11 @@ class Search(commands.Cog):
                 timeout=float(os.environ["BOT_SEARCH_TIMEOUT"]),
             )
             await msg.clear_reactions()
-            if reaction.emoji == _SearchReaction.CANCEL_REACTION:
-                raise _SearchCanceledException
-            await msg.add_reaction("👍")
+            if reaction.emoji == SearchInteraction.CANCEL_REACTION:
+                raise SearchCanceledException
             await msg.add_reaction(reaction.emoji)
-        except (asyncio.TimeoutError, _SearchCanceledException):
-            e = embed.music_search_message(ctx, title="Research canceled")
+        except (asyncio.TimeoutError, SearchCanceledException):
+            e = embed.music_search_message(ctx, title="Search canceled")
             await msg.clear_reactions()
             await msg.edit(embed=e)
             return
@@ -100,11 +97,11 @@ def setup(bot):
     bot.add_cog(Search(bot))
 
 
-class _SearchCanceledException(Exception):
+class SearchCanceledException(Exception):
     pass
 
 
-class _SearchReaction:
+class SearchInteraction:
     CANCEL_REACTION = "❌"
     ALLOWED_REACTION = [
         "1️⃣",
@@ -119,3 +116,11 @@ class _SearchReaction:
         "🔟",
         CANCEL_REACTION,
     ]
+
+    @staticmethod
+    async def add_reaction_to_message(msg: Message, end: int = None):
+        if not end:
+            end = len(SearchInteraction.ALLOWED_REACTION) - 1
+        for i in range(1, end + 1):
+            await msg.add_reaction(f"{converter.number_to_emoji(i)}")
+        await msg.add_reaction(SearchInteraction.CANCEL_REACTION)

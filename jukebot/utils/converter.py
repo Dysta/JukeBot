@@ -16,22 +16,6 @@ def seconds_to_youtube_format(seconds: int) -> str:
     return time_to_youtube_format(seconds_to_time(seconds))
 
 
-def number_to_str(n: int) -> str:
-    number: dict = {
-        1: "one",
-        2: "two",
-        3: "three",
-        4: "four",
-        5: "five",
-        6: "six",
-        7: "seven",
-        8: "eight",
-        9: "nine",
-        10: "keycap_ten",
-    }
-    return number[n]
-
-
 def number_to_emoji(n: int) -> str:
     number: dict = {
         1: "1️⃣",

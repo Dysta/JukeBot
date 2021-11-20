@@ -110,7 +110,7 @@ def music_not_found_message(ctx: Context, title="", content=""):
 def playlist_message(ctx: Context, playlist: Union[ResultSet, SongSet], title=""):
     content = "\n\n".join(
         [
-            f":{converter.number_to_str(i)}: `{s.title} by {s.channel}` **[{s.fmt_duration}]**"
+            f"{converter.number_to_emoji(i)} `{s.title} by {s.channel}` **[{s.fmt_duration}]**"
             for i, s in enumerate(playlist, start=1)
         ]
     )
