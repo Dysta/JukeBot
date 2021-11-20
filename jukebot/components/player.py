@@ -25,7 +25,7 @@ class Player:
         self.guild_id: int = guild_id
 
         self._voice: Optional[VoiceClient] = None
-        self._current: Optional[VoiceClient] = None
+        self._current: Optional[AudioStream] = None
         self._song: Optional[Song] = None
         self._next = asyncio.Event()
         self._queue = asyncio.Queue()
