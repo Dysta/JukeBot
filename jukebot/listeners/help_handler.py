@@ -1,4 +1,4 @@
-from discord.ext import commands
+from nextcord.ext import commands
 
 import itertools
 from jukebot.utils import embed

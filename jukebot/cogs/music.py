@@ -1,5 +1,6 @@
-from discord.ext import commands
-from discord.ext.commands import Context
+import nextcord
+from nextcord.ext import commands
+from nextcord.ext.commands import Context, BucketType
 
 from jukebot.components import Player, Query, PlayerCollection
 from jukebot.components.audio_stream import AudioStream
@@ -19,6 +20,7 @@ class Music(commands.Cog):
         usage="<url|query_str>",
     )
     @commands.guild_only()
+    @commands.cooldown(1, 5.0, BucketType.user)
     async def play(self, ctx: Context, *, query: str):
         e = embed.music_search_message(ctx, title=f"Searching for {query}..")
         msg = await ctx.send(embed=e)
@@ -112,6 +114,23 @@ class Music(commands.Cog):
             await ctx.send(embed=e)
         else:
             raise Exception("Player not in container")
+
+    @commands.command(
+        aliases=["j", "summon", "invoke"],
+        brief="Connect the bot to your current voice channel",
+        help="Connect the bot to your current voice channel without playing anything",
+    )
+    @commands.guild_only()
+    async def join(self, ctx: Context):
+        if not ctx.message.author.voice.channel:
+            raise nextcord.ClientException("Not in a voice channel")
+
+        player: Player = self._players[ctx.guild.id]
+        await player.join(ctx.message.author.voice.channel)
+        e = embed.basic_message(
+            ctx, title=f"Player joined {ctx.message.author.voice.channel.name}"
+        )
+        await ctx.send(embed=e)
 
 
 def setup(bot):

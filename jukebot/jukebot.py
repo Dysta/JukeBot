@@ -1,12 +1,12 @@
-import discord
+import nextcord
 from datetime import datetime
-from discord.ext import commands
+from nextcord.ext import commands
 
 
 class JukeBot(commands.Bot):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._activity = discord.Game("Juke goes brrr")
+        self._activity = nextcord.Game("Juke goes brrr")
         self._start = None
 
     async def on_ready(self):
@@ -14,7 +14,7 @@ class JukeBot(commands.Bot):
         print("------")
         self._start = datetime.now()
         await self.change_presence(
-            status=discord.Status.online, activity=self._activity
+            status=nextcord.Status.online, activity=self._activity
         )
 
     async def on_error(self, event, *args, **kwargs):

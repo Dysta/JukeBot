@@ -1,12 +1,12 @@
 import asyncio
-import discord
+import nextcord
 import platform
 import sys
 
 from typing import Optional
 
-from discord import VoiceClient, VoiceChannel
-from discord.ext.commands import Context, Bot
+from nextcord import VoiceClient, VoiceChannel
+from nextcord.ext.commands import Context, Bot
 
 from .song import Song
 from .audio_stream import AudioStream
@@ -38,7 +38,7 @@ class Player:
                 self._voice = await channel.connect()
             except asyncio.TimeoutError:
                 return "Could not connect to the voice channel in time."
-            except discord.ClientException:
+            except nextcord.ClientException:
                 return "Already connected to a voice channel."
         if self._voice.channel.id != channel.id:
             await self._voice.move_to(channel)
@@ -47,7 +47,7 @@ class Player:
     async def play(self, ctx: Context, song):
 
         try:
-            audio = discord.FFmpegPCMAudio(
+            audio = nextcord.FFmpegPCMAudio(
                 song.stream_url,
                 executable=_PlayerOption.FFMPEG_EXECUTABLE[platform.system()],
                 pipe=False,
@@ -55,7 +55,7 @@ class Player:
                 before_options=_PlayerOption.FFMPEG_BEFORE_OPTIONS,  # "-nostdin",
                 options=_PlayerOption.FFMPEG_OPTIONS,
             )
-        except discord.ClientException:
+        except nextcord.ClientException:
             print("_play_now", "The subprocess failed to be created")
             return
 

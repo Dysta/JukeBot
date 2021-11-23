@@ -2,7 +2,7 @@ import datetime
 import logging
 import os
 
-from discord.ext import commands
+from nextcord.ext import commands
 
 from dotenv import load_dotenv
 from jukebot.utils import Extensions

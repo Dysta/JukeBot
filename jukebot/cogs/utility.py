@@ -1,10 +1,11 @@
-import discord
+import nextcord
 import typing
 
 from datetime import datetime
 
-from discord.ext import commands
-from discord.ext.commands import Context
+from nextcord.ext import commands
+from nextcord.ext.commands import Context, BucketType
+from nextcord import Member
 
 from jukebot.utils import embed, converter
 
@@ -18,6 +19,7 @@ class Utility(commands.Cog):
         brief="Get info about the bot",
         help="Get information about the bot like the ping and the uptime.",
     )
+    @commands.cooldown(1, 15.0, BucketType.user)
     @commands.guild_only()
     async def info(self, ctx: Context):
         e = embed.info_message(ctx)
@@ -28,7 +30,7 @@ class Utility(commands.Cog):
         )
         e.add_field(
             name="Uptime",
-            value=f"{days} days, {hours} hours, {minutes} minutes and {seconds} seconds",
+            value=f"{days}d, {hours}h, {minutes}m, {seconds}s",
             inline=False,
         )
         await ctx.reply(embed=e)
@@ -37,6 +39,7 @@ class Utility(commands.Cog):
         brief="Check the bot latency",
         help="Return the current latency of the bot.",
     )
+    @commands.cooldown(1, 15.0, BucketType.user)
     @commands.guild_only()
     async def ping(self, ctx: Context):
         e = embed.info_message(ctx, content=f"Pong.. {self.bot.latency * 1000:.2f}ms")
@@ -48,6 +51,7 @@ class Utility(commands.Cog):
         help="Repeat message",
         usage="<message>",
     )
+    @commands.cooldown(1, 5.0, BucketType.user)
     @commands.guild_only()
     async def echo(self, ctx: Context, *, args):
         await ctx.send(args)
@@ -57,11 +61,12 @@ class Utility(commands.Cog):
         help="Display a user avatar in a embed message.\nIf no user is provided, it will show the command invoker avatar.",
         usage="[member]",
     )
+    @commands.cooldown(1, 5.0, BucketType.user)
     @commands.guild_only()
-    async def avatar(self, ctx: Context, who: typing.Optional[discord.Member] = None):
-        who = ctx.author if who is None else who
+    async def avatar(self, ctx: Context, who: typing.Optional[Member] = None):
+        who: Member = ctx.author if who is None else who
         e = embed.basic_message(ctx, title=f"{who}'s avatar")
-        e.set_image(url=who.avatar_url)
+        e.set_image(url=who.display_avatar.url)
         await ctx.send(embed=e)
 
     @commands.command(hidden=True)

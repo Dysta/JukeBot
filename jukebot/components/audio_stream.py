@@ -1,4 +1,4 @@
-from discord import FFmpegPCMAudio, AudioSource
+from nextcord import FFmpegPCMAudio, AudioSource
 
 
 class AudioStream(AudioSource):

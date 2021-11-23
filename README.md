@@ -4,7 +4,7 @@
 </div>
 
 # JukeBot
-Discord bot using [Pycord](https://github.com/Pycord-Development/pycord) and [Poetry](https://python-poetry.org/)
+Discord bot using [Nextcord](https://github.com/nextcord/nextcord/) and [Poetry](https://python-poetry.org/)
 ___
 
 ## Installation

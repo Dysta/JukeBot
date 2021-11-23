@@ -1,9 +1,9 @@
 import asyncio
 import os
 
-from discord import Reaction, User, Message
-from discord.ext import commands
-from discord.ext.commands import Context, Bot
+from nextcord import Reaction, User, Message
+from nextcord.ext import commands
+from nextcord.ext.commands import Context, Bot, BucketType
 
 from jukebot.components import Player, Query, PlayerCollection, Song, ResultSet
 from jukebot.utils import embed, converter
@@ -37,10 +37,11 @@ class Search(commands.Cog):
         await SearchInteraction.add_reaction_to_message(msg, len(results))
 
         def check(reaction: Reaction, user: User):
-            return (
-                reaction.emoji in SearchInteraction.ALLOWED_REACTION
-                and user == ctx.message.author
-            )
+            if user != ctx.message.author:
+                return False
+            if reaction.emoji == SearchInteraction.CANCEL_REACTION:
+                raise SearchCanceledException
+            return reaction.emoji in SearchInteraction.ALLOWED_REACTION
 
         try:
             reaction, user = await self.bot.wait_for(
@@ -49,8 +50,6 @@ class Search(commands.Cog):
                 timeout=float(os.environ["BOT_SEARCH_TIMEOUT"]),
             )
             await msg.clear_reactions()
-            if reaction.emoji == SearchInteraction.CANCEL_REACTION:
-                raise SearchCanceledException
             await msg.add_reaction(reaction.emoji)
         except (asyncio.TimeoutError, SearchCanceledException):
             e = embed.music_search_message(ctx, title="Search canceled")
@@ -76,6 +75,8 @@ class Search(commands.Cog):
         usage="<query>",
         hidden=True,
     )
+    @commands.max_concurrency(1, BucketType.user)
+    @commands.cooldown(1, 3.0, BucketType.user)
     @commands.guild_only()
     async def soundcloud(self, ctx: Context, *, query: str):
         raise NotImplementedError
@@ -88,6 +89,8 @@ class Search(commands.Cog):
         help="Search a query on YouTube and display the 10 first results",
         usage="<query>",
     )
+    @commands.max_concurrency(1, BucketType.user)
+    @commands.cooldown(1, 3.0, BucketType.user)
     @commands.guild_only()
     async def youtube(self, ctx: Context, *, query: str):
         await self._search_process(ctx, query, "ytsearch10:")
