@@ -5,6 +5,7 @@ from nextcord import Reaction, User, Message
 from nextcord.ext import commands
 from nextcord.ext.commands import Context, Bot, BucketType
 
+from jukebot.checks import VoiceChecks
 from jukebot.components import Player, Query, PlayerCollection, Song, ResultSet
 from jukebot.utils import embed, converter
 
@@ -78,6 +79,7 @@ class Search(commands.Cog):
     @commands.max_concurrency(1, BucketType.user)
     @commands.cooldown(1, 3.0, BucketType.user)
     @commands.guild_only()
+    @commands.check(VoiceChecks.user_is_connected)
     async def soundcloud(self, ctx: Context, *, query: str):
         raise NotImplementedError
         # issue with yt_dlp, scsearch never stop, even if we put the option 'playlistend'
@@ -92,6 +94,7 @@ class Search(commands.Cog):
     @commands.max_concurrency(1, BucketType.user)
     @commands.cooldown(1, 3.0, BucketType.user)
     @commands.guild_only()
+    @commands.check(VoiceChecks.user_is_connected)
     async def youtube(self, ctx: Context, *, query: str):
         await self._search_process(ctx, query, "ytsearch10:")
 
