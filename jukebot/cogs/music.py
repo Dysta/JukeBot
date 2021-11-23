@@ -109,7 +109,7 @@ class Music(commands.Cog):
             stream: AudioStream = player.stream
             song: Song = player.song
             e = embed.music_message(
-                ctx, song=song, current_duration=int(stream.progress)
+                ctx, song=song, current_duration=stream.progress
             )
             await ctx.send(embed=e)
         else:

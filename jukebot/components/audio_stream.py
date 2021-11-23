@@ -16,6 +16,6 @@ class AudioStream(AudioSource):
         self._source.cleanup()
 
     @property
-    def progress(self) -> float:
+    def progress(self) -> int:
         # 20ms
-        return self._progress * 0.02
+        return int(self._progress * 0.02)
