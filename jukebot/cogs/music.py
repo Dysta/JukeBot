@@ -1,11 +1,9 @@
-import nextcord
 from nextcord.ext import commands
 from nextcord.ext.commands import Context, BucketType
 
-from jukebot.components import Player, Query, PlayerCollection
-from jukebot.components.audio_stream import AudioStream
+from jukebot.checks import VoiceChecks
+from jukebot.components import Player, Query, PlayerCollection, Song, AudioStream
 from jukebot.utils import embed
-from jukebot.components import Song
 
 
 class Music(commands.Cog):
@@ -21,6 +19,7 @@ class Music(commands.Cog):
     )
     @commands.guild_only()
     @commands.cooldown(1, 5.0, BucketType.user)
+    @commands.check(VoiceChecks.user_is_connected)
     async def play(self, ctx: Context, *, query: str):
         e = embed.music_search_message(ctx, title=f"Searching for {query}..")
         msg = await ctx.send(embed=e)
@@ -48,54 +47,50 @@ class Music(commands.Cog):
         help="Disconnect the bot from the current connected voice channel.",
     )
     @commands.guild_only()
+    @commands.check(VoiceChecks.bot_is_connected)
+    @commands.check(VoiceChecks.bot_and_user_in_same_channel)
     async def leave(self, ctx: Context):
-        if ctx.guild.id in self._players:
-            e = embed.basic_message(ctx, title="Player disconnected")
-            await ctx.send(embed=e)
-            await self._players[ctx.guild.id].disconnect()
-            # once the bot leave, we destroy is ref from the container
-            del self._players[ctx.guild.id]
-        else:
-            raise Exception("Player not in container")
+        e = embed.basic_message(ctx, title="Player disconnected")
+        await ctx.send(embed=e)
+        await self._players[ctx.guild.id].disconnect()
+        # once the bot leave, we destroy is ref from the container
+        del self._players[ctx.guild.id]
 
     @commands.command(
         brief="Stop the current music",
         help="Stop the current music from the bot without disconnect him.",
     )
     @commands.guild_only()
+    @commands.check(VoiceChecks.bot_is_connected)
+    @commands.check(VoiceChecks.bot_and_user_in_same_channel)
     async def stop(self, ctx: Context):
-        if ctx.guild.id in self._players:
-            e = embed.basic_message(ctx, title="Player stopped")
-            await ctx.send(embed=e)
-            self._players[ctx.guild.id].stop()
-        else:
-            raise Exception("Player not in container")
+        e = embed.basic_message(ctx, title="Player stopped")
+        await ctx.send(embed=e)
+        self._players[ctx.guild.id].stop()
 
     @commands.command(
         brief="Pause the current music",
         help="Pause the current music from the bot without stop it.",
     )
     @commands.guild_only()
+    @commands.check(VoiceChecks.bot_is_connected)
+    @commands.check(VoiceChecks.bot_and_user_in_same_channel)
     async def pause(self, ctx: Context):
-        if ctx.guild.id in self._players:
-            e = embed.basic_message(ctx, title="Player paused")
-            await ctx.send(embed=e)
-            self._players[ctx.guild.id].pause()
-        else:
-            raise Exception("Player not in container")
+        e = embed.basic_message(ctx, title="Player paused")
+        await ctx.send(embed=e)
+        self._players[ctx.guild.id].pause()
 
     @commands.command(
         brief="Resume the current music",
         help="Resume the current music from the bot.",
     )
     @commands.guild_only()
+    @commands.check(VoiceChecks.bot_is_connected)
+    @commands.check(VoiceChecks.bot_and_user_in_same_channel)
     async def resume(self, ctx: Context):
-        if ctx.guild.id in self._players:
-            e = embed.basic_message(ctx, title="Player resumed")
-            await ctx.send(embed=e)
-            self._players[ctx.guild.id].resume()
-        else:
-            raise Exception("Player not in container")
+        e = embed.basic_message(ctx, title="Player resumed")
+        await ctx.send(embed=e)
+        self._players[ctx.guild.id].resume()
 
     @commands.command(
         aliases=["np", "now", "now_playing", "curr", "c"],
@@ -103,17 +98,14 @@ class Music(commands.Cog):
         help="Display the current music and the progression from the bot.",
     )
     @commands.guild_only()
+    @commands.check(VoiceChecks.bot_is_connected)
+    @commands.check(VoiceChecks.bot_and_user_in_same_channel)
     async def current(self, ctx: Context):
-        if ctx.guild.id in self._players:
-            player: Player = self._players[ctx.guild.id]
-            stream: AudioStream = player.stream
-            song: Song = player.song
-            e = embed.music_message(
-                ctx, song=song, current_duration=stream.progress
-            )
-            await ctx.send(embed=e)
-        else:
-            raise Exception("Player not in container")
+        player: Player = self._players[ctx.guild.id]
+        stream: AudioStream = player.stream
+        song: Song = player.song
+        e = embed.music_message(ctx, song=song, current_duration=stream.progress)
+        await ctx.send(embed=e)
 
     @commands.command(
         aliases=["j", "summon", "invoke"],
@@ -121,10 +113,9 @@ class Music(commands.Cog):
         help="Connect the bot to your current voice channel without playing anything",
     )
     @commands.guild_only()
+    @commands.check(VoiceChecks.user_is_connected)
+    @commands.check(VoiceChecks.bot_and_user_in_same_channel)
     async def join(self, ctx: Context):
-        if not ctx.message.author.voice.channel:
-            raise nextcord.ClientException("Not in a voice channel")
-
         player: Player = self._players[ctx.guild.id]
         await player.join(ctx.message.author.voice.channel)
         e = embed.basic_message(

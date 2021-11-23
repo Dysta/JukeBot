@@ -1,4 +1,3 @@
-import nextcord
 import typing
 
 from datetime import datetime
