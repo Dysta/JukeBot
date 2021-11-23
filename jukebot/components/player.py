@@ -1,4 +1,6 @@
 import asyncio
+from threading import Lock
+
 import nextcord
 import platform
 import sys
@@ -110,11 +112,13 @@ class Player:
 
 class PlayerCollection(abc.MutableMapping):
     _instance = None
+    _lock: Lock = Lock()
 
     def __new__(cls, bot):
-        if cls._instance is None:
-            cls._instance = super(PlayerCollection, cls).__new__(cls)
-            cls.bot = bot
+        with cls._lock:
+            if cls._instance is None:
+                cls._instance = super(PlayerCollection, cls).__new__(cls)
+                cls.bot = bot
         return cls._instance
 
     def __contains__(self, key):
