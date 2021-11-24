@@ -1,13 +1,14 @@
-import asyncio
 import os
+from typing import Optional
 
-from nextcord import Reaction, User, Message
+import nextcord.ui
+from nextcord import Interaction, Message
 from nextcord.ext import commands
 from nextcord.ext.commands import Context, Bot, BucketType
 
 from jukebot.checks import VoiceChecks
-from jukebot.components import Player, Query, PlayerCollection, Song, ResultSet
-from jukebot.utils import embed, converter
+from jukebot.components import PlayerCollection, Query, ResultSet, Song
+from jukebot.utils import embed
 
 
 class Search(commands.Cog):
@@ -15,7 +16,26 @@ class Search(commands.Cog):
         self.bot: Bot = bot
         self._players: PlayerCollection = PlayerCollection(bot)
 
-    async def _search_process(self, ctx: Context, query: str, source: str):
+    async def _single_search_process(
+        self, ctx: Context, query: str
+    ) -> tuple[Message, Optional[Song]]:
+        e = embed.music_search_message(ctx, title=f"Searching for {query}..")
+        msg = await ctx.send(embed=e)
+        qry: Query = Query(query)
+        await qry.process()
+        if not qry.success:
+            e = embed.music_not_found_message(
+                ctx,
+                title=f"Nothing found for {query}, sorry..",
+            )
+            await msg.edit(embed=e)
+            return msg, None
+        song: Song = Song.from_query(qry)
+        return msg, song
+
+    async def _search_process(
+        self, ctx: Context, query: str, source: str
+    ) -> tuple[Message, Optional[ResultSet]]:
         e = embed.music_search_message(ctx, title=f"Searching for {query}..")
         msg = await ctx.send(embed=e)
         qry: Query = Query(f"{source}{query}")
@@ -26,48 +46,10 @@ class Search(commands.Cog):
                 title=f"Nothing found for {query}, sorry..",
             )
             await msg.edit(embed=e)
-            return
+            return msg, None
 
         results: ResultSet = ResultSet.from_query(qry)
-        e = embed.playlist_message(
-            ctx,
-            playlist=results,
-            title=f"Result for {query}",
-        )
-        await msg.edit(embed=e)
-        await SearchInteraction.add_reaction_to_message(msg, len(results))
-
-        def check(reaction: Reaction, user: User):
-            if user != ctx.message.author:
-                return False
-            if reaction.emoji == SearchInteraction.CANCEL_REACTION:
-                raise SearchCanceledException
-            return reaction.emoji in SearchInteraction.ALLOWED_REACTION
-
-        try:
-            reaction, user = await self.bot.wait_for(
-                "reaction_add",
-                check=check,
-                timeout=float(os.environ["BOT_SEARCH_TIMEOUT"]),
-            )
-            await msg.clear_reactions()
-            await msg.add_reaction(reaction.emoji)
-        except (asyncio.TimeoutError, SearchCanceledException):
-            e = embed.music_search_message(ctx, title="Search canceled")
-            await msg.clear_reactions()
-            await msg.edit(embed=e)
-            return
-
-        qry: Query = Query(results[converter.emoji_to_number(reaction.emoji) - 1].web_url)
-        await qry.process()
-        song: Song = Song.from_query(qry)
-        e = embed.music_message(ctx, song)
-        await msg.edit(embed=e)
-
-        # PlayerContainer create bot if needed
-        player: Player = self._players[ctx.guild.id]
-        await player.play(ctx, song)
-        await msg.clear_reactions()
+        return msg, results
 
     @commands.command(
         aliases=["sc", "ssc"],
@@ -96,7 +78,25 @@ class Search(commands.Cog):
     @commands.guild_only()
     @commands.check(VoiceChecks.user_is_connected)
     async def youtube(self, ctx: Context, *, query: str):
-        await self._search_process(ctx, query, "ytsearch10:")
+        msg, results = await self._search_process(ctx, query, "ytsearch10:")
+        e = embed.playlist_message(
+            ctx,
+            playlist=results,
+            title=f"Result for {query}",
+        )
+        v = SearchDropdownView(ctx, results)
+        await msg.edit(embed=e, view=v)
+        await v.wait()
+        r: str = v.result
+        if r == "Cancel":
+            e = embed.music_not_found_message(
+                ctx,
+                title=f"Search canceled",
+            )
+            await msg.edit(embed=e)
+            return
+        await msg.delete()
+        await self.bot.get_cog("Music").play(context=ctx, query=v.result)
 
 
 def setup(bot):
@@ -109,7 +109,7 @@ class SearchCanceledException(Exception):
 
 class SearchInteraction:
     CANCEL_REACTION = "❌"
-    ALLOWED_REACTION = [
+    NUMBER_REACTION = [
         "1️⃣",
         "2️⃣",
         "3️⃣",
@@ -120,13 +120,53 @@ class SearchInteraction:
         "8️⃣",
         "9️⃣",
         "🔟",
-        CANCEL_REACTION,
     ]
 
-    @staticmethod
-    async def add_reaction_to_message(msg: Message, end: int = None):
-        if not end:
-            end = len(SearchInteraction.ALLOWED_REACTION) - 1
-        for i in range(1, end + 1):
-            await msg.add_reaction(f"{converter.number_to_emoji(i)}")
-        await msg.add_reaction(SearchInteraction.CANCEL_REACTION)
+
+class SearchDropdown(nextcord.ui.Select):
+    def __init__(self, results: ResultSet):
+        self._results = results
+        options = [
+            nextcord.SelectOption(
+                label=r.title,
+                value=r.web_url,
+                description=f"on {r.channel} [{r.fmt_duration}]",
+                emoji=SearchInteraction.NUMBER_REACTION[i],
+            )
+            for i, r in enumerate(results)
+        ]
+        options.append(
+            nextcord.SelectOption(
+                label="Cancel",
+                value="Cancel",
+                description="Cancel the current search",
+                emoji=SearchInteraction.CANCEL_REACTION,
+            )
+        )
+
+        super().__init__(
+            placeholder="Choose a song...",
+            min_values=1,
+            max_values=1,
+            options=options,
+        )
+
+
+class SearchDropdownView(nextcord.ui.View):
+    def __init__(self, ctx: Context, results: ResultSet):
+        super().__init__(timeout=float(os.environ["BOT_SEARCH_TIMEOUT"]))
+        self._ctx = ctx
+        self._drop = SearchDropdown(results)
+        self.add_item(self._drop)
+
+    async def interaction_check(self, interaction: Interaction):
+        if self._ctx.author != interaction.user:
+            return
+        await interaction.response.edit_message(
+            content=embed.VOID_TOKEN, embed=None, view=None
+        )
+        self.stop()
+
+    @property
+    def result(self):
+        return self._drop.values[0]

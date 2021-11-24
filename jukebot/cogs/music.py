@@ -1,14 +1,14 @@
 from nextcord.ext import commands
-from nextcord.ext.commands import Context, BucketType
+from nextcord.ext.commands import Context, BucketType, Bot
 
 from jukebot.checks import VoiceChecks
-from jukebot.components import Player, Query, PlayerCollection, Song, AudioStream
+from jukebot.components import AudioStream, Player, PlayerCollection, Song
 from jukebot.utils import embed
 
 
 class Music(commands.Cog):
     def __init__(self, bot):
-        self.bot = bot
+        self.bot: Bot = bot
         self._players: PlayerCollection = PlayerCollection(bot)
 
     @commands.command(
@@ -21,25 +21,17 @@ class Music(commands.Cog):
     @commands.cooldown(1, 5.0, BucketType.user)
     @commands.check(VoiceChecks.user_is_connected)
     async def play(self, ctx: Context, *, query: str):
-        e = embed.music_search_message(ctx, title=f"Searching for {query}..")
-        msg = await ctx.send(embed=e)
-        qry: Query = Query(query)
-        await qry.process()
-        if not qry.success:
-            e = embed.music_not_found_message(
-                ctx,
-                title=f"Nothing found for {query}, sorry..",
+        async with ctx.typing():
+            msg, song = await self.bot.get_cog("Search")._single_search_process(
+                ctx=ctx, query=query
             )
-            await msg.edit(embed=e)
-            return
+            if song:
+                e = embed.music_message(ctx, song)
 
-        song: Song = Song.from_query(qry)
-        e = embed.music_message(ctx, song)
-
-        # PlayerContainer create bot if needed
-        player: Player = self._players[ctx.guild.id]
-        await player.play(ctx, song)
-        await msg.edit(embed=e)
+                # PlayerContainer create bot if needed
+                player: Player = self._players[ctx.guild.id]
+                await player.play(ctx, song)
+                await msg.edit(embed=e)
 
     @commands.command(
         aliases=["l"],
