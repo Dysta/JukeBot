@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from typing import Optional, Union
 
 from jukebot.components import Query
 from jukebot.utils import converter
@@ -7,8 +6,7 @@ from jukebot.utils import converter
 
 @dataclass
 class Result:
-    id: Optional[Union[str, int]]
-    url: str
+    web_url: str
     title: str
     channel: str
     duration: int = 0
@@ -16,8 +14,7 @@ class Result:
     live: bool = False
 
     def __init__(self, info: dict):
-        self.url = info["url"]
-        self.id = info.get("id", -1)
+        self.web_url = info["url"]
         self.title = info.get("title", "Unknown")
         self.channel = info.get("channel", info.get("uploader", "Unknown"))
         self.duration = int(info.get("duration", 0) or 0)

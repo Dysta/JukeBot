@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Optional, Any
+from typing import Optional
 
 from .query import Query
 from jukebot.utils import converter
@@ -14,8 +14,7 @@ class Song:
     channel: str = "Unknown"
     duration: int = 0
     fmt_duration: str = "0:00"
-    success: bool = False
-    live: Any = None
+    live: bool = False
 
     def __init__(self, info: dict):
         self.stream_url = info["url"]

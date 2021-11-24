@@ -11,7 +11,6 @@ class Query:
         self._query: str = query
         self._info: dict = {}
         self._success: bool = False
-        self._extra_info: dict = {"id": -1, "title": "Unknown", "uploader": "Unknown"}
 
     async def search(self):
         await self._get(process=False)
@@ -23,7 +22,6 @@ class Query:
         ytdl_kwargs = dict(
             download=False,
             process=process,
-            extra_info=self._extra_info if not process else None,
         )
         with yt_dlp.YoutubeDL(params=_RequestOption.YTDL_FORMAT_OPTION) as ytdl:
             ytdl.cache.remove()

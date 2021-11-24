@@ -58,7 +58,7 @@ class Search(commands.Cog):
             await msg.edit(embed=e)
             return
 
-        qry: Query = Query(results[converter.emoji_to_number(reaction.emoji) - 1].url)
+        qry: Query = Query(results[converter.emoji_to_number(reaction.emoji) - 1].web_url)
         await qry.process()
         song: Song = Song.from_query(qry)
         e = embed.music_message(ctx, song)
