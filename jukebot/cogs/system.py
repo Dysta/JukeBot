@@ -1,6 +1,9 @@
 from nextcord.ext import commands
 from typing import Optional
-from jukebot.utils import Extensions
+
+from nextcord.ext.commands import Context
+
+from jukebot.utils import Extensions, embed
 
 
 class System(commands.Cog):
@@ -35,6 +38,7 @@ class System(commands.Cog):
         hidden=True,
     )
     @commands.guild_only()
+    @commands.has_permissions(administrator=True)
     async def reload(self, ctx, cog_name: Optional[str] = None):
         try:
             if cog_name is None:
@@ -45,6 +49,30 @@ class System(commands.Cog):
             await ctx.message.add_reaction("❌")
             raise
         await ctx.message.add_reaction("✅")
+
+    @commands.command(
+        aliases=["pfx"],
+        brief="Change the prefix of the bot",
+        help="Set a new prefix for the bot.\nIf no prefix are given, sends the current server prefix.",
+        usage="[prefix]",
+    )
+    @commands.guild_only()
+    @commands.has_permissions(administrator=True)
+    async def prefix(self, ctx: Context, prefix: Optional[str] = None):
+        if prefix:
+            self.bot.prefixes[str(ctx.guild.id)] = prefix
+            e = embed.basic_message(
+                ctx,
+                title="Prefix changed!",
+                content=f"Prefix is set to `{prefix}` for server `{ctx.guild.name}`",
+            )
+            await ctx.send(embed=e)
+        else:
+            e = embed.basic_message(
+                ctx,
+                content=f"Prefix for `{ctx.guild.name}` is `{self.bot.prefixes[str(ctx.guild.id)]}`",
+            )
+            await ctx.send(embed=e)
 
 
 def setup(bot):
