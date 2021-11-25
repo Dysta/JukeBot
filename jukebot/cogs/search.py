@@ -1,32 +1,30 @@
 import asyncio
 import os
 
-from nextcord import Reaction, User, Message
+from nextcord import Message, Reaction, User
 from nextcord.ext import commands
 from nextcord.ext.commands import Context, Bot, BucketType
 
 from jukebot.checks import VoiceChecks
-from jukebot.components import Player, Query, PlayerCollection, Song, ResultSet
+from jukebot.components import Query, ResultSet
 from jukebot.utils import embed, converter
 
 
 class Search(commands.Cog):
     def __init__(self, bot):
         self.bot: Bot = bot
-        self._players: PlayerCollection = PlayerCollection(bot)
 
     async def _search_process(self, ctx: Context, query: str, source: str):
-        e = embed.music_search_message(ctx, title=f"Searching for {query}..")
-        msg = await ctx.send(embed=e)
-        qry: Query = Query(f"{source}{query}")
-        await qry.search()
-        if not qry.success:
-            e = embed.music_not_found_message(
-                ctx,
-                title=f"Nothing found for {query}, sorry..",
-            )
-            await msg.edit(embed=e)
-            return
+        with ctx.typing():
+            qry: Query = Query(f"{source}{query}")
+            await qry.search()
+            if not qry.success:
+                e = embed.music_not_found_message(
+                    ctx,
+                    title=f"Nothing found for {query}, sorry..",
+                )
+                await ctx.send(embed=e)
+                return
 
         results: ResultSet = ResultSet.from_query(qry)
         e = embed.playlist_message(
@@ -34,7 +32,7 @@ class Search(commands.Cog):
             playlist=results,
             title=f"Result for {query}",
         )
-        await msg.edit(embed=e)
+        msg = await ctx.send(embed=e)
         await SearchInteraction.add_reaction_to_message(msg, len(results))
 
         def check(reaction: Reaction, user: User):
@@ -58,16 +56,11 @@ class Search(commands.Cog):
             await msg.edit(embed=e)
             return
 
-        qry: Query = Query(results[converter.emoji_to_number(reaction.emoji) - 1].web_url)
-        await qry.process()
-        song: Song = Song.from_query(qry)
-        e = embed.music_message(ctx, song)
-        await msg.edit(embed=e)
-
-        # PlayerContainer create bot if needed
-        player: Player = self._players[ctx.guild.id]
-        await player.play(ctx, song)
-        await msg.clear_reactions()
+        await self.bot.get_cog("Music").play(
+            context=ctx,
+            query=results[converter.emoji_to_number(reaction.emoji) - 1].web_url,
+        )
+        await msg.delete()
 
     @commands.command(
         aliases=["sc", "ssc"],

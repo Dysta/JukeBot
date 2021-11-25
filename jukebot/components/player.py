@@ -64,8 +64,6 @@ class Player:
         stream = AudioStream(audio)
         stream.read()
 
-        await self.join(ctx.message.author.voice.channel)
-
         if self._voice and self._voice.is_playing():
             self._voice.stop()
 
@@ -104,6 +102,10 @@ class Player:
     @property
     def playing(self) -> bool:
         return bool(self.stream and self.voice)
+
+    @property
+    def connected(self) -> bool:
+        return bool(self._voice)
 
     @property
     def song(self):

@@ -21,25 +21,26 @@ class Music(commands.Cog):
     @commands.cooldown(1, 5.0, BucketType.user)
     @commands.check(VoiceChecks.user_is_connected)
     async def play(self, ctx: Context, *, query: str):
-        e = embed.music_search_message(ctx, title=f"Searching for {query}..")
-        msg = await ctx.send(embed=e)
-        qry: Query = Query(query)
-        await qry.process()
-        if not qry.success:
-            e = embed.music_not_found_message(
-                ctx,
-                title=f"Nothing found for {query}, sorry..",
-            )
-            await msg.edit(embed=e)
-            return
+        with ctx.typing():
+            qry: Query = Query(query)
+            await qry.process()
+            if not qry.success:
+                e = embed.music_not_found_message(
+                    ctx,
+                    title=f"Nothing found for {query}, sorry..",
+                )
+                await ctx.send(embed=e)
+                return
 
         song: Song = Song.from_query(qry)
         e = embed.music_message(ctx, song)
 
         # PlayerContainer create bot if needed
         player: Player = self._players[ctx.guild.id]
+        if not player.connected:
+            await ctx.invoke(self.join)
         await player.play(ctx, song)
-        await msg.edit(embed=e)
+        await ctx.send(embed=e)
 
     @commands.command(
         aliases=["l"],
@@ -64,9 +65,9 @@ class Music(commands.Cog):
     @commands.check(VoiceChecks.bot_is_connected)
     @commands.check(VoiceChecks.bot_and_user_in_same_channel)
     async def stop(self, ctx: Context):
+        self._players[ctx.guild.id].stop()
         e = embed.basic_message(ctx, title="Player stopped")
         await ctx.send(embed=e)
-        self._players[ctx.guild.id].stop()
 
     @commands.command(
         brief="Pause the current music",
@@ -76,9 +77,9 @@ class Music(commands.Cog):
     @commands.check(VoiceChecks.bot_is_connected)
     @commands.check(VoiceChecks.bot_and_user_in_same_channel)
     async def pause(self, ctx: Context):
+        self._players[ctx.guild.id].pause()
         e = embed.basic_message(ctx, title="Player paused")
         await ctx.send(embed=e)
-        self._players[ctx.guild.id].pause()
 
     @commands.command(
         brief="Resume the current music",
@@ -88,9 +89,9 @@ class Music(commands.Cog):
     @commands.check(VoiceChecks.bot_is_connected)
     @commands.check(VoiceChecks.bot_and_user_in_same_channel)
     async def resume(self, ctx: Context):
+        self._players[ctx.guild.id].resume()
         e = embed.basic_message(ctx, title="Player resumed")
         await ctx.send(embed=e)
-        self._players[ctx.guild.id].resume()
 
     @commands.command(
         aliases=["np", "now", "now_playing", "curr", "c"],
@@ -114,7 +115,7 @@ class Music(commands.Cog):
     )
     @commands.guild_only()
     @commands.check(VoiceChecks.user_is_connected)
-    @commands.check(VoiceChecks.bot_and_user_in_same_channel)
+    @commands.check(VoiceChecks.bot_is_not_connected)
     async def join(self, ctx: Context):
         player: Player = self._players[ctx.guild.id]
         await player.join(ctx.message.author.voice.channel)
