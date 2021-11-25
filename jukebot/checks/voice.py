@@ -26,6 +26,16 @@ class VoiceChecks:
         return True
 
     @staticmethod
+    async def bot_is_not_connected(ctx: Context):
+        if ctx.guild.voice_client:
+            e: Embed = embed.error_message(
+                ctx, content="The bot is already connected to a voice channel."
+            )
+            await ctx.send(embed=e)
+            return False
+        return True
+
+    @staticmethod
     async def bot_and_user_in_same_channel(ctx: Context):
         b_conn: bool = await VoiceChecks.bot_is_connected(ctx)
         u_conn: bool = await VoiceChecks.user_is_connected(ctx)
