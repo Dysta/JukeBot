@@ -12,7 +12,7 @@ class HelpHandler(commands.HelpCommand):
             "help": "Display a list of all available commands.\nCan display help for a specific category or command.",
             "usage": "[command_name|category_name]",
         }
-        super().__init__(command_attrs=opts)
+        super().__init__(verify_checks=False, command_attrs=opts)
 
     def get_ending_note(self):
         command_name = self.invoked_with
