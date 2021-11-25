@@ -1,4 +1,5 @@
 import nextcord
+import os
 from datetime import datetime
 from nextcord.ext import commands
 
@@ -6,7 +7,7 @@ from nextcord.ext import commands
 class JukeBot(commands.Bot):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._activity = nextcord.Game("Juke goes brrr")
+        self._activity = nextcord.Game(f"{os.environ['BOT_PREFIX']}help")
         self._start = None
 
     async def on_ready(self):
