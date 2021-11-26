@@ -1,13 +1,13 @@
-import asyncio
 import os
 
-from nextcord import Message, Reaction, User
+import nextcord.ui
+from nextcord import Interaction
 from nextcord.ext import commands
 from nextcord.ext.commands import Context, Bot, BucketType
 
 from jukebot.checks import VoiceChecks
 from jukebot.components import Query, ResultSet
-from jukebot.utils import embed, converter
+from jukebot.utils import embed
 
 
 class Search(commands.Cog):
@@ -33,35 +33,21 @@ class Search(commands.Cog):
                 playlist=results,
                 title=f"Result for {query}",
             )
-        msg = await ctx.send(embed=e)
-        await SearchInteraction.add_reaction_to_message(msg, len(results))
 
-        def check(reaction: Reaction, user: User):
-            if user != ctx.message.author:
-                return False
-            if reaction.emoji == SearchInteraction.CANCEL_REACTION:
-                raise SearchCanceledException
-            return reaction.emoji in SearchInteraction.ALLOWED_REACTION
-
-        try:
-            reaction, user = await self.bot.wait_for(
-                "reaction_add",
-                check=check,
-                timeout=float(os.environ["BOT_SEARCH_TIMEOUT"]),
+        v = SearchDropdownView(ctx, results)
+        msg = await ctx.send(embed=e, view=v)
+        await v.wait()
+        await msg.edit(embed=e, view=None)
+        result: str = v.result
+        if result == "Cancel":
+            e = embed.music_search_message(
+                ctx,
+                title=f"Search canceled",
             )
-            await msg.clear_reactions()
-            await msg.add_reaction(reaction.emoji)
-        except (asyncio.TimeoutError, SearchCanceledException):
-            e = embed.music_search_message(ctx, title="Search canceled")
-            await msg.clear_reactions()
             await msg.edit(embed=e)
             await msg.delete(delay=5.0)
             return
-
-        await self.bot.get_cog("Music").play(
-            context=ctx,
-            query=results[converter.emoji_to_number(reaction.emoji) - 1].web_url,
-        )
+        await self.bot.get_cog("Music").play(context=ctx, query=result)
         await msg.delete()
 
     @commands.command(
@@ -72,7 +58,7 @@ class Search(commands.Cog):
         hidden=True,
     )
     @commands.max_concurrency(1, BucketType.user)
-    @commands.cooldown(1, 3.0, BucketType.user)
+    @commands.cooldown(1, 5.0, BucketType.user)
     @commands.guild_only()
     @commands.check(VoiceChecks.user_is_connected)
     async def soundcloud(self, ctx: Context, *, query: str):
@@ -87,7 +73,7 @@ class Search(commands.Cog):
         usage="<query>",
     )
     @commands.max_concurrency(1, BucketType.user)
-    @commands.cooldown(1, 3.0, BucketType.user)
+    @commands.cooldown(1, 5.0, BucketType.user)
     @commands.guild_only()
     @commands.check(VoiceChecks.user_is_connected)
     async def youtube(self, ctx: Context, *, query: str):
@@ -104,7 +90,7 @@ class SearchCanceledException(Exception):
 
 class SearchInteraction:
     CANCEL_REACTION = "❌"
-    ALLOWED_REACTION = [
+    NUMBER_REACTION = [
         "1️⃣",
         "2️⃣",
         "3️⃣",
@@ -115,13 +101,51 @@ class SearchInteraction:
         "8️⃣",
         "9️⃣",
         "🔟",
-        CANCEL_REACTION,
     ]
 
-    @staticmethod
-    async def add_reaction_to_message(msg: Message, end: int = None):
-        if not end:
-            end = len(SearchInteraction.ALLOWED_REACTION) - 1
-        for i in range(1, end + 1):
-            await msg.add_reaction(f"{converter.number_to_emoji(i)}")
-        await msg.add_reaction(SearchInteraction.CANCEL_REACTION)
+
+class SearchDropdown(nextcord.ui.Select):
+    def __init__(self, results: ResultSet):
+        self._results = results
+        options = [
+            nextcord.SelectOption(
+                label=r.title,
+                value=r.web_url,
+                description=f"on {r.channel} [{r.fmt_duration}]",
+                emoji=SearchInteraction.NUMBER_REACTION[i],
+            )
+            for i, r in enumerate(results)
+        ]
+        options.append(
+            nextcord.SelectOption(
+                label="Cancel",
+                value="Cancel",
+                description="Cancel the current search",
+                emoji=SearchInteraction.CANCEL_REACTION,
+            )
+        )
+
+        super().__init__(
+            placeholder="Choose a song...",
+            min_values=1,
+            max_values=1,
+            options=options,
+        )
+
+
+class SearchDropdownView(nextcord.ui.View):
+    def __init__(self, ctx: Context, results: ResultSet):
+        super().__init__(timeout=float(os.environ["BOT_SEARCH_TIMEOUT"]))
+        self._ctx = ctx
+        self._drop = SearchDropdown(results)
+        self.add_item(self._drop)
+
+    async def interaction_check(self, interaction: Interaction):
+        if self._ctx.author != interaction.user:
+            return
+
+        self.stop()
+
+    @property
+    def result(self):
+        return self._drop.values[0]

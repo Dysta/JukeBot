@@ -6,7 +6,7 @@ import os
 from datetime import datetime
 
 from nextcord import Guild
-from nextcord.ext import commands, tasks
+from nextcord.ext import commands
 
 from jukebot.abstract_components import AbstractCollection
 

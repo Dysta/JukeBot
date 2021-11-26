@@ -1,14 +1,15 @@
+from nextcord import Embed
 from nextcord.ext import commands
-from nextcord.ext.commands import Context, BucketType
+from nextcord.ext.commands import Context, BucketType, Bot
 
 from jukebot.checks import VoiceChecks
-from jukebot.components import Player, Query, PlayerCollection, Song, AudioStream
+from jukebot.components import AudioStream, Player, PlayerCollection, Song, Query
 from jukebot.utils import embed
 
 
 class Music(commands.Cog):
     def __init__(self, bot):
-        self.bot = bot
+        self.bot: Bot = bot
         self._players: PlayerCollection = PlayerCollection(bot)
 
     @commands.command(
@@ -33,7 +34,7 @@ class Music(commands.Cog):
                 return
 
         song: Song = Song.from_query(qry)
-        e = embed.music_message(ctx, song)
+        e: Embed = embed.music_message(ctx, song)
 
         # PlayerContainer create bot if needed
         player: Player = self._players[ctx.guild.id]
