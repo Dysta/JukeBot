@@ -9,6 +9,7 @@ python = "^3.9"
 python-dotenv = "^0.19.1"
 yt-dlp = "^2021.11.10"
 nextcord = {extras = ["speed", "voice"], version = "^2.0.0-alpha.3"}
+aiofiles = "^0.7.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"

@@ -29,10 +29,10 @@ def main():
 
     async def prefix_for(client, message):
         prefixes = PrefixCollection()
-        try:
-            prefix = prefixes[str(message.guild.id)]
-        except KeyError:
-            prefix = prefixes[str(message.guild.id)] = os.environ["BOT_PREFIX"]
+        if str(message.guild.id) in prefixes:
+            prefix = prefixes[message.guild.id]
+        else:
+            prefix = prefixes[message.guild.id] = os.environ["BOT_PREFIX"]
         return prefix
 
     async def get_prefix(client, message):

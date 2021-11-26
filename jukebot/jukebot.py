@@ -1,6 +1,6 @@
 import json
-from threading import Lock
 
+import aiofiles
 import nextcord
 import os
 from datetime import datetime
@@ -17,7 +17,6 @@ class JukeBot(commands.Bot, nextcord.Client):
         self._activity = nextcord.Game(f"{os.environ['BOT_PREFIX']}help")
         self._start = None
         self._prefixes: PrefixCollection = PrefixCollection.load()
-        self._save_prefix.start()
 
     async def on_ready(self):
         print(f"Logged in as {self.user} (ID: {self.user.id})")
@@ -28,25 +27,22 @@ class JukeBot(commands.Bot, nextcord.Client):
         )
 
     async def close(self):
-        self._prefixes.export()
+        await self._prefixes.export()
         await super().close()
 
     async def on_error(self, event, *args, **kwargs):
         print(f"{event=}{args}{kwargs}")
 
     async def on_guild_join(self, guild: Guild):
-        self._prefixes[guild.id] = os.environ["BOT_PREFIX"]
+        await self.set_prefix_for(guild.id, os.environ["BOT_PREFIX"])
 
     async def on_guild_remove(self, guild):
         del self._prefixes[guild.id]
+        await self._prefixes.export()
 
-    @tasks.loop(minutes=30)
-    async def _save_prefix(self):
-        self._prefixes.export()
-
-    @_save_prefix.before_loop
-    async def before_save(self):
-        await self.wait_until_ready()
+    async def set_prefix_for(self, guild_id, prefix):
+        self._prefixes[guild_id] = prefix
+        await self._prefixes.export()
 
     @property
     def start_time(self):
@@ -59,22 +55,31 @@ class JukeBot(commands.Bot, nextcord.Client):
 
 class PrefixCollection(AbstractCollection[str, str]):
     _instance = None
-    _lock: Lock = Lock()
+    _filename = "data/prefixes.json"
 
     def __new__(cls):
-        with cls._lock:
-            if cls._instance is None:
-                cls._instance = super(PrefixCollection, cls).__new__(cls)
+        if cls._instance is None:
+            cls._instance = super(PrefixCollection, cls).__new__(cls)
         return cls._instance
 
-    def export(self):
-        with open("data/prefixes.json", "w") as f:
-            json.dump(self.__dict__, f)
+    async def export(self):
+        async with aiofiles.open(PrefixCollection._filename, "w") as f:
+            data = json.dumps(self.__dict__)
+            await f.write(data)
 
     @staticmethod
     def load():
-        with open("data/prefixes.json", "r") as f:
+        with open(PrefixCollection._filename, "r") as f:
             data = json.load(f)
         col = PrefixCollection()
         col.__dict__ = data
         return col
+
+    def __setitem__(self, key: int, value: str):
+        super().__setitem__(str(key), value)
+
+    def __getitem__(self, key: int) -> str:
+        return super().__getitem__(str(key))
+
+    def __delitem__(self, key: int) -> None:
+        super().__delitem__(str(key))

@@ -60,7 +60,7 @@ class System(commands.Cog):
     @commands.has_permissions(administrator=True)
     async def prefix(self, ctx: Context, prefix: Optional[str] = None):
         if prefix:
-            self.bot.prefixes[str(ctx.guild.id)] = prefix
+            await self.bot.set_prefix_for(str(ctx.guild.id), prefix)
             e = embed.basic_message(
                 ctx,
                 title="Prefix changed!",
