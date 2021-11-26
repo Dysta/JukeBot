@@ -12,8 +12,9 @@ from nextcord.ext.commands import Context, Bot
 
 from .song import Song
 from .audio_stream import AudioStream
-from collections import abc
 from enum import Enum
+
+from ..abstract_components import AbstractCollection
 
 
 class Player:
@@ -64,8 +65,6 @@ class Player:
         stream = AudioStream(audio)
         stream.read()
 
-        await self.join(ctx.message.author.voice.channel)
-
         if self._voice and self._voice.is_playing():
             self._voice.stop()
 
@@ -106,11 +105,15 @@ class Player:
         return bool(self.stream and self.voice)
 
     @property
+    def connected(self) -> bool:
+        return bool(self._voice)
+
+    @property
     def song(self):
         return self._song
 
 
-class PlayerCollection(abc.MutableMapping):
+class PlayerCollection(AbstractCollection[int, Player]):
     _instance = None
     _lock: Lock = Lock()
 
@@ -121,29 +124,10 @@ class PlayerCollection(abc.MutableMapping):
                 cls.bot = bot
         return cls._instance
 
-    def __contains__(self, key):
-        return key in self.__dict__.keys()
-
     def __getitem__(self, key):
         if not key in self.__dict__:
             self.__dict__[key] = Player(self.bot, key)
         return self.__dict__[key]
-
-    def __setitem__(self, key, value):
-        self.__dict__[key] = value
-
-    def __delitem__(self, key):
-        del self.__dict__[key]
-
-    def __iter__(self):
-        for p in self.__dict__:
-            yield p
-
-    def __len__(self):
-        return len(self.__dict__)
-
-    def __str__(self):
-        return str(self.__dict__)
 
 
 class _PlayerOption:

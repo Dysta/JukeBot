@@ -5,6 +5,8 @@ import os
 from nextcord.ext import commands
 
 from dotenv import load_dotenv
+
+from jukebot.jukebot import PrefixCollection
 from jukebot.utils import Extensions
 from jukebot import JukeBot
 from jukebot.listeners import HelpHandler
@@ -25,12 +27,20 @@ def main():
     )
     logger.addHandler(handler)
 
-    # get your bot token and create a key named `TOKEN` to the secrets panel then paste your bot token as the value.
-    # to keep your bot from shutting down use https://uptimerobot.com then create a https:// monitor and put the link
-    # to the website that appewars when you run this repl in the monitor and it will keep your bot alive by pinging
-    # the flask server enjoy!
+    async def prefix_for(client, message):
+        prefixes = PrefixCollection()
+        if str(message.guild.id) in prefixes:
+            prefix = prefixes[message.guild.id]
+        else:
+            prefix = prefixes[message.guild.id] = os.environ["BOT_PREFIX"]
+        return prefix
+
+    async def get_prefix(client, message):
+        prefix = await prefix_for(client, message)
+        return commands.when_mentioned_or(prefix)(client, message)
+
     bot = JukeBot(
-        command_prefix=commands.when_mentioned_or(os.environ["BOT_PREFIX"]),
+        command_prefix=get_prefix,
         help_command=HelpHandler(),
     )
 

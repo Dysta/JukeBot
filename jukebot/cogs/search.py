@@ -1,55 +1,54 @@
 import os
-from typing import Optional
 
 import nextcord.ui
-from nextcord import Interaction, Message
+from nextcord import Interaction
 from nextcord.ext import commands
 from nextcord.ext.commands import Context, Bot, BucketType
 
 from jukebot.checks import VoiceChecks
-from jukebot.components import PlayerCollection, Query, ResultSet, Song
+from jukebot.components import Query, ResultSet
 from jukebot.utils import embed
 
 
 class Search(commands.Cog):
     def __init__(self, bot):
         self.bot: Bot = bot
-        self._players: PlayerCollection = PlayerCollection(bot)
 
-    async def _single_search_process(
-        self, ctx: Context, query: str
-    ) -> tuple[Message, Optional[Song]]:
-        e = embed.music_search_message(ctx, title=f"Searching for {query}..")
-        msg = await ctx.send(embed=e)
-        qry: Query = Query(query)
-        await qry.process()
-        if not qry.success:
-            e = embed.music_not_found_message(
+    async def _search_process(self, ctx: Context, query: str, source: str):
+        with ctx.typing():
+            qry: Query = Query(f"{source}{query}")
+            await qry.search()
+            if not qry.success:
+                e = embed.music_not_found_message(
+                    ctx,
+                    title=f"Nothing found for {query}, sorry..",
+                )
+                msg = await ctx.send(embed=e)
+                await msg.delete(delay=5.0)
+                return
+
+            results: ResultSet = ResultSet.from_query(qry)
+            e = embed.playlist_message(
                 ctx,
-                title=f"Nothing found for {query}, sorry..",
+                playlist=results,
+                title=f"Result for {query}",
+            )
+
+        v = SearchDropdownView(ctx, results)
+        msg = await ctx.send(embed=e, view=v)
+        await v.wait()
+        await msg.edit(embed=e, view=None)
+        result: str = v.result
+        if result == "Cancel":
+            e = embed.music_search_message(
+                ctx,
+                title=f"Search canceled",
             )
             await msg.edit(embed=e)
-            return msg, None
-        song: Song = Song.from_query(qry)
-        return msg, song
-
-    async def _search_process(
-        self, ctx: Context, query: str, source: str
-    ) -> tuple[Message, Optional[ResultSet]]:
-        e = embed.music_search_message(ctx, title=f"Searching for {query}..")
-        msg = await ctx.send(embed=e)
-        qry: Query = Query(f"{source}{query}")
-        await qry.search()
-        if not qry.success:
-            e = embed.music_not_found_message(
-                ctx,
-                title=f"Nothing found for {query}, sorry..",
-            )
-            await msg.edit(embed=e)
-            return msg, None
-
-        results: ResultSet = ResultSet.from_query(qry)
-        return msg, results
+            await msg.delete(delay=5.0)
+            return
+        await self.bot.get_cog("Music").play(context=ctx, query=result)
+        await msg.delete()
 
     @commands.command(
         aliases=["sc", "ssc"],
@@ -59,7 +58,7 @@ class Search(commands.Cog):
         hidden=True,
     )
     @commands.max_concurrency(1, BucketType.user)
-    @commands.cooldown(1, 3.0, BucketType.user)
+    @commands.cooldown(1, 5.0, BucketType.user)
     @commands.guild_only()
     @commands.check(VoiceChecks.user_is_connected)
     async def soundcloud(self, ctx: Context, *, query: str):
@@ -74,29 +73,11 @@ class Search(commands.Cog):
         usage="<query>",
     )
     @commands.max_concurrency(1, BucketType.user)
-    @commands.cooldown(1, 3.0, BucketType.user)
+    @commands.cooldown(1, 5.0, BucketType.user)
     @commands.guild_only()
     @commands.check(VoiceChecks.user_is_connected)
     async def youtube(self, ctx: Context, *, query: str):
-        msg, results = await self._search_process(ctx, query, "ytsearch10:")
-        e = embed.playlist_message(
-            ctx,
-            playlist=results,
-            title=f"Result for {query}",
-        )
-        v = SearchDropdownView(ctx, results)
-        await msg.edit(embed=e, view=v)
-        await v.wait()
-        r: str = v.result
-        if r == "Cancel":
-            e = embed.music_not_found_message(
-                ctx,
-                title=f"Search canceled",
-            )
-            await msg.edit(embed=e)
-            return
-        await msg.delete()
-        await self.bot.get_cog("Music").play(context=ctx, query=v.result)
+        await self._search_process(ctx, query, "ytsearch10:")
 
 
 def setup(bot):
@@ -162,9 +143,7 @@ class SearchDropdownView(nextcord.ui.View):
     async def interaction_check(self, interaction: Interaction):
         if self._ctx.author != interaction.user:
             return
-        await interaction.response.edit_message(
-            content=embed.VOID_TOKEN, embed=None, view=None
-        )
+
         self.stop()
 
     @property
