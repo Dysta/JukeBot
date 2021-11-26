@@ -69,8 +69,11 @@ class PrefixCollection(AbstractCollection[str, str]):
 
     @staticmethod
     def load():
-        with open(PrefixCollection._filename, "r") as f:
-            data = json.load(f)
+        if not os.path.exists(PrefixCollection._filename):
+            data = {}
+        else:
+            with open(PrefixCollection._filename, "r") as f:
+                data = json.load(f)
         col = PrefixCollection()
         col.__dict__ = data
         return col
