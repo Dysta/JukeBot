@@ -23,15 +23,16 @@ class Search(commands.Cog):
                     ctx,
                     title=f"Nothing found for {query}, sorry..",
                 )
-                await ctx.send(embed=e)
+                msg = await ctx.send(embed=e)
+                await msg.delete(delay=5.0)
                 return
 
-        results: ResultSet = ResultSet.from_query(qry)
-        e = embed.playlist_message(
-            ctx,
-            playlist=results,
-            title=f"Result for {query}",
-        )
+            results: ResultSet = ResultSet.from_query(qry)
+            e = embed.playlist_message(
+                ctx,
+                playlist=results,
+                title=f"Result for {query}",
+            )
         msg = await ctx.send(embed=e)
         await SearchInteraction.add_reaction_to_message(msg, len(results))
 
@@ -54,6 +55,7 @@ class Search(commands.Cog):
             e = embed.music_search_message(ctx, title="Search canceled")
             await msg.clear_reactions()
             await msg.edit(embed=e)
+            await msg.delete(delay=5.0)
             return
 
         await self.bot.get_cog("Music").play(
