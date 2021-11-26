@@ -139,6 +139,7 @@ class SearchDropdownView(nextcord.ui.View):
         self._ctx = ctx
         self._drop = SearchDropdown(results)
         self.add_item(self._drop)
+        self._timeout = False
 
     async def interaction_check(self, interaction: Interaction):
         if self._ctx.author != interaction.user:
@@ -146,6 +147,9 @@ class SearchDropdownView(nextcord.ui.View):
 
         self.stop()
 
+    async def on_timeout(self) -> None:
+        self._timeout = True
+
     @property
     def result(self):
-        return self._drop.values[0]
+        return self._drop.values[0] if not self._timeout else "Cancel"
