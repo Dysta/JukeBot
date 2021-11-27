@@ -3,7 +3,7 @@ import typing
 from datetime import datetime
 
 from nextcord.ext import commands
-from nextcord.ext.commands import Context, BucketType
+from nextcord.ext.commands import Context, BucketType, Bot
 from nextcord import Member
 
 from jukebot.utils import embed, converter
@@ -11,7 +11,7 @@ from jukebot.utils import embed, converter
 
 class Utility(commands.Cog):
     def __init__(self, bot):
-        self.bot = bot
+        self.bot: Bot = bot
 
     @commands.command(
         aliases=["i"],
@@ -22,16 +22,21 @@ class Utility(commands.Cog):
     @commands.guild_only()
     async def info(self, ctx: Context):
         e = embed.info_message(ctx)
-        e.add_field(name="Ping", value=f"{self.bot.latency * 1000:.2f}ms", inline=False)
+        e.set_thumbnail(url=self.bot.user.display_avatar.url)
+        e.add_field(name="🤖 Name", value=f"`{self.bot.user.display_name}`", inline=True)
+        e.add_field(name="📍 Ping", value=f"`{self.bot.latency * 1000:.2f}ms`", inline=True)
         uptime = datetime.now() - self.bot.start_time
         days, hours, minutes, seconds = converter.seconds_to_time(
             int(uptime.total_seconds())
         )
         e.add_field(
-            name="Uptime",
-            value=f"{days}d, {hours}h, {minutes}m, {seconds}s",
-            inline=False,
+            name="📊 Uptime",
+            value=f"`{days}d, {hours}h, {minutes}m, {seconds}s`",
+            inline=True,
         )
+        e.add_field(name="🏛️ Guilds", value=f"`{str(len(self.bot.guilds))}`", inline=True)
+        e.add_field(name="👨‍👧‍👦 Members", value=f"`{str(len(set(self.bot.get_all_members())))}`", inline=True)
+        e.add_field(name="🪄 Prefix", value=f"`{self.bot.prefixes[ctx.guild.id]}`", inline=True)
         await ctx.reply(embed=e)
 
     @commands.command(
