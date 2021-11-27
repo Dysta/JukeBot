@@ -121,7 +121,7 @@ class Music(commands.Cog):
         player: Player = self._players[ctx.guild.id]
         await player.join(ctx.message.author.voice.channel)
         e = embed.basic_message(
-            ctx, title=f"Player joined {ctx.message.author.voice.channel.name}"
+            ctx, title=f"Connected to {ctx.message.author.voice.channel.name}"
         )
         await ctx.send(embed=e)
 

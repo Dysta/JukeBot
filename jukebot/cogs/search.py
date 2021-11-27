@@ -39,7 +39,7 @@ class Search(commands.Cog):
         await v.wait()
         await msg.edit(embed=e, view=None)
         result: str = v.result
-        if result == "Cancel":
+        if result == SearchInteraction.CANCEL_TEXT:
             e = embed.music_search_message(
                 ctx,
                 title=f"Search canceled",
@@ -90,6 +90,7 @@ class SearchCanceledException(Exception):
 
 class SearchInteraction:
     CANCEL_REACTION = "❌"
+    CANCEL_TEXT = "Cancel"
     NUMBER_REACTION = [
         "1️⃣",
         "2️⃣",
@@ -119,7 +120,7 @@ class SearchDropdown(nextcord.ui.Select):
         options.append(
             nextcord.SelectOption(
                 label="Cancel",
-                value="Cancel",
+                value=SearchInteraction.CANCEL_TEXT,
                 description="Cancel the current search",
                 emoji=SearchInteraction.CANCEL_REACTION,
             )
@@ -152,4 +153,6 @@ class SearchDropdownView(nextcord.ui.View):
 
     @property
     def result(self):
-        return self._drop.values[0] if not self._timeout else "Cancel"
+        return (
+            self._drop.values[0] if not self._timeout else SearchInteraction.CANCEL_TEXT
+        )
