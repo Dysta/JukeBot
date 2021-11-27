@@ -1,7 +1,8 @@
+from nextcord import Permissions
 from nextcord.ext import commands
 from typing import Optional
 
-from nextcord.ext.commands import Context
+from nextcord.ext.commands import Context, BucketType
 
 from jukebot.utils import Extensions, embed
 
@@ -57,15 +58,19 @@ class System(commands.Cog):
         usage="[prefix]",
     )
     @commands.guild_only()
-    @commands.has_permissions(administrator=True)
+    @commands.cooldown(1, 15.0, BucketType.guild)
     async def prefix(self, ctx: Context, prefix: Optional[str] = None):
         if prefix:
-            await self.bot.set_prefix_for(str(ctx.guild.id), prefix)
-            e = embed.basic_message(
-                ctx,
-                title="Prefix changed!",
-                content=f"Prefix is set to `{prefix}` for server `{ctx.guild.name}`",
-            )
+            perm: Permissions = ctx.author.guild_permissions
+            if perm.administrator:
+                await self.bot.set_prefix_for(str(ctx.guild.id), prefix)
+                e = embed.basic_message(
+                    ctx,
+                    title="Prefix changed!",
+                    content=f"Prefix is set to `{prefix}` for server `{ctx.guild.name}`",
+                )
+            else:
+                e = embed.error_message(ctx, title="You're not administrator of this server.")
             await ctx.send(embed=e)
         else:
             e = embed.basic_message(
