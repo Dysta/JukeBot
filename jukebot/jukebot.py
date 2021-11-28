@@ -1,8 +1,8 @@
-import json
-
 import aiofiles
+import json
 import nextcord
 import os
+
 from datetime import datetime
 
 from nextcord import Guild
@@ -14,17 +14,12 @@ from jukebot.abstract_components import AbstractCollection
 class JukeBot(commands.Bot, nextcord.Client):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._activity = nextcord.Game(f"{os.environ['BOT_PREFIX']}help")
-        self._start = None
+        self._start = datetime.now()
         self._prefixes: PrefixCollection = PrefixCollection.load()
 
     async def on_ready(self):
         print(f"Logged in as {self.user} (ID: {self.user.id})")
         print("------")
-        self._start = datetime.now()
-        await self.change_presence(
-            status=nextcord.Status.online, activity=self._activity
-        )
 
     async def close(self):
         await self._prefixes.export()
