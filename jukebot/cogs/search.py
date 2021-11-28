@@ -37,7 +37,7 @@ class Search(commands.Cog):
         v = SearchDropdownView(ctx, results)
         msg = await ctx.send(embed=e, view=v)
         await v.wait()
-        await msg.edit(embed=e, view=None)
+        await msg.edit(view=None)
         result: str = v.result
         if result == SearchInteraction.CANCEL_TEXT:
             e = embed.music_search_message(
@@ -112,7 +112,7 @@ class SearchDropdown(nextcord.ui.Select):
             nextcord.SelectOption(
                 label=r.title,
                 value=r.web_url,
-                description=f"on {r.channel} [{r.fmt_duration}]",
+                description=f"on {r.channel} — {r.fmt_duration}",
                 emoji=SearchInteraction.NUMBER_REACTION[i],
             )
             for i, r in enumerate(results)
