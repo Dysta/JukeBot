@@ -1,10 +1,12 @@
+import itertools
+
 import nextcord
 import random
 
 from typing import Union
 from nextcord.ext.commands import Context
 
-from jukebot.components import Song, ResultSet
+from jukebot.components import Song, ResultSet, Result
 from jukebot.components.songset import SongSet
 from jukebot.utils import converter
 
@@ -129,4 +131,53 @@ def search_result_message(ctx: Context, playlist: Union[ResultSet, SongSet], tit
         name=VOID_TOKEN,
         value="Click on the reaction corresponding to the emoji. Click on ❌ to cancel the research.",
     )
+    return embed
+
+
+def basic_queue_message(ctx: Context, title="", content=""):
+    colors = [0x438F96, 0x469961, 0x3F3F3F]
+    c = colors[random.randint(0, 2)]
+    embed: nextcord.Embed = nextcord.Embed(title="", description=content, color=c)
+    embed.set_author(
+        name="Information" if title == "" else title,
+        icon_url="https://icons.iconarchive.com/icons/papirus-team/papirus-apps/512/logisim-icon-icon.png",
+    )
+    embed.set_footer(
+        text=f"Requested by {ctx.author}", icon_url=f"{ctx.author.display_avatar.url}"
+    )
+
+    return embed
+
+
+def queue_message(ctx: Context, playlist: Union[ResultSet, SongSet], title=""):
+    playlist_slice = itertools.islice(playlist, 10)
+    content = "\n\n".join(
+        [
+            f"{i}. `{s.title} by {s.channel}` **[{s.fmt_duration}]**"
+            for i, s in enumerate(playlist_slice, start=1)
+        ]
+    )
+    embed: nextcord.Embed = basic_queue_message(ctx, title=title, content=content)
+    embed.add_field(name="Total songs", value=f"`{len(playlist)}`")
+    total_time: int = sum([e.duration for e in playlist if not e.live])
+    total_time_fmt: str = converter.seconds_to_youtube_format(total_time)
+    embed.add_field(name="Total duration", value=f"`{total_time_fmt}`")
+    return embed
+
+
+def result_enqueued(ctx: Context, res: Result):
+    colors = [0x438F96, 0x469961, 0x3F3F3F]
+    c = colors[random.randint(0, 2)]
+    embed: nextcord.Embed = nextcord.Embed(title="", description="", color=c)
+    embed.set_author(
+        name=f"Added to queue : {res.title}",
+        url=res.web_url,
+        icon_url="https://icons.iconarchive.com/icons/papirus-team/papirus-apps/512/logisim-icon-icon.png",
+    )
+    embed.add_field(name="Channel", value=res.channel, inline=True)
+    embed.add_field(name="Duration", value=res.fmt_duration)
+    embed.set_footer(
+        text=f"Requested by {ctx.author}", icon_url=f"{ctx.author.display_avatar.url}"
+    )
+
     return embed
