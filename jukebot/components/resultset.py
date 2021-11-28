@@ -2,7 +2,8 @@ from dataclasses import dataclass
 from typing import List
 
 from jukebot.abstract_components import AbstractSet
-from jukebot.components import Result, Query
+from .result import Result
+from .query import Query
 
 
 @dataclass
@@ -14,3 +15,13 @@ class ResultSet(AbstractSet[Result]):
             results.append(Result.from_entry(r))
 
         return cls(set=results)
+
+    @classmethod
+    def empty(cls):
+        return cls(set=[])
+
+    def get(self) -> Result:
+        return self.set.pop(0)
+
+    def put(self, result: Result) -> None:
+        self.set.append(result)
