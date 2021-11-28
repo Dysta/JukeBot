@@ -1,20 +1,20 @@
 import asyncio
-from threading import Lock
-
 import nextcord
 import platform
 import sys
 
+from enum import Enum
+from threading import Lock
 from typing import Optional
 
-from nextcord import VoiceClient, VoiceChannel
-from nextcord.ext.commands import Context, Bot
-
-from .song import Song
-from .audio_stream import AudioStream
-from enum import Enum
+from nextcord import VoiceChannel, VoiceClient
+from nextcord.ext.commands import Bot, Context
 
 from ..abstract_components import AbstractCollection
+from .result import Result
+from .resultset import ResultSet
+from .song import Song
+from .audio_stream import AudioStream
 
 
 class Player:
@@ -22,6 +22,7 @@ class Player:
         IDLE = 0
         PLAYING = 1
         PAUSED = 2
+        STOPPED = 3
 
     def __init__(self, bot: Bot, guild_id: int):
         self.bot: Bot = bot
@@ -29,14 +30,14 @@ class Player:
 
         self._voice: Optional[VoiceClient] = None
         self._stream: Optional[AudioStream] = None
+        self._context: Optional[Context] = None
         self._song: Optional[Song] = None
-        self._next = asyncio.Event()
-        self._queue = asyncio.Queue()
+        self._queue: ResultSet = ResultSet.empty()
 
         self._state: Player.State = Player.State.IDLE
 
     async def join(self, channel: VoiceChannel):
-        if self._voice is None or not self._voice.is_connected():
+        if not self._voice or not self._voice.is_connected():
             try:
                 self._voice = await channel.connect()
             except asyncio.TimeoutError:
@@ -47,8 +48,7 @@ class Player:
             await self._voice.move_to(channel)
         return True
 
-    async def play(self, ctx: Context, song):
-
+    async def play(self, song: Song):
         try:
             audio = nextcord.FFmpegPCMAudio(
                 song.stream_url,
@@ -68,24 +68,50 @@ class Player:
         if self._voice and self._voice.is_playing():
             self._voice.stop()
 
-        self._voice.play(stream)
+        self._voice.play(stream, after=self._after)
         self._stream = stream
         self._song = song
+        self._state = Player.State.PLAYING
+
+    def _after(self, error):
+        if error:
+            print(f"_after {error=}")
+        if self._state == Player.State.STOPPED:
+            return
+
+        self._state = Player.State.IDLE
+        self._stream = None
+        self._song = None
+
+        if len(self._queue):
+            req: Result = self._queue.get()
+            func = self.bot.get_cog("Music").play(
+                context=self._context, force=True, query=req.web_url
+            )
+            fut = asyncio.run_coroutine_threadsafe(func, self.bot.loop)
+            try:
+                fut.result()
+            except Exception as e:
+                print(f"exception in _after {e=}")
 
     async def disconnect(self):
         if self._voice:
+            self._state = Player.State.STOPPED
             await self._voice.disconnect()
 
     def stop(self):
         if self._voice:
+            self._state = Player.State.IDLE
             self._voice.stop()
 
     def pause(self):
         if self._voice:
+            self._state = Player.State.PAUSED
             self._voice.pause()
 
     def resume(self):
         if self._voice:
+            self._state = Player.State.PLAYING
             self._voice.resume()
 
     @property
@@ -102,15 +128,27 @@ class Player:
 
     @property
     def playing(self) -> bool:
-        return bool(self.stream and self.voice)
+        return bool(self.stream and self.voice and self._state == Player.State.PLAYING)
 
     @property
     def connected(self) -> bool:
         return bool(self._voice)
 
     @property
-    def song(self):
+    def song(self) -> Optional[Song]:
         return self._song
+
+    @property
+    def queue(self) -> ResultSet:
+        return self._queue
+
+    @property
+    def context(self) -> Optional[Context]:
+        return self._context
+
+    @context.setter
+    def context(self, c: Context) -> None:
+        self._context = c
 
 
 class PlayerCollection(AbstractCollection[int, Player]):

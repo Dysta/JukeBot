@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from jukebot.components import Query
+from .query import Query
 from jukebot.utils import converter
 
 
@@ -25,7 +25,14 @@ class Result:
 
     @classmethod
     def from_query(cls, query: Query, entry: int = 0):
-        info = query.get_entries(entry) if "entries" in query.info else query.info
+        # when query is called with .search(self), entries is a iterator
+        # so we convert it to a list
+        entries: list = list(query.entries)
+        try:
+            info = entries[entry]
+        except KeyError:
+            raise
+
         return cls(info=info)
 
     @classmethod
