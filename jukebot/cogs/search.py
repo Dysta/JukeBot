@@ -28,7 +28,7 @@ class Search(commands.Cog):
                 return
 
             results: ResultSet = ResultSet.from_query(qry)
-            e = embed.playlist_message(
+            e = embed.search_result_message(
                 ctx,
                 playlist=results,
                 title=f"Result for {query}",

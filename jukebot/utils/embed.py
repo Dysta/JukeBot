@@ -117,7 +117,7 @@ def music_not_found_message(ctx: Context, title="", content=""):
     return embed
 
 
-def playlist_message(ctx: Context, playlist: Union[ResultSet, SongSet], title=""):
+def search_result_message(ctx: Context, playlist: Union[ResultSet, SongSet], title=""):
     content = "\n\n".join(
         [
             f"{converter.number_to_emoji(i)} `{s.title} by {s.channel}` **[{s.fmt_duration}]**"
