@@ -37,8 +37,8 @@ class VoiceChecks:
 
     @staticmethod
     async def bot_and_user_in_same_channel(ctx: Context):
-        b_conn: bool = await VoiceChecks.bot_is_connected(ctx)
-        u_conn: bool = await VoiceChecks.user_is_connected(ctx)
+        b_conn: bool = ctx.guild.voice_client
+        u_conn: bool = ctx.message.author.voice
         if not b_conn or not u_conn:
             return False
 
