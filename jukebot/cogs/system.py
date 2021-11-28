@@ -72,7 +72,9 @@ class System(commands.Cog):
                     content=f"Prefix is set to `{prefix}` for server `{ctx.guild.name}`",
                 )
             else:
-                e = embed.error_message(ctx, title="You're not administrator of this server.")
+                e = embed.error_message(
+                    ctx, title="You're not administrator of this server."
+                )
             await ctx.send(embed=e)
         else:
             e = embed.basic_message(
