@@ -14,7 +14,7 @@ from jukebot.components import (
     Result,
     ResultSet,
 )
-from jukebot.utils import embed
+from jukebot.utils import embed, regex
 
 
 class Music(commands.Cog):
@@ -166,8 +166,9 @@ class Music(commands.Cog):
     @commands.check(VoiceChecks.bot_is_connected)
     @commands.check(VoiceChecks.bot_and_user_in_same_channel)
     async def add(self, ctx: Context, *, query: str):
+        query = query if regex.is_url(query) else f"ytsearch1:{query}"
         with ctx.typing():
-            qry: Query = Query(f"ytsearch1:{query}")
+            qry: Query = Query(query)
             await qry.search()
             if not qry.success:
                 e = embed.music_not_found_message(
