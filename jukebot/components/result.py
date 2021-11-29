@@ -14,7 +14,7 @@ class Result:
     live: bool = False
 
     def __init__(self, info: dict):
-        self.web_url = info["url"]
+        self.web_url = info.get("url", info.get("original_url"))
         self.title = info.get("title", "Unknown")
         self.channel = info.get("channel", info.get("uploader", "Unknown"))
         self.duration = int(info.get("duration", 0) or 0)
