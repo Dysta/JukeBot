@@ -59,7 +59,7 @@ class PrefixCollection(AbstractCollection[str, str]):
 
     async def export(self):
         async with aiofiles.open(PrefixCollection._filename, "w") as f:
-            data = json.dumps(self.__dict__)
+            data = json.dumps(self._collection)
             await f.write(data)
 
     @staticmethod
@@ -70,7 +70,7 @@ class PrefixCollection(AbstractCollection[str, str]):
             with open(PrefixCollection._filename, "r") as f:
                 data = json.load(f)
         col = PrefixCollection()
-        col.__dict__ = data
+        col._collection = data
         return col
 
     def __setitem__(self, key: int, value: str):

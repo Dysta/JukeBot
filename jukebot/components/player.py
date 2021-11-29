@@ -163,9 +163,9 @@ class PlayerCollection(AbstractCollection[int, Player]):
         return cls._instance
 
     def __getitem__(self, key):
-        if not key in self.__dict__:
-            self.__dict__[key] = Player(self.bot, key)
-        return self.__dict__[key]
+        if not key in self._collection:
+            self._collection[key] = Player(self.bot, key)
+        return self._collection[key]
 
 
 class _PlayerOption:
