@@ -86,13 +86,10 @@ class Player:
         if len(self._queue):
             req: Result = self._queue.get()
             func = self.bot.get_cog("Music").play(
-                context=self._context, force=True, query=req.web_url
+                context=self._context, author=req.author, force=True, query=req.web_url
             )
             fut = asyncio.run_coroutine_threadsafe(func, self.bot.loop)
-            try:
-                fut.result()
-            except Exception as e:
-                print(f"exception in _after {e=}")
+            fut.result()
 
     async def disconnect(self):
         if self._voice:
