@@ -1,6 +1,5 @@
 import aiofiles
 import json
-import nextcord
 import os
 
 from datetime import datetime
@@ -11,7 +10,7 @@ from nextcord.ext import commands
 from jukebot.abstract_components import AbstractCollection
 
 
-class JukeBot(commands.Bot, nextcord.Client):
+class JukeBot(commands.Bot):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._start = datetime.now()
