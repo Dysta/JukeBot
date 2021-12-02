@@ -27,7 +27,7 @@ class Search(commands.Cog):
                 await msg.delete(delay=5.0)
                 return
 
-            results: ResultSet = ResultSet.from_query(qry)
+            results: ResultSet = ResultSet.from_query(ctx.author, qry)
             e = embed.search_result_message(
                 ctx,
                 playlist=results,

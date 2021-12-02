@@ -178,7 +178,7 @@ class Music(commands.Cog):
                 await ctx.send(embed=e)
                 return
 
-        res: Result = Result.from_query(qry)
+        res: Result = Result.from_query(ctx.author, qry)
         player: Player = self._players[ctx.guild.id]
         player.queue.put(res)
 

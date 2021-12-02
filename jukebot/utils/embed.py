@@ -129,7 +129,7 @@ def search_result_message(ctx: Context, playlist: Union[ResultSet, SongSet], tit
     embed: nextcord.Embed = music_search_message(ctx, title=title, content=content)
     embed.add_field(
         name=VOID_TOKEN,
-        value="Click on the reaction corresponding to the emoji. Click on ❌ to cancel the research.",
+        value="Use the selector below to choose a result.",
     )
     return embed
 
@@ -153,7 +153,7 @@ def queue_message(ctx: Context, playlist: Union[ResultSet, SongSet], title=""):
     playlist_slice = itertools.islice(playlist, 10)
     content = "\n\n".join(
         [
-            f"{i}. `{s.title} by {s.channel}` **[{s.fmt_duration}]**"
+            f"{i}. `{s.title}` on `{s.channel}` **[{s.fmt_duration}]** — `{s.author}`"
             for i, s in enumerate(playlist_slice, start=1)
         ]
     )
