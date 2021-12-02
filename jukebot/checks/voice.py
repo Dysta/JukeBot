@@ -4,12 +4,13 @@ from nextcord.ext.commands import Context
 from jukebot.utils import embed
 
 
-class VoiceChecks:
+class Voice:
     @staticmethod
     async def user_is_connected(ctx: Context):
         if not ctx.message.author.voice:
             e: Embed = embed.error_message(
-                ctx.author, content="You must be on a voice channel to use this command."
+                ctx.author,
+                content="You must be on a voice channel to use this command.",
             )
             await ctx.send(embed=e)
             return False

@@ -1,2 +1,2 @@
-from .voice import VoiceChecks
-from .user import UserChecks
+from .voice import Voice
+from .user import User
