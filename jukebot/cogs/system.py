@@ -14,23 +14,13 @@ class System(commands.Cog):
 
     def _reload_all_cogs(self):
         for e in Extensions.all():
-            try:
-                self.bot.reload_extension(name=f"{e['package']}.{e['name']}")
-            except commands.ExtensionNotFound as e:
-                print(e)
-                raise e
+            self.bot.reload_extension(name=f"{e['package']}.{e['name']}")
 
     def _reload_cog(self, name):
         e = Extensions.get(name)
         if e is None:
             raise commands.ExtensionNotFound(name)
-
-        try:
-            self.bot.reload_extension(name=f"{e['package']}.{e['name']}")
-            return
-        except commands.ExtensionNotFound as e:
-            print(e)
-            raise e
+        self.bot.reload_extension(name=f"{e['package']}.{e['name']}")
 
     @commands.command(
         aliases=["rld"],
@@ -62,26 +52,27 @@ class System(commands.Cog):
     @commands.guild_only()
     @commands.cooldown(1, 15.0, BucketType.guild)
     async def prefix(self, ctx: Context, prefix: Optional[str] = None):
-        if prefix:
-            perm: Permissions = ctx.author.guild_permissions
-            if perm.administrator:
-                await self.bot.set_prefix_for(str(ctx.guild.id), prefix)
-                e = embed.basic_message(
-                    ctx.author,
-                    title="Prefix changed!",
-                    content=f"Prefix is set to `{prefix}` for server `{ctx.guild.name}`",
-                )
-            else:
-                e = embed.error_message(
-                    ctx.author, title="You're not administrator of this server."
-                )
-            await ctx.send(embed=e)
-        else:
+        if not prefix:
             e = embed.basic_message(
                 ctx.author,
                 content=f"Prefix for `{ctx.guild.name}` is `{self.bot.prefixes[str(ctx.guild.id)]}`",
             )
             await ctx.send(embed=e)
+            return
+
+        perm: Permissions = ctx.author.guild_permissions
+        if perm.administrator:
+            await self.bot.set_prefix_for(ctx.guild.id, prefix)
+            e = embed.basic_message(
+                ctx.author,
+                title="Prefix changed!",
+                content=f"Prefix is set to `{prefix}` for server `{ctx.guild.name}`",
+            )
+        else:
+            e = embed.error_message(
+                ctx.author, title="You're not administrator of this server."
+            )
+        await ctx.send(embed=e)
 
 
 def setup(bot):
