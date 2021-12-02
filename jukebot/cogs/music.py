@@ -1,6 +1,6 @@
 from typing import Optional
 
-from nextcord import Embed
+from nextcord import Embed, Member
 from nextcord.ext import commands
 from nextcord.ext.commands import Context, BucketType, Bot
 
@@ -31,9 +31,17 @@ class Music(commands.Cog):
     @commands.guild_only()
     @commands.cooldown(1, 5.0, BucketType.user)
     @commands.check(VoiceChecks.user_is_connected)
-    async def play(self, ctx: Context, force: Optional[bool] = False, *, query: str):
+    async def play(
+        self,
+        ctx: Context,
+        author: Optional[Member] = None,
+        force: Optional[bool] = False,
+        *,
+        query: str,
+    ):
         # PlayerContainer create bot if needed
         player: Player = self._players[ctx.guild.id]
+        author = author or ctx.author
         if not player.context:
             await ctx.invoke(self.bind)
 
@@ -46,7 +54,7 @@ class Music(commands.Cog):
             await qry.process()
             if not qry.success:
                 e = embed.music_not_found_message(
-                    ctx.author,
+                    author,
                     title=f"Nothing found for {query}, sorry..",
                 )
                 await ctx.send(embed=e)
@@ -57,7 +65,7 @@ class Music(commands.Cog):
         if not player.connected:
             await ctx.invoke(self.join)
         await player.play(song)
-        e: Embed = embed.music_message(ctx.author, song)
+        e: Embed = embed.music_message(author, song)
         await ctx.send(embed=e)
 
     @commands.command(
