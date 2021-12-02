@@ -30,7 +30,17 @@ class Song:
 
     @classmethod
     def from_query(cls, query: Query, entry: int = 0):
-        info = query.get_entries(entry) if "entries" in query.info else query.info
+        results = query.results
+        if isinstance(results, list):
+            try:
+                info = results[entry]
+            except KeyError:
+                raise
+        elif isinstance(results, dict):
+            info = results
+        else:
+            raise Exception(f"Query result unknown format for {results=}")
+
         return cls(info=info)
 
     @classmethod

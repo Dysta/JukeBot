@@ -1,4 +1,7 @@
 from dataclasses import dataclass
+from typing import Optional
+
+from nextcord import Member
 
 from .query import Query
 from jukebot.utils import converter
@@ -12,8 +15,10 @@ class Result:
     duration: int = 0
     fmt_duration: str = "0:00"
     live: bool = False
+    author: Optional[Member] = None
 
-    def __init__(self, info: dict):
+    def __init__(self, author: Member, info: dict):
+        self.author = author
         self.web_url = info.get("url", info.get("original_url"))
         self.title = info.get("title", "Unknown")
         self.channel = info.get("channel", info.get("uploader", "Unknown"))
@@ -24,17 +29,20 @@ class Result:
         )
 
     @classmethod
-    def from_query(cls, query: Query, entry: int = 0):
-        # when query is called with .search(self), entries is a iterator
-        # so we convert it to a list
-        entries: list = list(query.entries)
-        try:
-            info = entries[entry]
-        except KeyError:
-            raise
+    def from_query(cls, author: Member, query: Query, entry: int = 0):
+        results = query.results
+        if isinstance(results, list):
+            try:
+                info = results[entry]
+            except KeyError:
+                raise
+        elif isinstance(results, dict):
+            info = results
+        else:
+            raise Exception(f"Query result unknown format for {results=}")
 
-        return cls(info=info)
+        return cls(author=author, info=info)
 
     @classmethod
-    def from_entry(cls, entry: dict):
-        return cls(info=entry)
+    def from_entry(cls, author: Member, entry: dict):
+        return cls(author=author, info=entry)
