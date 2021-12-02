@@ -67,18 +67,18 @@ class System(commands.Cog):
             if perm.administrator:
                 await self.bot.set_prefix_for(str(ctx.guild.id), prefix)
                 e = embed.basic_message(
-                    ctx,
+                    ctx.author,
                     title="Prefix changed!",
                     content=f"Prefix is set to `{prefix}` for server `{ctx.guild.name}`",
                 )
             else:
                 e = embed.error_message(
-                    ctx, title="You're not administrator of this server."
+                    ctx.author, title="You're not administrator of this server."
                 )
             await ctx.send(embed=e)
         else:
             e = embed.basic_message(
-                ctx,
+                ctx.author,
                 content=f"Prefix for `{ctx.guild.name}` is `{self.bot.prefixes[str(ctx.guild.id)]}`",
             )
             await ctx.send(embed=e)
