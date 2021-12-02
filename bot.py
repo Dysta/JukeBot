@@ -13,9 +13,7 @@ from jukebot import JukeBot
 from jukebot.listeners import HelpHandler
 
 
-def main():
-    load_dotenv()
-    # setting up logging
+def set_logging():
     logger = logging.getLogger("discord")
     logger.setLevel(logging.DEBUG)
     handler = logging.FileHandler(
@@ -28,17 +26,24 @@ def main():
     )
     logger.addHandler(handler)
 
-    async def prefix_for(client, message):
-        prefixes = PrefixCollection()
-        if str(message.guild.id) in prefixes:
-            prefix = prefixes[message.guild.id]
-        else:
-            prefix = prefixes[message.guild.id] = os.environ["BOT_PREFIX"]
-        return prefix
 
-    async def get_prefix(client, message):
-        prefix = await prefix_for(client, message)
-        return commands.when_mentioned_or(prefix)(client, message)
+async def prefix_for(client, message):
+    prefixes = PrefixCollection()
+    if str(message.guild.id) in prefixes:
+        prefix = prefixes[message.guild.id]
+    else:
+        prefix = prefixes[message.guild.id] = os.environ["BOT_PREFIX"]
+    return prefix
+
+
+async def get_prefix(client, message):
+    prefix = await prefix_for(client, message)
+    return commands.when_mentioned_or(prefix)(client, message)
+
+
+def main():
+    load_dotenv()
+    set_logging()
 
     bot = JukeBot(
         command_prefix=get_prefix,
