@@ -46,7 +46,7 @@ class Music(commands.Cog):
             await qry.process()
             if not qry.success:
                 e = embed.music_not_found_message(
-                    ctx,
+                    ctx.author,
                     title=f"Nothing found for {query}, sorry..",
                 )
                 await ctx.send(embed=e)
@@ -57,7 +57,7 @@ class Music(commands.Cog):
         if not player.connected:
             await ctx.invoke(self.join)
         await player.play(song)
-        e: Embed = embed.music_message(ctx, song)
+        e: Embed = embed.music_message(ctx.author, song)
         await ctx.send(embed=e)
 
     @commands.command(
@@ -73,7 +73,7 @@ class Music(commands.Cog):
         await self._players[ctx.guild.id].disconnect()
         # once the bot leave, we destroy is instance from the container
         del self._players[ctx.guild.id]
-        e = embed.basic_message(ctx, title="Player disconnected")
+        e = embed.basic_message(ctx.author, title="Player disconnected")
         await ctx.send(embed=e)
 
     @commands.command(
@@ -87,7 +87,7 @@ class Music(commands.Cog):
     async def stop(self, ctx: Context, silent: Optional[bool] = False):
         self._players[ctx.guild.id].stop()
         if not silent:
-            e = embed.basic_message(ctx, title="Player stopped")
+            e = embed.basic_message(ctx.author, title="Player stopped")
             await ctx.send(embed=e)
 
     @commands.command(
@@ -100,7 +100,7 @@ class Music(commands.Cog):
     @commands.check(VoiceChecks.bot_and_user_in_same_channel)
     async def pause(self, ctx: Context):
         self._players[ctx.guild.id].pause()
-        e = embed.basic_message(ctx, title="Player paused")
+        e = embed.basic_message(ctx.author, title="Player paused")
         await ctx.send(embed=e)
 
     @commands.command(
@@ -113,7 +113,7 @@ class Music(commands.Cog):
     @commands.check(VoiceChecks.bot_and_user_in_same_channel)
     async def resume(self, ctx: Context):
         self._players[ctx.guild.id].resume()
-        e = embed.basic_message(ctx, title="Player resumed")
+        e = embed.basic_message(ctx.author, title="Player resumed")
         await ctx.send(embed=e)
 
     @commands.command(
@@ -130,10 +130,12 @@ class Music(commands.Cog):
         stream: AudioStream = player.stream
         song: Song = player.song
         if stream and song:
-            e = embed.music_message(ctx, song=song, current_duration=stream.progress)
+            e = embed.music_message(
+                ctx.author, song=song, current_duration=stream.progress
+            )
         else:
             e = embed.basic_message(
-                ctx,
+                ctx.author,
                 title="Nothing is currently playing",
                 content=f"Try `{ctx.prefix}play` to add a music !",
             )
@@ -151,7 +153,8 @@ class Music(commands.Cog):
         player: Player = self._players[ctx.guild.id]
         await player.join(ctx.message.author.voice.channel)
         e = embed.basic_message(
-            ctx, title=f"Player connected to {ctx.message.author.voice.channel.name}"
+            ctx.author,
+            title=f"Player connected to {ctx.message.author.voice.channel.name}",
         )
         await ctx.send(embed=e)
 
@@ -172,7 +175,7 @@ class Music(commands.Cog):
             await qry.search()
             if not qry.success:
                 e = embed.music_not_found_message(
-                    ctx,
+                    ctx.author,
                     title=f"Nothing found for {query}, sorry..",
                 )
                 await ctx.send(embed=e)
@@ -182,7 +185,7 @@ class Music(commands.Cog):
         player: Player = self._players[ctx.guild.id]
         player.queue.put(res)
 
-        e: Embed = embed.result_enqueued(ctx, res)
+        e: Embed = embed.result_enqueued(ctx.author, res)
         await ctx.send(embed=e)
 
     @commands.command(
@@ -193,7 +196,9 @@ class Music(commands.Cog):
     @commands.guild_only()
     async def queue(self, ctx: Context):
         queue: ResultSet = self._players[ctx.guild.id].queue
-        e: Embed = embed.queue_message(ctx, queue, title=f"Queue for {ctx.guild.name}")
+        e: Embed = embed.queue_message(
+            ctx.author, queue, title=f"Queue for {ctx.guild.name}"
+        )
         await ctx.send(embed=e)
 
     @commands.command(
@@ -210,7 +215,7 @@ class Music(commands.Cog):
         queue: ResultSet = self._players[ctx.guild.id].queue
         keep_playing: bool = len(queue) > 0
         if keep_playing:
-            e: embed = embed.basic_message(ctx, title="Skipped !")
+            e: embed = embed.basic_message(ctx.author, title="Skipped !")
             await ctx.send(embed=e)
         await ctx.invoke(self.stop, silent=keep_playing)
 
@@ -226,7 +231,9 @@ class Music(commands.Cog):
     async def bind(self, ctx: Context):
         player: Player = self._players[ctx.guild.id]
         player.context = ctx
-        e: embed = embed.basic_message(ctx, title=f"Binded to {ctx.channel.name}")
+        e: embed = embed.basic_message(
+            ctx.author, title=f"Binded to {ctx.channel.name}"
+        )
         await ctx.send(embed=e)
 
 

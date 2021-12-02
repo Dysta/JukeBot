@@ -1,7 +1,7 @@
 import os
 
 import nextcord.ui
-from nextcord import Interaction
+from nextcord import Interaction, Member
 from nextcord.ext import commands
 from nextcord.ext.commands import Context, Bot, BucketType
 
@@ -20,7 +20,7 @@ class Search(commands.Cog):
             await qry.search()
             if not qry.success:
                 e = embed.music_not_found_message(
-                    ctx,
+                    ctx.author,
                     title=f"Nothing found for {query}, sorry..",
                 )
                 msg = await ctx.send(embed=e)
@@ -29,19 +29,19 @@ class Search(commands.Cog):
 
             results: ResultSet = ResultSet.from_query(ctx.author, qry)
             e = embed.search_result_message(
-                ctx,
+                ctx.author,
                 playlist=results,
                 title=f"Result for {query}",
             )
 
-        v = SearchDropdownView(ctx, results)
+        v = SearchDropdownView(ctx.author, results)
         msg = await ctx.send(embed=e, view=v)
         await v.wait()
         await msg.edit(view=None)
         result: str = v.result
         if result == SearchInteraction.CANCEL_TEXT:
             e = embed.music_search_message(
-                ctx,
+                ctx.author,
                 title=f"Search canceled",
             )
             await msg.edit(embed=e)
@@ -135,17 +135,16 @@ class SearchDropdown(nextcord.ui.Select):
 
 
 class SearchDropdownView(nextcord.ui.View):
-    def __init__(self, ctx: Context, results: ResultSet):
+    def __init__(self, author: Member, results: ResultSet):
         super().__init__(timeout=float(os.environ["BOT_SEARCH_TIMEOUT"]))
-        self._ctx = ctx
+        self._author = author
         self._drop = SearchDropdown(results)
         self.add_item(self._drop)
         self._timeout = False
 
     async def interaction_check(self, interaction: Interaction):
-        if self._ctx.author != interaction.user:
+        if self._author != interaction.user:
             return
-
         self.stop()
 
     async def on_timeout(self) -> None:

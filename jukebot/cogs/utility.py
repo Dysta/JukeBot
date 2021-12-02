@@ -21,7 +21,7 @@ class Utility(commands.Cog):
     @commands.cooldown(1, 15.0, BucketType.user)
     @commands.guild_only()
     async def info(self, ctx: Context):
-        e = embed.info_message(ctx)
+        e = embed.info_message(ctx.author)
         e.set_thumbnail(url=self.bot.user.display_avatar.url)
         e.add_field(name="🤖 Name", value=f"`{self.bot.user.display_name}`", inline=True)
         e.add_field(
@@ -56,7 +56,9 @@ class Utility(commands.Cog):
     @commands.cooldown(1, 15.0, BucketType.user)
     @commands.guild_only()
     async def ping(self, ctx: Context):
-        e = embed.info_message(ctx, content=f"Pong.. {self.bot.latency * 1000:.2f}ms")
+        e = embed.info_message(
+            ctx.author, content=f"Pong.. {self.bot.latency * 1000:.2f}ms"
+        )
         await ctx.reply(embed=e)
 
     @commands.command(
@@ -79,7 +81,7 @@ class Utility(commands.Cog):
     @commands.guild_only()
     async def avatar(self, ctx: Context, who: typing.Optional[Member] = None):
         who: Member = ctx.author if who is None else who
-        e = embed.basic_message(ctx, title=f"{who}'s avatar")
+        e = embed.basic_message(ctx.author, title=f"{who}'s avatar")
         e.set_image(url=who.display_avatar.url)
         await ctx.send(embed=e)
 
