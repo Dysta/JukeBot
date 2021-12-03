@@ -70,7 +70,7 @@ class System(commands.Cog):
             )
         else:
             e = embed.error_message(
-                ctx.author, title="You're not administrator of this server."
+                ctx.author, content="You're not administrator of this server."
             )
         await ctx.send(embed=e)
 
