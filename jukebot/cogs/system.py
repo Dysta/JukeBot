@@ -4,7 +4,7 @@ from typing import Optional
 
 from nextcord.ext.commands import Context, BucketType
 
-from jukebot.checks import User
+from jukebot.checks import user
 from jukebot.utils import Extensions, embed
 
 
@@ -31,7 +31,7 @@ class System(commands.Cog):
     )
     @commands.guild_only()
     @commands.has_permissions(administrator=True)
-    @commands.check(User.is_dysta)
+    @commands.check(user.is_dysta)
     async def reload(self, ctx, cog_name: Optional[str] = None):
         try:
             if not cog_name:

@@ -4,7 +4,7 @@ from nextcord import Embed, Member
 from nextcord.ext import commands
 from nextcord.ext.commands import Context, BucketType, Bot
 
-from jukebot.checks import Voice
+from jukebot.checks import voice
 from jukebot.components import (
     AudioStream,
     Player,
@@ -30,7 +30,7 @@ class Music(commands.Cog):
     )
     @commands.guild_only()
     @commands.cooldown(1, 5.0, BucketType.user)
-    @commands.check(Voice.user_is_connected)
+    @commands.check(voice.user_is_connected)
     async def play(
         self,
         ctx: Context,
@@ -75,9 +75,9 @@ class Music(commands.Cog):
     )
     @commands.guild_only()
     @commands.cooldown(1, 5.0, BucketType.user)
-    @commands.check(Voice.bot_and_user_in_same_channel)
-    @commands.check(Voice.bot_is_connected)
-    @commands.check(Voice.user_is_connected)
+    @commands.check(voice.bot_and_user_in_same_channel)
+    @commands.check(voice.bot_is_connected)
+    @commands.check(voice.user_is_connected)
     async def leave(self, ctx: Context):
         await self._players[ctx.guild.id].disconnect()
         # once the bot leave, we destroy is instance from the container
@@ -91,9 +91,9 @@ class Music(commands.Cog):
     )
     @commands.guild_only()
     @commands.cooldown(1, 5.0, BucketType.user)
-    @commands.check(Voice.bot_and_user_in_same_channel)
-    @commands.check(Voice.bot_is_connected)
-    @commands.check(Voice.user_is_connected)
+    @commands.check(voice.bot_and_user_in_same_channel)
+    @commands.check(voice.bot_is_connected)
+    @commands.check(voice.user_is_connected)
     async def stop(self, ctx: Context, silent: Optional[bool] = False):
         self._players[ctx.guild.id].stop()
         if not silent:
@@ -106,9 +106,9 @@ class Music(commands.Cog):
     )
     @commands.guild_only()
     @commands.cooldown(1, 5.0, BucketType.user)
-    @commands.check(Voice.bot_and_user_in_same_channel)
-    @commands.check(Voice.bot_is_connected)
-    @commands.check(Voice.user_is_connected)
+    @commands.check(voice.bot_and_user_in_same_channel)
+    @commands.check(voice.bot_is_connected)
+    @commands.check(voice.user_is_connected)
     async def pause(self, ctx: Context):
         self._players[ctx.guild.id].pause()
         e = embed.basic_message(ctx.author, title="Player paused")
@@ -120,9 +120,9 @@ class Music(commands.Cog):
     )
     @commands.guild_only()
     @commands.cooldown(1, 5.0, BucketType.user)
-    @commands.check(Voice.bot_and_user_in_same_channel)
-    @commands.check(Voice.bot_is_connected)
-    @commands.check(Voice.user_is_connected)
+    @commands.check(voice.bot_and_user_in_same_channel)
+    @commands.check(voice.bot_is_connected)
+    @commands.check(voice.user_is_connected)
     async def resume(self, ctx: Context):
         self._players[ctx.guild.id].resume()
         e = embed.basic_message(ctx.author, title="Player resumed")
@@ -135,9 +135,9 @@ class Music(commands.Cog):
     )
     @commands.guild_only()
     @commands.cooldown(1, 5.0, BucketType.user)
-    @commands.check(Voice.bot_and_user_in_same_channel)
-    @commands.check(Voice.bot_is_connected)
-    @commands.check(Voice.user_is_connected)
+    @commands.check(voice.bot_and_user_in_same_channel)
+    @commands.check(voice.bot_is_connected)
+    @commands.check(voice.user_is_connected)
     async def current(self, ctx: Context):
         player: Player = self._players[ctx.guild.id]
         stream: AudioStream = player.stream
@@ -161,8 +161,8 @@ class Music(commands.Cog):
     )
     @commands.guild_only()
     @commands.cooldown(1, 5.0, BucketType.user)
-    @commands.check(Voice.user_is_connected)
-    @commands.check(Voice.bot_is_not_connected)
+    @commands.check(voice.user_is_connected)
+    @commands.check(voice.bot_is_not_connected)
     async def join(self, ctx: Context):
         player: Player = self._players[ctx.guild.id]
         await player.join(ctx.message.author.voice.channel)
@@ -180,9 +180,9 @@ class Music(commands.Cog):
     )
     @commands.guild_only()
     @commands.cooldown(1, 5.0, BucketType.user)
-    @commands.check(Voice.bot_and_user_in_same_channel)
-    @commands.check(Voice.bot_is_connected)
-    @commands.check(Voice.user_is_connected)
+    @commands.check(voice.bot_and_user_in_same_channel)
+    @commands.check(voice.bot_is_connected)
+    @commands.check(voice.user_is_connected)
     async def add(self, ctx: Context, *, query: str):
         query = query if regex.is_url(query) else f"ytsearch1:{query}"
         with ctx.typing():
@@ -210,8 +210,8 @@ class Music(commands.Cog):
     )
     @commands.guild_only()
     @commands.cooldown(1, 3.0, BucketType.user)
-    @commands.check(Voice.bot_is_connected)
-    @commands.check(Voice.user_is_connected)
+    @commands.check(voice.bot_is_connected)
+    @commands.check(voice.user_is_connected)
     async def queue(self, ctx: Context):
         queue: ResultSet = self._players[ctx.guild.id].queue
         e: Embed = embed.queue_message(
@@ -226,9 +226,9 @@ class Music(commands.Cog):
     )
     @commands.guild_only()
     @commands.cooldown(3, 10.0, BucketType.user)
-    @commands.check(Voice.bot_and_user_in_same_channel)
-    @commands.check(Voice.bot_is_connected)
-    @commands.check(Voice.user_is_connected)
+    @commands.check(voice.bot_and_user_in_same_channel)
+    @commands.check(voice.bot_is_connected)
+    @commands.check(voice.user_is_connected)
     async def skip(self, ctx: Context):
         queue: ResultSet = self._players[ctx.guild.id].queue
         keep_playing: bool = len(queue) > 0
@@ -243,9 +243,9 @@ class Music(commands.Cog):
         help="Bind the current text channel to the bot. The channel will be used to send information about the bot status.",
     )
     @commands.guild_only()
-    @commands.check(Voice.bot_and_user_in_same_channel)
-    @commands.check(Voice.bot_is_connected)
-    @commands.check(Voice.user_is_connected)
+    @commands.check(voice.bot_and_user_in_same_channel)
+    @commands.check(voice.bot_is_connected)
+    @commands.check(voice.user_is_connected)
     @commands.cooldown(1, 10.0, BucketType.guild)
     async def bind(self, ctx: Context):
         player: Player = self._players[ctx.guild.id]
