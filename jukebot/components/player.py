@@ -24,44 +24,28 @@ class Player:
         PAUSED = 2
         STOPPED = 3
 
-    def __init__(self, bot: Bot, guild_id: int):
+    def __init__(self, bot: Bot):
         self.bot: Bot = bot
-        self.guild_id: int = guild_id
 
         self._voice: Optional[VoiceClient] = None
         self._stream: Optional[AudioStream] = None
         self._context: Optional[Context] = None
         self._song: Optional[Song] = None
         self._queue: ResultSet = ResultSet.empty()
-
         self._state: Player.State = Player.State.IDLE
 
     async def join(self, channel: VoiceChannel):
-        if not self._voice or not self._voice.is_connected():
-            try:
-                self._voice = await channel.connect()
-            except asyncio.TimeoutError:
-                return "Could not connect to the voice channel in time."
-            except nextcord.ClientException:
-                return "Already connected to a voice channel."
-        if self._voice.channel.id != channel.id:
-            await self._voice.move_to(channel)
-        return True
+        self._voice = await channel.connect()
 
     async def play(self, song: Song):
-        try:
-            audio = nextcord.FFmpegPCMAudio(
-                song.stream_url,
-                executable=_PlayerOption.FFMPEG_EXECUTABLE[platform.system()],
-                pipe=False,
-                stderr=sys.stdout,  # None,  # subprocess.PIPE
-                before_options=_PlayerOption.FFMPEG_BEFORE_OPTIONS,  # "-nostdin",
-                options=_PlayerOption.FFMPEG_OPTIONS,
-            )
-        except nextcord.ClientException:
-            print("_play_now", "The subprocess failed to be created")
-            return
-
+        audio = nextcord.FFmpegPCMAudio(
+            song.stream_url,
+            executable=_PlayerOption.FFMPEG_EXECUTABLE[platform.system()],
+            pipe=False,
+            stderr=sys.stdout,  # None,  # subprocess.PIPE
+            before_options=_PlayerOption.FFMPEG_BEFORE_OPTIONS,  # "-nostdin",
+            options=_PlayerOption.FFMPEG_OPTIONS,
+        )
         stream = AudioStream(audio)
         stream.read()
 
@@ -161,7 +145,7 @@ class PlayerCollection(AbstractCollection[int, Player]):
 
     def __getitem__(self, key):
         if not key in self._collection:
-            self._collection[key] = Player(self.bot, key)
+            self._collection[key] = Player(self.bot)
         return self._collection[key]
 
 
