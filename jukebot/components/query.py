@@ -28,9 +28,13 @@ class Query:
             ytdl.cache.remove()
 
             loop = asyncio.get_event_loop()
-            info = await loop.run_in_executor(
-                None, lambda: ytdl.extract_info(url=self._query, **ytdl_kwargs)
-            )
+            try:
+                info = await loop.run_in_executor(
+                    None, lambda: ytdl.extract_info(url=self._query, **ytdl_kwargs)
+                )
+            except:
+                self._success = False
+                return
             info = Query._sanitize_info(info)
 
         # with open("debug.json", "w") as f:
