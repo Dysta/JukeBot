@@ -1,5 +1,5 @@
-import aiofiles
-import json
+import asyncio
+
 import os
 
 from datetime import datetime
@@ -7,76 +7,55 @@ from datetime import datetime
 from nextcord import Guild
 from nextcord.ext import commands
 
-from jukebot.abstract_components import AbstractMap
+from jukebot.abstract_components import AbstractMongoDB
 
 
 class JukeBot(commands.Bot):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._start = datetime.now()
-        self._prefixes: PrefixCollection = PrefixCollection.load()
+        self._prefixes: PrefixDB = PrefixDB(
+            url=os.environ["MONGO_DB_URI"], database="jukebot", collection="prefixes"
+        )
 
     async def on_ready(self):
         print(f"Logged in as {self.user} (ID: {self.user.id})")
         print("------")
 
-    async def close(self):
-        await self._prefixes.export()
-        await super().close()
-
     async def on_error(self, event, *args, **kwargs):
         print(f"{event=}{args}{kwargs}")
 
     async def on_guild_join(self, guild: Guild):
-        await self.set_prefix_for(guild.id, os.environ["BOT_PREFIX"])
+        await self._prefixes.set_item(guild.id, os.environ["BOT_PREFIX"])
 
     async def on_guild_remove(self, guild):
-        del self._prefixes[guild.id]
-        await self._prefixes.export()
-
-    async def set_prefix_for(self, guild_id, prefix):
-        self._prefixes[guild_id] = prefix
-        await self._prefixes.export()
+        await self._prefixes.del_item(guild.id)
 
     @property
     def start_time(self):
         return self._start
 
     @property
-    def prefixes(self) -> "PrefixCollection":
+    def prefixes(self) -> "PrefixDB":
         return self._prefixes
 
 
-class PrefixCollection(AbstractMap[str, str]):
-    _instance = None
-    _filename = "data/prefixes.json"
+class PrefixDB(AbstractMongoDB):
+    async def contain(self, guild_id: int) -> bool:
+        item = {"guild_id": guild_id}
+        res = await self._collection.find_one(item)
+        return bool(res)
 
-    def __new__(cls):
-        if cls._instance is None:
-            cls._instance = super(PrefixCollection, cls).__new__(cls)
-        return cls._instance
+    async def get_item(self, guild_id: int) -> str:
+        item = {"guild_id": guild_id}
+        res = await self._collection.find_one(item)
+        return res["prefix"]
 
-    async def export(self):
-        async with aiofiles.open(PrefixCollection._filename, "w") as f:
-            data = json.dumps(self._collection)
-            await f.write(data)
+    async def set_item(self, guild_id: int, prefix: str) -> None:
+        key = {"guild_id": guild_id}
+        value = {"$set": {"prefix": prefix}}
+        asyncio.ensure_future(self._collection.update_one(key, value, upsert=True))
 
-    @staticmethod
-    def load():
-        if not os.path.exists(PrefixCollection._filename):
-            data = {}
-        else:
-            with open(PrefixCollection._filename, "r") as f:
-                data = json.load(f)
-        col = PrefixCollection()
-        col._collection = data
-        return col
-
-    def __setitem__(self, key: int, value: str):
-        super().__setitem__(str(key), value)
-
-    def __getitem__(self, key: int) -> str:
-        return super().__getitem__(str(key))
-
-    def __delitem__(self, key: int) -> None:
-        super().__delitem__(str(key))
+    async def del_item(self, guild_id: int) -> None:
+        item = {"guild_id": guild_id}
+        asyncio.ensure_future(self._collection.delete_one(item))

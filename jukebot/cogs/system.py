@@ -55,14 +55,14 @@ class System(commands.Cog):
         if not prefix:
             e = embed.basic_message(
                 ctx.author,
-                content=f"Prefix for `{ctx.guild.name}` is `{self.bot.prefixes[str(ctx.guild.id)]}`",
+                content=f"Prefix for `{ctx.guild.name}` is `{await self.bot.prefixes.get_item(ctx.guild.id)}`",
             )
             await ctx.send(embed=e)
             return
 
         perm: Permissions = ctx.author.guild_permissions
         if perm.administrator:
-            await self.bot.set_prefix_for(ctx.guild.id, prefix)
+            await self.bot.prefixes.set_item(ctx.guild.id, prefix)
             e = embed.basic_message(
                 ctx.author,
                 title="Prefix changed!",

@@ -45,7 +45,9 @@ class Utility(commands.Cog):
             inline=True,
         )
         e.add_field(
-            name="🪄 Prefix", value=f"`{self.bot.prefixes[ctx.guild.id]}`", inline=True
+            name="🪄 Prefix",
+            value=f"`{await self.bot.prefixes.get_item(ctx.guild.id)}`",
+            inline=True,
         )
         await ctx.reply(embed=e)
 
