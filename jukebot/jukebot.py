@@ -7,7 +7,7 @@ from datetime import datetime
 from nextcord import Guild
 from nextcord.ext import commands
 
-from jukebot.abstract_components import AbstractCollection
+from jukebot.abstract_components import AbstractMap
 
 
 class JukeBot(commands.Bot):
@@ -47,7 +47,7 @@ class JukeBot(commands.Bot):
         return self._prefixes
 
 
-class PrefixCollection(AbstractCollection[str, str]):
+class PrefixCollection(AbstractMap[str, str]):
     _instance = None
     _filename = "data/prefixes.json"
 

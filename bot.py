@@ -7,7 +7,6 @@ from nextcord.ext import commands
 
 from dotenv import load_dotenv
 
-from jukebot.jukebot import PrefixCollection
 from jukebot.utils import Extensions
 from jukebot import JukeBot
 from jukebot.listeners import HelpHandler
@@ -28,7 +27,7 @@ def set_logging():
 
 
 async def prefix_for(client, message):
-    prefixes = PrefixCollection()
+    prefixes = client.prefixes
     if str(message.guild.id) in prefixes:
         prefix = prefixes[message.guild.id]
     else:

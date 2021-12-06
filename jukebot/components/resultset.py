@@ -3,13 +3,13 @@ from typing import List
 
 from nextcord import Member
 
-from jukebot.abstract_components import AbstractSet
+from jukebot.abstract_components import AbstractCollection
 from .result import Result
 from .query import Query
 
 
 @dataclass
-class ResultSet(AbstractSet[Result]):
+class ResultSet(AbstractCollection[Result]):
     @classmethod
     def from_query(cls, author: Member, query: Query) -> "ResultSet":
         result_set: List[Result] = []

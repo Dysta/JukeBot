@@ -1,12 +1,12 @@
 from dataclasses import dataclass
 from typing import List
 
-from jukebot.abstract_components import AbstractSet
+from jukebot.abstract_components import AbstractCollection
 from jukebot.components import Song, Query
 
 
 @dataclass
-class SongSet(AbstractSet[Song]):
+class SongSet(AbstractCollection[Song]):
     @classmethod
     def from_query(cls, query: Query) -> "SongSet":
         song_set: List[Song] = []

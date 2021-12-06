@@ -10,7 +10,7 @@ from typing import Optional
 from nextcord import VoiceChannel, VoiceClient
 from nextcord.ext.commands import Bot, Context
 
-from ..abstract_components import AbstractCollection
+from ..abstract_components import AbstractMap
 from .result import Result
 from .resultset import ResultSet
 from .song import Song
@@ -132,7 +132,7 @@ class Player:
         self._context = c
 
 
-class PlayerCollection(AbstractCollection[int, Player]):
+class PlayerCollection(AbstractMap[int, Player]):
     _instance = None
     _lock: Lock = Lock()
 
