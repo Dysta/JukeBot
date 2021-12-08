@@ -49,7 +49,7 @@ class PrefixDB(AbstractMongoDB):
     async def get_item(self, guild_id: int) -> str:
         item = {"guild_id": guild_id}
         res = await self._collection.find_one(item)
-        return res["prefix"]
+        return res["prefix"] if res else None
 
     async def set_item(self, guild_id: int, prefix: str) -> None:
         key = {"guild_id": guild_id}

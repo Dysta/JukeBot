@@ -29,9 +29,7 @@ def set_logging():
 async def prefix_for(client, message):
     prefixes = client.prefixes
     guild_id = message.guild.id
-    if await prefixes.contain(guild_id):
-        prefix = await prefixes.get_item(guild_id)
-    else:
+    if (prefix := await prefixes.get_item(guild_id)) is None:
         await prefixes.set_item(guild_id, os.environ["BOT_PREFIX"])
         prefix = os.environ["BOT_PREFIX"]
     return prefix
