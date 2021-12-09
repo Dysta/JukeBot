@@ -41,7 +41,7 @@ class JukeBot(commands.Bot):
 
 
 class PrefixDB(AbstractMongoDB):
-    async def contain(self, guild_id: int) -> bool:
+    async def contains(self, guild_id: int) -> bool:
         item = {"guild_id": guild_id}
         res = await self._collection.find_one(item)
         return bool(res)
