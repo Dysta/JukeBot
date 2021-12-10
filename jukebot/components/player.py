@@ -1,8 +1,10 @@
 import asyncio
+import os
 import nextcord
 import platform
 import sys
 
+from asyncio import Task
 from enum import Enum
 from threading import Lock
 from typing import Optional
@@ -33,6 +35,7 @@ class Player:
         self._song: Optional[Song] = None
         self._queue: ResultSet = ResultSet.empty()
         self._state: Player.State = Player.State.IDLE
+        self._idle_task: Optional[Task] = None
 
     async def join(self, channel: VoiceChannel):
         self._voice = await channel.connect()
@@ -55,17 +58,33 @@ class Player:
         self._voice.play(stream, after=self._after)
         self._stream = stream
         self._song = song
-        self._state = Player.State.PLAYING
+        self.state = Player.State.PLAYING
+
+    async def disconnect(self):
+        if self._voice:
+            self.state = Player.State.STOPPED
+            await self._voice.disconnect()
+
+    def stop(self):
+        if self._voice:
+            self.state = Player.State.IDLE
+            self._voice.stop()
+
+    def pause(self):
+        if self._voice:
+            self.state = Player.State.PAUSED
+            self._voice.pause()
+
+    def resume(self):
+        if self._voice:
+            self.state = Player.State.PLAYING
+            self._voice.resume()
 
     def _after(self, error):
         if error:
             print(f"_after {error=}")
-        if self._state == Player.State.STOPPED:
+        if self.state == Player.State.STOPPED:
             return
-
-        self._state = Player.State.IDLE
-        self._stream = None
-        self._song = None
 
         if len(self._queue):
             req: Result = self._queue.get()
@@ -74,26 +93,28 @@ class Player:
             )
             fut = asyncio.run_coroutine_threadsafe(func, self.bot.loop)
             fut.result()
+        else:
+            self.state = Player.State.IDLE
+            self._stream = None
+            self._song = None
 
-    async def disconnect(self):
-        if self._voice:
-            self._state = Player.State.STOPPED
-            await self._voice.disconnect()
+    async def _idle(self) -> None:
+        time = float(os.environ["BOT_MAX_IDLE_TIME"])
+        await asyncio.sleep(delay=time)
 
-    def stop(self):
-        if self._voice:
-            self._state = Player.State.IDLE
-            self._voice.stop()
+    def _idle_callback(self, task: Task) -> None:
+        if not task.cancelled():
+            func = self.bot.get_cog("Music").leave(context=self._context, idle=True)
+            asyncio.ensure_future(func, loop=self.bot.loop)
 
-    def pause(self):
-        if self._voice:
-            self._state = Player.State.PAUSED
-            self._voice.pause()
-
-    def resume(self):
-        if self._voice:
-            self._state = Player.State.PLAYING
-            self._voice.resume()
+    def _set_idle_task(self, state: State) -> None:
+        if state == Player.State.IDLE and not self._idle_task:
+            task = self.bot.loop.create_task(self._idle())
+            task.add_done_callback(self._idle_callback)
+            self._idle_task = task
+        elif state != Player.State.IDLE and self._idle_task:
+            self._idle_task.cancel()
+            self._idle_task = None
 
     @property
     def stream(self) -> Optional[AudioStream]:
@@ -109,7 +130,7 @@ class Player:
 
     @property
     def playing(self) -> bool:
-        return bool(self.stream and self.voice and self._state == Player.State.PLAYING)
+        return bool(self.stream and self.voice and self.state == Player.State.PLAYING)
 
     @property
     def connected(self) -> bool:
@@ -130,6 +151,15 @@ class Player:
     @context.setter
     def context(self, c: Context) -> None:
         self._context = c
+
+    @property
+    def state(self) -> State:
+        return self._state
+
+    @state.setter
+    def state(self, new: State) -> None:
+        self._state = new
+        self._set_idle_task(new)
 
 
 class PlayerCollection(AbstractMap[int, Player]):
