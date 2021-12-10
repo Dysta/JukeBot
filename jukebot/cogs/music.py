@@ -78,11 +78,13 @@ class Music(commands.Cog):
     @commands.check(voice.bot_and_user_in_same_channel)
     @commands.check(voice.bot_is_connected)
     @commands.check(voice.user_is_connected)
-    async def leave(self, ctx: Context):
+    async def leave(self, ctx: Context, idle: Optional[bool] = False):
         await self._players[ctx.guild.id].disconnect()
         # once the bot leave, we destroy is instance from the container
         del self._players[ctx.guild.id]
-        e = embed.basic_message(ctx.author, title="Player disconnected")
+        e = embed.basic_message(
+            ctx.author, title=f"Player disconnected{' for inactivity' if idle else ''}"
+        )
         await ctx.send(embed=e)
 
     @commands.command(
