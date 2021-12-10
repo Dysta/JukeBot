@@ -1,19 +1,22 @@
 import asyncio
-from threading import Lock
-
+import os
 import nextcord
 import platform
 import sys
 
+from asyncio import Task
+from enum import Enum
+from threading import Lock
 from typing import Optional
 
-from nextcord import VoiceClient, VoiceChannel
-from nextcord.ext.commands import Context, Bot
+from nextcord import VoiceChannel, VoiceClient
+from nextcord.ext.commands import Bot, Context
 
+from ..abstract_components import AbstractMap
+from .result import Result
+from .resultset import ResultSet
 from .song import Song
 from .audio_stream import AudioStream
-from collections import abc
-from enum import Enum
 
 
 class Player:
@@ -21,73 +24,97 @@ class Player:
         IDLE = 0
         PLAYING = 1
         PAUSED = 2
+        STOPPED = 3
 
-    def __init__(self, bot: Bot, guild_id: int):
+    def __init__(self, bot: Bot):
         self.bot: Bot = bot
-        self.guild_id: int = guild_id
 
         self._voice: Optional[VoiceClient] = None
         self._stream: Optional[AudioStream] = None
+        self._context: Optional[Context] = None
         self._song: Optional[Song] = None
-        self._next = asyncio.Event()
-        self._queue = asyncio.Queue()
-
+        self._queue: ResultSet = ResultSet.empty()
         self._state: Player.State = Player.State.IDLE
+        self._idle_task: Optional[Task] = None
 
     async def join(self, channel: VoiceChannel):
-        if self._voice is None or not self._voice.is_connected():
-            try:
-                self._voice = await channel.connect()
-            except asyncio.TimeoutError:
-                return "Could not connect to the voice channel in time."
-            except nextcord.ClientException:
-                return "Already connected to a voice channel."
-        if self._voice.channel.id != channel.id:
-            await self._voice.move_to(channel)
-        return True
+        self._voice = await channel.connect()
 
-    async def play(self, ctx: Context, song):
-
-        try:
-            audio = nextcord.FFmpegPCMAudio(
-                song.stream_url,
-                executable=_PlayerOption.FFMPEG_EXECUTABLE[platform.system()],
-                pipe=False,
-                stderr=sys.stdout,  # None,  # subprocess.PIPE
-                before_options=_PlayerOption.FFMPEG_BEFORE_OPTIONS,  # "-nostdin",
-                options=_PlayerOption.FFMPEG_OPTIONS,
-            )
-        except nextcord.ClientException:
-            print("_play_now", "The subprocess failed to be created")
-            return
-
+    async def play(self, song: Song):
+        audio = nextcord.FFmpegPCMAudio(
+            song.stream_url,
+            executable=_PlayerOption.FFMPEG_EXECUTABLE[platform.system()],
+            pipe=False,
+            stderr=sys.stdout,  # None,  # subprocess.PIPE
+            before_options=_PlayerOption.FFMPEG_BEFORE_OPTIONS,  # "-nostdin",
+            options=_PlayerOption.FFMPEG_OPTIONS,
+        )
         stream = AudioStream(audio)
         stream.read()
-
-        await self.join(ctx.message.author.voice.channel)
 
         if self._voice and self._voice.is_playing():
             self._voice.stop()
 
-        self._voice.play(stream)
+        self._voice.play(stream, after=self._after)
         self._stream = stream
         self._song = song
+        self.state = Player.State.PLAYING
 
     async def disconnect(self):
         if self._voice:
+            self.state = Player.State.STOPPED
             await self._voice.disconnect()
 
     def stop(self):
         if self._voice:
+            self.state = Player.State.IDLE
             self._voice.stop()
 
     def pause(self):
         if self._voice:
+            self.state = Player.State.PAUSED
             self._voice.pause()
 
     def resume(self):
         if self._voice:
+            self.state = Player.State.PLAYING
             self._voice.resume()
+
+    def _after(self, error):
+        if error:
+            print(f"_after {error=}")
+        if self.state == Player.State.STOPPED:
+            return
+
+        if len(self._queue):
+            req: Result = self._queue.get()
+            func = self.bot.get_cog("Music").play(
+                context=self._context, author=req.author, force=True, query=req.web_url
+            )
+            fut = asyncio.run_coroutine_threadsafe(func, self.bot.loop)
+            fut.result()
+        else:
+            self.state = Player.State.IDLE
+            self._stream = None
+            self._song = None
+
+    async def _idle(self) -> None:
+        time = float(os.environ["BOT_MAX_IDLE_TIME"])
+        await asyncio.sleep(delay=time)
+
+    def _idle_callback(self, task: Task) -> None:
+        if not task.cancelled():
+            func = self.bot.get_cog("Music").leave(context=self._context, idle=True)
+            asyncio.ensure_future(func, loop=self.bot.loop)
+
+    def _set_idle_task(self, state: State) -> None:
+        if state == Player.State.IDLE and not self._idle_task:
+            task = self.bot.loop.create_task(self._idle())
+            task.add_done_callback(self._idle_callback)
+            self._idle_task = task
+        elif state != Player.State.IDLE and self._idle_task:
+            self._idle_task.cancel()
+            self._idle_task = None
 
     @property
     def stream(self) -> Optional[AudioStream]:
@@ -103,14 +130,39 @@ class Player:
 
     @property
     def playing(self) -> bool:
-        return bool(self.stream and self.voice)
+        return bool(self.stream and self.voice and self.state == Player.State.PLAYING)
 
     @property
-    def song(self):
+    def connected(self) -> bool:
+        return bool(self._voice)
+
+    @property
+    def song(self) -> Optional[Song]:
         return self._song
 
+    @property
+    def queue(self) -> ResultSet:
+        return self._queue
 
-class PlayerCollection(abc.MutableMapping):
+    @property
+    def context(self) -> Optional[Context]:
+        return self._context
+
+    @context.setter
+    def context(self, c: Context) -> None:
+        self._context = c
+
+    @property
+    def state(self) -> State:
+        return self._state
+
+    @state.setter
+    def state(self, new: State) -> None:
+        self._state = new
+        self._set_idle_task(new)
+
+
+class PlayerCollection(AbstractMap[int, Player]):
     _instance = None
     _lock: Lock = Lock()
 
@@ -121,29 +173,10 @@ class PlayerCollection(abc.MutableMapping):
                 cls.bot = bot
         return cls._instance
 
-    def __contains__(self, key):
-        return key in self.__dict__.keys()
-
     def __getitem__(self, key):
-        if not key in self.__dict__:
-            self.__dict__[key] = Player(self.bot, key)
-        return self.__dict__[key]
-
-    def __setitem__(self, key, value):
-        self.__dict__[key] = value
-
-    def __delitem__(self, key):
-        del self.__dict__[key]
-
-    def __iter__(self):
-        for p in self.__dict__:
-            yield p
-
-    def __len__(self):
-        return len(self.__dict__)
-
-    def __str__(self):
-        return str(self.__dict__)
+        if not key in self._collection:
+            self._collection[key] = Player(self.bot)
+        return self._collection[key]
 
 
 class _PlayerOption:

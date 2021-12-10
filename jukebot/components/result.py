@@ -1,23 +1,25 @@
 from dataclasses import dataclass
-from typing import Optional, Union
+from typing import Optional
 
-from jukebot.components import Query
+from nextcord import Member
+
+from .query import Query
 from jukebot.utils import converter
 
 
 @dataclass
 class Result:
-    id: Optional[Union[str, int]]
-    url: str
+    web_url: str
     title: str
     channel: str
     duration: int = 0
     fmt_duration: str = "0:00"
     live: bool = False
+    author: Optional[Member] = None
 
-    def __init__(self, info: dict):
-        self.url = info["url"]
-        self.id = info.get("id", -1)
+    def __init__(self, author: Member, info: dict):
+        self.author = author
+        self.web_url = info.get("url", info.get("original_url"))
         self.title = info.get("title", "Unknown")
         self.channel = info.get("channel", info.get("uploader", "Unknown"))
         self.duration = int(info.get("duration", 0) or 0)
@@ -27,10 +29,20 @@ class Result:
         )
 
     @classmethod
-    def from_query(cls, query: Query, entry: int = 0):
-        info = query.get_entries(entry) if "entries" in query.info else query.info
-        return cls(info=info)
+    def from_query(cls, author: Member, query: Query, entry: int = 0):
+        results = query.results
+        if isinstance(results, list):
+            try:
+                info = results[entry]
+            except KeyError:
+                raise
+        elif isinstance(results, dict):
+            info = results
+        else:
+            raise Exception(f"Query result unknown format for {results=}")
+
+        return cls(author=author, info=info)
 
     @classmethod
-    def from_entry(cls, entry: dict):
-        return cls(info=entry)
+    def from_entry(cls, author: Member, entry: dict):
+        return cls(author=author, info=entry)

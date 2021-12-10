@@ -32,22 +32,6 @@ def number_to_emoji(n: int) -> str:
     return number[n]
 
 
-def emoji_to_number(e: str) -> int:
-    emoji: dict = {
-        "1️⃣": 1,
-        "2️⃣": 2,
-        "3️⃣": 3,
-        "4️⃣": 4,
-        "5️⃣": 5,
-        "6️⃣": 6,
-        "7️⃣": 7,
-        "8️⃣": 8,
-        "9️⃣": 9,
-        "🔟": 10,
-    }
-    return emoji[e]
-
-
 def duration_seconds_to_progress_bar(time: int, total: int, ticks: int = 30) -> str:
     x = int(ticks * (time / total)) if total else 0
     line = "".join(["▬" if t != x else "🔘" for t in range(ticks)])

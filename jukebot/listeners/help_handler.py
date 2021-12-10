@@ -12,7 +12,7 @@ class HelpHandler(commands.HelpCommand):
             "help": "Display a list of all available commands.\nCan display help for a specific category or command.",
             "usage": "[command_name|category_name]",
         }
-        super().__init__(command_attrs=opts)
+        super().__init__(verify_checks=False, command_attrs=opts)
 
     def get_ending_note(self):
         command_name = self.invoked_with
@@ -25,7 +25,7 @@ class HelpHandler(commands.HelpCommand):
         ctx = self.context
         bot = ctx.bot
 
-        help_embed = embed.info_message(ctx, title="Available commands")
+        help_embed = embed.info_message(ctx.author, title="Available commands")
 
         def get_category(command, *, no_category="Other:"):
             cog = command.cog
@@ -50,7 +50,7 @@ class HelpHandler(commands.HelpCommand):
     async def send_cog_help(self, cog):
         ctx = self.context
 
-        cog_embed = embed.info_message(ctx, title="Available commands")
+        cog_embed = embed.info_message(ctx.author, title="Available commands")
 
         filtered = await self.filter_commands(cog.get_commands(), sort=True)
         cmds = sorted(filtered, key=lambda c: c.name)
@@ -69,7 +69,7 @@ class HelpHandler(commands.HelpCommand):
         ctx = self.context
 
         cmd_embed = embed.info_message(
-            ctx, title=f"Command : {command.name}", content=command.help
+            ctx.author, title=f"Command : {command.name}", content=command.help
         )
 
         aliases = ", ".join([a for a in [command.name] + command.aliases])

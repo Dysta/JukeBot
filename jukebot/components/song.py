@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Optional, Any
+from typing import Optional
 
 from .query import Query
 from jukebot.utils import converter
@@ -14,8 +14,7 @@ class Song:
     channel: str = "Unknown"
     duration: int = 0
     fmt_duration: str = "0:00"
-    success: bool = False
-    live: Any = None
+    live: bool = False
 
     def __init__(self, info: dict):
         self.stream_url = info["url"]
@@ -31,7 +30,17 @@ class Song:
 
     @classmethod
     def from_query(cls, query: Query, entry: int = 0):
-        info = query.get_entries(entry) if "entries" in query.info else query.info
+        results = query.results
+        if isinstance(results, list):
+            try:
+                info = results[entry]
+            except KeyError:
+                raise
+        elif isinstance(results, dict):
+            info = results
+        else:
+            raise Exception(f"Query result unknown format for {results=}")
+
         return cls(info=info)
 
     @classmethod

@@ -6,7 +6,7 @@ _T = TypeVar("_T")
 
 
 @dataclass
-class AbstractSet(abc.Collection, Generic[_T]):
+class AbstractCollection(abc.Collection, Generic[_T]):
     set: List[_T]
 
     def __len__(self) -> int:
