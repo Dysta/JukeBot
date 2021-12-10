@@ -85,6 +85,8 @@ class Player:
             print(f"_after {error=}")
         if self.state == Player.State.STOPPED:
             return
+        self._stream = None
+        self._song = None
 
         if len(self._queue):
             req: Result = self._queue.get()
@@ -95,8 +97,6 @@ class Player:
             fut.result()
         else:
             self.state = Player.State.IDLE
-            self._stream = None
-            self._song = None
 
     async def _idle(self) -> None:
         time = float(os.environ["BOT_MAX_IDLE_TIME"])
