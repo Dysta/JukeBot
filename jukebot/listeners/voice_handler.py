@@ -1,5 +1,3 @@
-from typing import List, Optional
-
 from nextcord import Member, VoiceState, VoiceChannel
 from nextcord.ext import commands
 from nextcord.ext.commands import Bot
