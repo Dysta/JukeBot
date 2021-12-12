@@ -2,6 +2,7 @@ import datetime
 import logging
 import os
 
+import nextcord
 from nextcord import Game
 from nextcord.ext import commands
 
@@ -48,6 +49,7 @@ def main():
         command_prefix=get_prefix,
         help_command=HelpHandler(),
         activity=Game(f"{os.environ['BOT_PREFIX']}help"),
+        intents=nextcord.Intents.all()
     )
 
     for e in Extensions.all():

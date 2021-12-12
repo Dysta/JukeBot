@@ -85,6 +85,8 @@ class Player:
             print(f"_after {error=}")
         if self.state == Player.State.STOPPED:
             return
+        self._stream = None
+        self._song = None
 
         if len(self._queue):
             req: Result = self._queue.get()
@@ -95,8 +97,6 @@ class Player:
             fut.result()
         else:
             self.state = Player.State.IDLE
-            self._stream = None
-            self._song = None
 
     async def _idle(self) -> None:
         time = float(os.environ["BOT_MAX_IDLE_TIME"])
@@ -108,11 +108,11 @@ class Player:
             asyncio.ensure_future(func, loop=self.bot.loop)
 
     def _set_idle_task(self, state: State) -> None:
-        if state == Player.State.IDLE and not self._idle_task:
+        if state in (Player.State.IDLE, Player.State.PAUSED) and not self._idle_task:
             task = self.bot.loop.create_task(self._idle())
             task.add_done_callback(self._idle_callback)
             self._idle_task = task
-        elif state != Player.State.IDLE and self._idle_task:
+        elif state not in (Player.State.IDLE, Player.State.PAUSED) and self._idle_task:
             self._idle_task.cancel()
             self._idle_task = None
 
