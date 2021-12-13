@@ -41,7 +41,7 @@ class Utility(commands.Cog):
         )
         e.add_field(
             name="👨‍👧‍👦 Members",
-            value=f"`{len(list(self.bot.get_all_members()))}`",
+            value=f"`{len(set(self.bot.get_all_members()))}`",
             inline=True,
         )
         e.add_field(
