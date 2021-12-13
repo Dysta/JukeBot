@@ -25,8 +25,6 @@ class VoiceHandler(commands.Cog):
                 self.bot.dispatch(
                     "voice_channel_move", member, before.channel, after.channel
                 )
-            # if after.afk:
-            #     self.bot.dispatch("voice_afk", member, before.channel)
 
     @commands.Cog.listener()
     async def on_voice_channel_connect(self, member: Member, channel: VoiceChannel):
