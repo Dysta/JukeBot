@@ -84,10 +84,6 @@ def setup(bot):
     bot.add_cog(Search(bot))
 
 
-class SearchCanceledException(Exception):
-    pass
-
-
 class SearchInteraction:
     CANCEL_REACTION = "❌"
     CANCEL_TEXT = "Cancel"
