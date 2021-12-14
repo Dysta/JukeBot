@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from typing import List
 
-
 from jukebot.abstract_components import AbstractCollection
 from .result import Result
 from .query import Query

@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 from typing import Optional
 
-from .query import Query
 from jukebot.utils import converter
+from .query import Query
 
 
 @dataclass

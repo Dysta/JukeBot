@@ -12,7 +12,7 @@ from typing import Optional
 from nextcord import VoiceChannel, VoiceClient
 from nextcord.ext.commands import Bot, Context
 
-from ..abstract_components import AbstractMap
+from jukebot.abstract_components import AbstractMap
 from .result import Result
 from .resultset import ResultSet
 from .song import Song

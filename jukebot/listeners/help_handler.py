@@ -1,6 +1,7 @@
+import itertools
+
 from nextcord.ext import commands
 
-import itertools
 from jukebot.utils import embed
 
 

@@ -1,7 +1,7 @@
 import asyncio
-from typing import Optional, Union
-
 import yt_dlp
+
+from typing import Optional, Union
 
 # Silence useless bug reports messages
 yt_dlp.utils.bug_reports_message = lambda: ""

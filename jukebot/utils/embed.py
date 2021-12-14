@@ -1,5 +1,4 @@
 import itertools
-
 import nextcord
 import random
 
@@ -7,8 +6,7 @@ from typing import Union
 
 from nextcord import Member
 
-from jukebot.components import Song, ResultSet, Result
-from jukebot.components.songset import SongSet
+from jukebot.components import Song, Result, SongSet, ResultSet
 from jukebot.utils import converter
 
 VOID_TOKEN = "\u200B"
