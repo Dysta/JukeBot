@@ -15,7 +15,9 @@ class JukeBot(commands.Bot):
         super().__init__(*args, **kwargs)
         self._start = datetime.now()
         self._prefixes: PrefixDB = PrefixDB(
-            url=os.environ["MONGO_DB_URI"], database="jukebot", collection="prefixes"
+            url=os.environ["MONGO_DB_URI"],
+            database="jukebot",
+            collection="prefixes",
         )
         self._players: PlayerCollection = PlayerCollection(self)
 
