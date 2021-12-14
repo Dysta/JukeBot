@@ -6,8 +6,8 @@ from datetime import datetime
 from nextcord import Guild
 from nextcord.ext import commands
 
-from jukebot.abstract_components import AbstractMongoDB
-from jukebot.components import PlayerCollection
+from jukebot.abstract_components import AbstractMongoDB, AbstractMap
+from jukebot.components import Player
 
 
 class JukeBot(commands.Bot):
@@ -41,7 +41,7 @@ class JukeBot(commands.Bot):
         return self._prefixes
 
     @property
-    def players(self) -> PlayerCollection:
+    def players(self) -> "PlayerCollection":
         return self._players
 
 
@@ -64,3 +64,18 @@ class PrefixDB(AbstractMongoDB):
     async def del_item(self, guild_id: int) -> None:
         item = {"guild_id": guild_id}
         asyncio.ensure_future(self._collection.delete_one(item))
+
+
+class PlayerCollection(AbstractMap[int, Player]):
+    _instance = None
+
+    def __new__(cls, bot):
+        if cls._instance is None:
+            cls._instance = super(PlayerCollection, cls).__new__(cls)
+            cls.bot = bot
+        return cls._instance
+
+    def __getitem__(self, key):
+        if not key in self._collection:
+            self._collection[key] = Player(self.bot)
+        return self._collection[key]
