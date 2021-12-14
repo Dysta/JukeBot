@@ -20,6 +20,7 @@ class AbstractCollection(abc.Collection, Generic[_T]):
         return e in self.set
 
     def __getitem__(self, idx: int) -> _T:
-        if 0 <= idx < len(self):
-            return self.set[idx]
-        raise IndexError
+        return self.set[idx]
+
+    def __str__(self) -> str:
+        return str(self.set)
