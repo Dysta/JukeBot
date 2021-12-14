@@ -2,13 +2,12 @@ from nextcord import Member, VoiceState, VoiceChannel
 from nextcord.ext import commands
 from nextcord.ext.commands import Bot
 
-from jukebot.components import PlayerCollection, Player
+from jukebot.components import Player
 
 
 class VoiceHandler(commands.Cog):
     def __init__(self, bot):
         self.bot: Bot = bot
-        self._players: PlayerCollection = PlayerCollection(bot)
 
     @commands.Cog.listener()
     async def on_voice_state_update(
@@ -31,7 +30,7 @@ class VoiceHandler(commands.Cog):
         if member == self.bot.user:
             return
         if self.bot.user in channel.members:
-            player: Player = self._players[channel.guild.id]
+            player: Player = self.bot.players[channel.guild.id]
             if player.stream and not player.playing:
                 ctx = player.context
                 await self.bot.get_cog("Music").resume(context=ctx)
@@ -39,7 +38,7 @@ class VoiceHandler(commands.Cog):
     @commands.Cog.listener()
     async def on_voice_channel_alone(self, member: Member, channel: VoiceChannel):
         if channel.members[0].id == self.bot.user.id:
-            player: Player = self._players[channel.guild.id]
+            player: Player = self.bot.players[channel.guild.id]
             if player.playing:
                 ctx = player.context
                 await self.bot.get_cog("Music").pause(context=ctx)

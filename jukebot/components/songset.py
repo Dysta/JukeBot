@@ -2,7 +2,8 @@ from dataclasses import dataclass
 from typing import List
 
 from jukebot.abstract_components import AbstractCollection
-from jukebot.components import Song, Query
+from .query import Query
+from .song import Song
 
 
 @dataclass

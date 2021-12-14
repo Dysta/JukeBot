@@ -1,4 +1,4 @@
-from .player import Player, PlayerCollection
+from .player import Player
 from .query import Query
 from .song import Song
 from .result import Result

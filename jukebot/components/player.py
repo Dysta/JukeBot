@@ -6,13 +6,11 @@ import sys
 
 from asyncio import Task
 from enum import Enum
-from threading import Lock
 from typing import Optional
 
 from nextcord import VoiceChannel, VoiceClient
 from nextcord.ext.commands import Bot, Context
 
-from ..abstract_components import AbstractMap
 from .result import Result
 from .resultset import ResultSet
 from .song import Song
@@ -160,23 +158,6 @@ class Player:
     def state(self, new: State) -> None:
         self._state = new
         self._set_idle_task(new)
-
-
-class PlayerCollection(AbstractMap[int, Player]):
-    _instance = None
-    _lock: Lock = Lock()
-
-    def __new__(cls, bot):
-        with cls._lock:
-            if cls._instance is None:
-                cls._instance = super(PlayerCollection, cls).__new__(cls)
-                cls.bot = bot
-        return cls._instance
-
-    def __getitem__(self, key):
-        if not key in self._collection:
-            self._collection[key] = Player(self.bot)
-        return self._collection[key]
 
 
 class _PlayerOption:

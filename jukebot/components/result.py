@@ -3,8 +3,8 @@ from typing import Optional
 
 from nextcord import Member
 
-from .query import Query
 from jukebot.utils import converter
+from .query import Query
 
 
 @dataclass
@@ -17,8 +17,7 @@ class Result:
     live: bool = False
     author: Optional[Member] = None
 
-    def __init__(self, author: Member, info: dict):
-        self.author = author
+    def __init__(self, info: dict):
         self.web_url = info.get("url", info.get("original_url"))
         self.title = info.get("title", "Unknown")
         self.channel = info.get("channel", info.get("uploader", "Unknown"))
@@ -29,7 +28,7 @@ class Result:
         )
 
     @classmethod
-    def from_query(cls, author: Member, query: Query, entry: int = 0):
+    def from_query(cls, query: Query, entry: int = 0):
         results = query.results
         if isinstance(results, list):
             try:
@@ -41,8 +40,8 @@ class Result:
         else:
             raise Exception(f"Query result unknown format for {results=}")
 
-        return cls(author=author, info=info)
+        return cls(info=info)
 
     @classmethod
-    def from_entry(cls, author: Member, entry: dict):
-        return cls(author=author, info=entry)
+    def from_entry(cls, entry: dict):
+        return cls(info=entry)

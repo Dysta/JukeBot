@@ -27,7 +27,7 @@ class Search(commands.Cog):
                 await msg.delete(delay=5.0)
                 return
 
-            results: ResultSet = ResultSet.from_query(ctx.author, qry)
+            results: ResultSet = ResultSet.from_query(qry)
             e = embed.search_result_message(
                 ctx.author,
                 playlist=results,
@@ -82,10 +82,6 @@ class Search(commands.Cog):
 
 def setup(bot):
     bot.add_cog(Search(bot))
-
-
-class SearchCanceledException(Exception):
-    pass
 
 
 class SearchInteraction:
