@@ -7,6 +7,7 @@ from nextcord import Guild
 from nextcord.ext import commands
 
 from jukebot.abstract_components import AbstractMongoDB
+from jukebot.components import PlayerCollection
 
 
 class JukeBot(commands.Bot):
@@ -16,6 +17,7 @@ class JukeBot(commands.Bot):
         self._prefixes: PrefixDB = PrefixDB(
             url=os.environ["MONGO_DB_URI"], database="jukebot", collection="prefixes"
         )
+        self._players: PlayerCollection = PlayerCollection(self)
 
     async def on_ready(self):
         print(f"Logged in as {self.user} (ID: {self.user.id})")
@@ -37,6 +39,10 @@ class JukeBot(commands.Bot):
     @property
     def prefixes(self) -> "PrefixDB":
         return self._prefixes
+
+    @property
+    def players(self) -> PlayerCollection:
+        return self._players
 
 
 class PrefixDB(AbstractMongoDB):

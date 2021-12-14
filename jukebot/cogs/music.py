@@ -8,7 +8,6 @@ from jukebot.checks import voice
 from jukebot.components import (
     AudioStream,
     Player,
-    PlayerCollection,
     Song,
     Query,
     Result,
@@ -20,7 +19,6 @@ from jukebot.utils import embed, regex
 class Music(commands.Cog):
     def __init__(self, bot):
         self.bot: Bot = bot
-        self._players: PlayerCollection = PlayerCollection(bot)
 
     @commands.command(
         aliases=["p"],
@@ -40,7 +38,7 @@ class Music(commands.Cog):
         query: str,
     ):
         # PlayerContainer create bot if needed
-        player: Player = self._players[ctx.guild.id]
+        player: Player = self.bot.players[ctx.guild.id]
         author = author or ctx.author
         if not player.context:
             await ctx.invoke(self.bind)
@@ -79,9 +77,9 @@ class Music(commands.Cog):
     @commands.check(voice.bot_is_connected)
     @commands.check(voice.user_is_connected)
     async def leave(self, ctx: Context, idle: Optional[bool] = False):
-        await self._players[ctx.guild.id].disconnect()
+        await self.bot.players[ctx.guild.id].disconnect()
         # once the bot leave, we destroy is instance from the container
-        del self._players[ctx.guild.id]
+        del self.bot.players[ctx.guild.id]
         e = embed.basic_message(
             ctx.author, title=f"Player disconnected{' for inactivity' if idle else ''}"
         )
@@ -97,7 +95,7 @@ class Music(commands.Cog):
     @commands.check(voice.bot_is_connected)
     @commands.check(voice.user_is_connected)
     async def stop(self, ctx: Context, silent: Optional[bool] = False):
-        self._players[ctx.guild.id].stop()
+        self.bot.players[ctx.guild.id].stop()
         if not silent:
             e = embed.basic_message(ctx.author, title="Player stopped")
             await ctx.send(embed=e)
@@ -112,7 +110,7 @@ class Music(commands.Cog):
     @commands.check(voice.bot_is_connected)
     @commands.check(voice.user_is_connected)
     async def pause(self, ctx: Context):
-        self._players[ctx.guild.id].pause()
+        self.bot.players[ctx.guild.id].pause()
         e = embed.basic_message(ctx.author, title="Player paused")
         await ctx.send(embed=e)
 
@@ -126,7 +124,7 @@ class Music(commands.Cog):
     @commands.check(voice.bot_is_connected)
     @commands.check(voice.user_is_connected)
     async def resume(self, ctx: Context):
-        self._players[ctx.guild.id].resume()
+        self.bot.players[ctx.guild.id].resume()
         e = embed.basic_message(ctx.author, title="Player resumed")
         await ctx.send(embed=e)
 
@@ -141,7 +139,7 @@ class Music(commands.Cog):
     @commands.check(voice.bot_is_connected)
     @commands.check(voice.user_is_connected)
     async def current(self, ctx: Context):
-        player: Player = self._players[ctx.guild.id]
+        player: Player = self.bot.players[ctx.guild.id]
         stream: AudioStream = player.stream
         song: Song = player.song
         if stream and song:
@@ -166,7 +164,7 @@ class Music(commands.Cog):
     @commands.check(voice.user_is_connected)
     @commands.check(voice.bot_is_not_connected)
     async def join(self, ctx: Context):
-        player: Player = self._players[ctx.guild.id]
+        player: Player = self.bot.players[ctx.guild.id]
         await player.join(ctx.message.author.voice.channel)
         e = embed.basic_message(
             ctx.author,
@@ -200,7 +198,7 @@ class Music(commands.Cog):
 
         res: Result = Result.from_query(qry)
         res.author = ctx.author
-        player: Player = self._players[ctx.guild.id]
+        player: Player = self.bot.players[ctx.guild.id]
         player.queue.put(res)
 
         e: Embed = embed.result_enqueued(ctx.author, res)
@@ -216,7 +214,7 @@ class Music(commands.Cog):
     @commands.check(voice.bot_is_connected)
     @commands.check(voice.user_is_connected)
     async def queue(self, ctx: Context):
-        queue: ResultSet = self._players[ctx.guild.id].queue
+        queue: ResultSet = self.bot.players[ctx.guild.id].queue
         e: Embed = embed.queue_message(
             ctx.author, queue, title=f"Queue for {ctx.guild.name}"
         )
@@ -233,7 +231,7 @@ class Music(commands.Cog):
     @commands.check(voice.bot_is_connected)
     @commands.check(voice.user_is_connected)
     async def skip(self, ctx: Context):
-        queue: ResultSet = self._players[ctx.guild.id].queue
+        queue: ResultSet = self.bot.players[ctx.guild.id].queue
         keep_playing: bool = len(queue) > 0
         if keep_playing:
             e: embed = embed.basic_message(ctx.author, title="Skipped !")
@@ -251,7 +249,7 @@ class Music(commands.Cog):
     @commands.check(voice.user_is_connected)
     @commands.cooldown(1, 10.0, BucketType.guild)
     async def bind(self, ctx: Context):
-        player: Player = self._players[ctx.guild.id]
+        player: Player = self.bot.players[ctx.guild.id]
         player.context = ctx
         e: embed = embed.basic_message(
             ctx.author, title=f"Binded to {ctx.channel.name}"
