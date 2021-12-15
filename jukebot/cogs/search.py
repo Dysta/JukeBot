@@ -1,3 +1,4 @@
+import asyncio
 import os
 
 import nextcord.ui
@@ -40,14 +41,16 @@ class Search(commands.Cog):
         await msg.edit(view=None)
         result: str = v.result
         if result == SearchInteraction.CANCEL_TEXT:
-            e = embed.music_search_message(
+            e = embed.music_not_found_message(
                 ctx.author,
                 title=f"Search canceled",
             )
-            await msg.edit(embed=e)
-            await msg.delete(delay=5.0)
+            await msg.edit(embed=e, delete_after=5.0)
             return
-        await self.bot.get_cog("Music").play(context=ctx, query=result)
+        asyncio.ensure_future(
+            self.bot.get_cog("Music").play(context=ctx, query=result),
+            loop=self.bot.loop,
+        )
         await msg.delete()
 
     @commands.command(
