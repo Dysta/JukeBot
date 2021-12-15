@@ -2,12 +2,12 @@ import datetime
 import logging
 import os
 
-from nextcord import Game, Intents
+from nextcord import Game
 from nextcord.ext import commands
 
 from dotenv import load_dotenv
 
-from jukebot.utils import Extensions
+from jukebot.utils import Extensions, intents
 from jukebot import JukeBot
 from jukebot.listeners import HelpHandler
 
@@ -48,7 +48,7 @@ def main():
         command_prefix=get_prefix,
         help_command=HelpHandler(),
         activity=Game(f"{os.environ['BOT_PREFIX']}help"),
-        intents=Intents.all(),
+        intents=intents.get(),
     )
 
     for e in Extensions.all():
