@@ -91,8 +91,7 @@ class Player:
             func = self.bot.get_cog("Music").play(
                 context=self._context, author=req.author, force=True, query=req.web_url
             )
-            fut = asyncio.run_coroutine_threadsafe(func, self.bot.loop)
-            fut.result()
+            asyncio.ensure_future(func, loop=self.bot.loop)
         else:
             self.state = Player.State.IDLE
 
