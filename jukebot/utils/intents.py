@@ -7,4 +7,5 @@ def get() -> Intents:
     intents.guild_reactions = True
     intents.guilds = True
     intents.voice_states = True
+    intents.members = True
     return intents
