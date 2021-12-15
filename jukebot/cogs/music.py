@@ -249,12 +249,15 @@ class Music(commands.Cog):
     @commands.check(voice.user_is_connected)
     @commands.cooldown(1, 10.0, BucketType.guild)
     async def bind(self, ctx: Context):
-        player: Player = self.bot.players[ctx.guild.id]
-        player.context = ctx
         e: embed = embed.basic_message(
             ctx.author, title=f"Binded to {ctx.channel.name}"
         )
-        await ctx.send(embed=e)
+        msg = await ctx.send(embed=e)
+        # we put the bot message as a context to avoid displaying
+        # the user who invoke the command to appear in system message
+        player: Player = self.bot.players[ctx.guild.id]
+        ctx = await self.bot.get_context(msg)
+        player.context = ctx
 
 
 def setup(bot):
