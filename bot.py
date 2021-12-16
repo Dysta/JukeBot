@@ -1,6 +1,7 @@
 import datetime
 import logging
 import os
+from typing import Set
 
 from nextcord import Game
 from nextcord.ext import commands
@@ -40,6 +41,13 @@ async def get_prefix(client, message):
     return commands.when_mentioned_or(prefix)(client, message)
 
 
+def get_ids() -> Set[int]:
+    ids = os.environ["BOT_OWNER_IDS"].split(",")
+    # we must apply a map on elements bc dotenv return str
+    # and discord bot expect int
+    return set(map(int, ids))
+
+
 def main():
     load_dotenv()
     set_logging()
@@ -49,6 +57,7 @@ def main():
         help_command=HelpHandler(),
         activity=Game(f"{os.environ['BOT_PREFIX']}help"),
         intents=intents.get(),
+        owner_ids=get_ids(),
     )
 
     for e in Extensions.all():
