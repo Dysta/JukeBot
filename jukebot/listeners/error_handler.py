@@ -14,8 +14,6 @@ class ErrorHandler(commands.Cog):
         if isinstance(error, commands.CommandNotFound):
             await ctx.message.add_reaction("⁉")
             return
-        if isinstance(error, commands.CheckFailure):
-            return
 
         e = embed.error_message(ctx.author, content=error)
         await ctx.send(embed=e)
