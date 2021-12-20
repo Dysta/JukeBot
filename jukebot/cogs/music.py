@@ -59,6 +59,7 @@ class Music(commands.Cog):
                 return
 
         song: Song = Song.from_query(qry)
+        song.requester = author
 
         if not player.connected:
             await ctx.invoke(self.join)
@@ -142,7 +143,7 @@ class Music(commands.Cog):
         song: Song = player.song
         if stream and song:
             e = embed.music_message(
-                ctx.author, song=song, current_duration=stream.progress
+                song.requester, song=song, current_duration=stream.progress
             )
         else:
             e = embed.basic_message(
@@ -195,7 +196,7 @@ class Music(commands.Cog):
                 return
 
         res: Result = Result.from_query(qry)
-        res.author = ctx.author
+        res.requester = ctx.author
         player: Player = self.bot.players[ctx.guild.id]
         player.queue.put(res)
 

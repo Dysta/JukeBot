@@ -128,7 +128,7 @@ def queue_message(author: Member, playlist: Union[ResultSet, SongSet], title="")
     playlist_slice = itertools.islice(playlist, 10)
     content = "\n\n".join(
         [
-            f"{i}. `{s.title}` on `{s.channel}` **[{s.fmt_duration}]** — `{s.author}`"
+            f"{i}. `{s.title}` on `{s.channel}` **[{s.fmt_duration}]** — `{s.requester}`"
             for i, s in enumerate(playlist_slice, start=1)
         ]
     )

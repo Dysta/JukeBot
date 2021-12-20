@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from typing import Optional
 
+from nextcord import Member
+
 from jukebot.utils import converter
 from .query import Query
 
@@ -15,6 +17,7 @@ class Song:
     duration: int = 0
     fmt_duration: str = "0:00"
     live: bool = False
+    requester: Optional[Member] = None
 
     def __init__(self, info: dict):
         self.stream_url = info["url"]
