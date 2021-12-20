@@ -89,7 +89,10 @@ class Player:
         if len(self._queue):
             req: Result = self._queue.get()
             func = self.bot.get_cog("Music").play(
-                context=self._context, author=req.requester, force=True, query=req.web_url
+                context=self._context,
+                author=req.requester,
+                force=True,
+                query=req.web_url,
             )
             asyncio.ensure_future(func, loop=self.bot.loop)
         else:
