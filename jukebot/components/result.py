@@ -15,7 +15,7 @@ class Result:
     duration: int = 0
     fmt_duration: str = "0:00"
     live: bool = False
-    author: Optional[Member] = None
+    requester: Optional[Member] = None
 
     def __init__(self, info: dict):
         self.web_url = info.get("url", info.get("original_url"))

@@ -59,6 +59,7 @@ class Music(commands.Cog):
                 return
 
         song: Song = Song.from_query(qry)
+        song.requester = author
 
         if not player.connected:
             await ctx.invoke(self.join)
@@ -76,13 +77,11 @@ class Music(commands.Cog):
     @commands.check(voice.bot_and_user_in_same_channel)
     @commands.check(voice.bot_is_connected)
     @commands.check(voice.user_is_connected)
-    async def leave(self, ctx: Context, idle: Optional[bool] = False):
+    async def leave(self, ctx: Context):
         await self.bot.players[ctx.guild.id].disconnect()
         # once the bot leave, we destroy is instance from the container
         del self.bot.players[ctx.guild.id]
-        e = embed.basic_message(
-            ctx.author, title=f"Player disconnected{' for inactivity' if idle else ''}"
-        )
+        e = embed.basic_message(ctx.author, title="Player disconnected")
         await ctx.send(embed=e)
 
     @commands.command(
@@ -144,7 +143,7 @@ class Music(commands.Cog):
         song: Song = player.song
         if stream and song:
             e = embed.music_message(
-                ctx.author, song=song, current_duration=stream.progress
+                song.requester, song=song, current_duration=stream.progress
             )
         else:
             e = embed.basic_message(
@@ -197,7 +196,7 @@ class Music(commands.Cog):
                 return
 
         res: Result = Result.from_query(qry)
-        res.author = ctx.author
+        res.requester = ctx.author
         player: Player = self.bot.players[ctx.guild.id]
         player.queue.put(res)
 

@@ -7,7 +7,7 @@ from nextcord.ext import commands
 from nextcord.ext.commands import Context, Bot, BucketType
 
 from jukebot.checks import voice
-from jukebot.components import Query, ResultSet
+from jukebot.components import Query, ResultSet, SongSet
 from jukebot.utils import embed
 
 
@@ -18,7 +18,10 @@ class Search(commands.Cog):
     async def _search_process(self, ctx: Context, query: str, source: str):
         with ctx.typing():
             qry: Query = Query(f"{source}{query}")
-            await qry.search()
+            if "sc" in source:
+                await qry.process()
+            else:
+                await qry.search()
             if not qry.success:
                 e = embed.music_not_found_message(
                     ctx.author,
@@ -28,7 +31,13 @@ class Search(commands.Cog):
                 await msg.delete(delay=5.0)
                 return
 
-            results: ResultSet = ResultSet.from_query(qry)
+            results: ResultSet = (
+                ResultSet.from_query(qry)
+                if not "sc" in source
+                else SongSet.from_query(qry)
+            )
+            print(f"{results=}")
+
             e = embed.search_result_message(
                 ctx.author,
                 playlist=results,
@@ -58,16 +67,13 @@ class Search(commands.Cog):
         brief="Search a song on SoundCloud",
         help="Search a query on SoundCloud and display the 10 first results",
         usage="<query>",
-        hidden=True,
     )
     @commands.max_concurrency(1, BucketType.user)
     @commands.cooldown(1, 5.0, BucketType.user)
     @commands.guild_only()
     @commands.check(voice.user_is_connected)
     async def soundcloud(self, ctx: Context, *, query: str):
-        raise NotImplementedError
-        # issue with yt_dlp, scsearch never stop, even if we put the option 'playlistend'
-        # await self._search_process(ctx, query, "scsearch10:")
+        await self._search_process(ctx, query, "scsearch10:")
 
     @commands.command(
         aliases=["yt", "syt"],
