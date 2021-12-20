@@ -101,7 +101,7 @@ class Player:
 
     def _idle_callback(self, task: Task) -> None:
         if not task.cancelled():
-            func = self.bot.get_cog("Music").leave(context=self._context, idle=True)
+            func = self.bot.get_cog("Music").leave(context=self._context)
             asyncio.ensure_future(func, loop=self.bot.loop)
 
     def _set_idle_task(self, state: State) -> None:
