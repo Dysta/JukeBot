@@ -1,8 +1,5 @@
 import asyncio
 import os
-import nextcord
-import platform
-import sys
 
 from asyncio import Task
 from enum import Enum
@@ -39,15 +36,7 @@ class Player:
         self._voice = await channel.connect()
 
     async def play(self, song: Song):
-        audio = nextcord.FFmpegPCMAudio(
-            song.stream_url,
-            executable=_PlayerOption.FFMPEG_EXECUTABLE[platform.system()],
-            pipe=False,
-            stderr=sys.stdout,  # None,  # subprocess.PIPE
-            before_options=_PlayerOption.FFMPEG_BEFORE_OPTIONS,  # "-nostdin",
-            options=_PlayerOption.FFMPEG_OPTIONS,
-        )
-        stream = AudioStream(audio)
+        stream = AudioStream(song.stream_url)
         stream.read()
 
         if self._voice and self._voice.is_playing():
@@ -160,13 +149,3 @@ class Player:
     def state(self, new: State) -> None:
         self._state = new
         self._set_idle_task(new)
-
-
-class _PlayerOption:
-    FFMPEG_EXECUTABLE = {"Linux": "./bin/ffmpeg", "Windows": "./bin/ffmpeg.exe"}
-
-    FFMPEG_BEFORE_OPTIONS = " ".join(
-        ["-reconnect 1", "-reconnect_streamed 1", "-reconnect_delay_max 3", "-nostdin"]
-    )
-
-    FFMPEG_OPTIONS = "-vn"
