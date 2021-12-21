@@ -1,8 +1,5 @@
 import asyncio
 import os
-import nextcord
-import platform
-import sys
 
 from asyncio import Task
 from enum import Enum

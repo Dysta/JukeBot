@@ -7,9 +7,9 @@ from nextcord.opus import Encoder as OpusEncoder
 
 
 class AudioStream(FFmpegPCMAudio):
-    def __init__(self, stream_url: str):
+    def __init__(self, source: str):
         super(AudioStream, self).__init__(
-            stream_url,
+            source,
             executable=_PlayerOption.FFMPEG_EXECUTABLE[platform.system()],
             pipe=False,
             stderr=sys.stdout,  # None,  # subprocess.PIPE
