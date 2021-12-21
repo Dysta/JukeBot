@@ -70,6 +70,10 @@ class Player:
             self.state = Player.State.PLAYING
             self._voice.resume()
 
+    def seek(self, sec: int) -> None:
+        if self._stream:
+            self._stream.seek(sec)
+
     def _after(self, error):
         if error:
             print(f"_after {error=}")

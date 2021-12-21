@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Optional
 
 from nextcord import Embed, Member
@@ -257,6 +258,32 @@ class Music(commands.Cog):
         player: Player = self.bot.players[ctx.guild.id]
         ctx = await self.bot.get_context(msg)
         player.context = ctx
+
+    @commands.command(
+        aliases=["time"],
+        brief="Set the current song to a defined time.",
+        help="TODO.",
+    )
+    @commands.guild_only()
+    # @commands.check(voice.bot_and_user_in_same_channel)
+    # @commands.check(voice.bot_is_connected)
+    # @commands.check(voice.user_is_connected)
+    # @commands.cooldown(1, 10.0, BucketType.guild)
+    async def seek(self, ctx: Context, time_string: str):
+        player: Player = self.bot.players[ctx.guild.id]
+        # if not player.playing:
+        #     e = embed.error_message(ctx.author, content="Player is not currently playing.")
+        #     await ctx.send(embed=e)
+        #     return
+
+        # fmt_date = datetime.strptime(time_string, "%H:%M:%S")
+        fmt_date = datetime.strptime(time_string, "%M:%S")
+        print(f"{fmt_date=}")
+
+        sec = int((fmt_date - datetime(1900, 1, 1)).total_seconds())
+        print(f"{sec=}")
+
+        player.seek(sec)
 
 
 def setup(bot):
