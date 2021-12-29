@@ -1,37 +1,33 @@
 import platform
 import sys
-from io import SEEK_CUR
 
 from nextcord import FFmpegPCMAudio
-from nextcord.opus import Encoder as OpusEncoder
 
 
 class AudioStream(FFmpegPCMAudio):
-    def __init__(self, source: str):
+    def __init__(self, source: str, seek: int = 0):
+        extra = f" -ss {seek}s" if seek else ""
         super(AudioStream, self).__init__(
             source,
             executable=_PlayerOption.FFMPEG_EXECUTABLE[platform.system()],
             pipe=False,
             stderr=sys.stdout,  # None,  # subprocess.PIPE
             before_options=_PlayerOption.FFMPEG_BEFORE_OPTIONS,  # "-nostdin",
-            options=_PlayerOption.FFMPEG_OPTIONS,
+            options=f"{_PlayerOption.FFMPEG_OPTIONS}{extra}",
         )
         self._progress: int = 0
+        self._offset: int = seek
 
     def read(self) -> bytes:
-        ret = self._stdout.read(OpusEncoder.FRAME_SIZE)
-        if len(ret) != OpusEncoder.FRAME_SIZE:
-            return b""
-        self._progress += 1
-        return ret
-
-    def seek(self, sec: int = 1):
-        self._stdout.seek(sec, SEEK_CUR)
+        data = super().read()
+        if data:
+            self._progress += 1
+        return data
 
     @property
     def progress(self) -> int:
         # 20ms
-        return int(self._progress * 0.02)
+        return int(self._progress * 0.02) + self._offset
 
 
 class _PlayerOption:
