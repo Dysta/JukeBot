@@ -14,7 +14,7 @@ from jukebot.components import (
     Result,
     ResultSet,
 )
-from jukebot.utils import embed, regex
+from jukebot.utils import embed, regex, converter
 
 
 class Music(commands.Cog):
@@ -262,28 +262,41 @@ class Music(commands.Cog):
     @commands.command(
         aliases=["time"],
         brief="Set the current song to a defined time.",
-        help="TODO.",
+        help="Set the song to the given timecode.\n"
+        "HH, for hour, is a integer between 0 and 24.\n"
+        "MM, for minute, is an integer between 0 and 59.\n"
+        "SS, for second, is a integer between 0 and 59.",
+        usage="<[[HH:]MM:]:SS>",
     )
     @commands.guild_only()
-    # @commands.check(voice.bot_and_user_in_same_channel)
-    # @commands.check(voice.bot_is_connected)
-    # @commands.check(voice.user_is_connected)
-    # @commands.cooldown(1, 10.0, BucketType.guild)
+    @commands.check(voice.bot_not_playing_live)
+    @commands.check(voice.bot_is_playing)
+    @commands.check(voice.bot_and_user_in_same_channel)
+    @commands.check(voice.bot_is_connected)
+    @commands.check(voice.user_is_connected)
+    @commands.cooldown(1, 10.0, BucketType.guild)
     async def seek(self, ctx: Context, time_string: str):
-        player: Player = self.bot.players[ctx.guild.id]
-        # if not player.playing:
-        #     e = embed.error_message(ctx.author, content="Player is not currently playing.")
-        #     await ctx.send(embed=e)
-        #     return
+        count = time_string.count(":")
+        if count == 2:
+            fmt = "%H:%M:%S"
+        elif count == 1:
+            fmt = "%M:%S"
+        else:
+            fmt = "%S"
 
-        # fmt_date = datetime.strptime(time_string, "%H:%M:%S")
-        fmt_date = datetime.strptime(time_string, "%M:%S")
-        print(f"{fmt_date=}")
+        try:
+            fmt_date = datetime.strptime(time_string, fmt)
+        except:
+            raise commands.UserInputError(
+                f"Incorrect timecode `{time_string}`, see **{ctx.prefix}help seek**."
+            )
 
         sec = int((fmt_date - datetime(1900, 1, 1)).total_seconds())
-        print(f"{sec=}")
+        await self.bot.players[ctx.guild.id].seek(sec)
 
-        player.seek(sec)
+        fmt_sec = converter.seconds_to_youtube_format(sec)
+        e = embed.basic_message(ctx.author, content=f"Time set to `{fmt_sec}`.")
+        await ctx.send(embed=e)
 
 
 def setup(bot):
