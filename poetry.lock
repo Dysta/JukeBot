@@ -237,7 +237,7 @@ python-versions = "*"
 
 [[package]]
 name = "nextcord"
-version = "2.0.0a3"
+version = "2.0.0a4"
 description = "A Python wrapper for the Discord API forked from discord.py"
 category = "main"
 optional = false
@@ -245,7 +245,7 @@ python-versions = ">=3.8.0"
 
 [package.dependencies]
 aiodns = {version = ">=1.1", optional = true, markers = "extra == \"speed\""}
-aiohttp = ">=3.6.0,<3.8.0"
+aiohttp = ">=3.6.0,<4.0.0"
 Brotli = {version = "*", optional = true, markers = "extra == \"speed\""}
 cchardet = {version = "*", optional = true, markers = "extra == \"speed\""}
 orjson = {version = ">=3.5.4", optional = true, markers = "extra == \"speed\""}
@@ -492,7 +492,7 @@ multidict = ">=4.0"
 
 [[package]]
 name = "yt-dlp"
-version = "2021.12.1"
+version = "2021.12.27"
 description = "A youtube-dl fork with additional features and patches"
 category = "main"
 optional = false
@@ -842,7 +842,7 @@ mypy-extensions = [
     {file = "mypy_extensions-0.4.3.tar.gz", hash = "sha256:2d82818f5bb3e369420cb3c4060a7970edba416647068eb4c5343488a6c604a8"},
 ]
 nextcord = [
-    {file = "nextcord-2.0.0a3.tar.gz", hash = "sha256:f45933be7052db13d29ef30061ef75af3d413dfcb0d1f7c3757fe7f8478002f1"},
+    {file = "nextcord-2.0.0a4.tar.gz", hash = "sha256:dbe36137573cfe9368771d9155c411b3be398fbe4476477ef3b400d80e5c7e83"},
 ]
 orjson = [
     {file = "orjson-3.6.5-cp310-cp310-macosx_10_7_x86_64.whl", hash = "sha256:6c444edc073eb69cf85b28851a7a957807a41ce9bb3a9c14eefa8b33030cf050"},
@@ -1249,6 +1249,6 @@ yarl = [
     {file = "yarl-1.7.2.tar.gz", hash = "sha256:45399b46d60c253327a460e99856752009fcee5f5d3c80b2f7c0cae1c38d56dd"},
 ]
 yt-dlp = [
-    {file = "yt-dlp-2021.12.1.tar.gz", hash = "sha256:58da5b96d4834fe8130c960b9dfd670cd2d0e53b650cd92e5c4381724151b80f"},
-    {file = "yt_dlp-2021.12.1-py2.py3-none-any.whl", hash = "sha256:78bca71906c40a69dcdd9b5a07b736c73579e1b166ebe70c9f93cdcd03e1c757"},
+    {file = "yt-dlp-2021.12.27.tar.gz", hash = "sha256:2244df3759751487e796b23b67216bee98e70832a3a43c2526b0b0e0bbfbcb5b"},
+    {file = "yt_dlp-2021.12.27-py2.py3-none-any.whl", hash = "sha256:bb46898a175d149c9c6bb2846056590d297aa4eafad8487c3e1315d2c6090896"},
 ]
