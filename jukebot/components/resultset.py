@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List
+from typing import List, Optional
 
 from jukebot.abstract_components import AbstractCollection
 from .result import Result
@@ -28,3 +28,10 @@ class ResultSet(AbstractCollection[Result]):
 
     def put(self, result: Result) -> None:
         self.set.append(result)
+
+    def remove(self, idx: int) -> Optional[Result]:
+        try:
+            e = self.set.pop(idx)
+        except:
+            return None
+        return e
