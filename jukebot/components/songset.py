@@ -12,7 +12,7 @@ class SongSet(AbstractCollection[Song]):
     def from_query(cls, query: Query) -> "SongSet":
         song_set: List[Song] = []
         results = query.results
-        if not isinstance(results, list):
+        if not query.type == Query.Type.PLAYLIST:
             results = [query.results]
         for r in results:
             song_set.append(Song.from_entry(r))

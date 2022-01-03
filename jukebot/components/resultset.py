@@ -12,7 +12,7 @@ class ResultSet(AbstractCollection[Result]):
     def from_query(cls, query: Query) -> "ResultSet":
         result_set: List[Result] = []
         results = query.results
-        if not isinstance(results, list):
+        if not query.type == Query.Type.PLAYLIST:
             results = [query.results]
         for r in results:
             result_set.append(Result.from_entry(r))
