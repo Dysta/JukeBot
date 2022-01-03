@@ -128,7 +128,7 @@ def queue_message(author: Member, playlist: Union[ResultSet, SongSet], title="")
     playlist_slice = itertools.islice(playlist, 10)
     content = "\n\n".join(
         [
-            f"{i}. `{s.title}` on `{s.channel}` **[{s.fmt_duration}]** — `{s.requester}`"
+            f"`{i}` • `{s.title}` on `{s.channel}` **[{s.fmt_duration}]** — `{s.requester}`"
             for i, s in enumerate(playlist_slice, start=1)
         ]
     )
@@ -139,6 +139,11 @@ def queue_message(author: Member, playlist: Union[ResultSet, SongSet], title="")
     total_time: int = sum([e.duration for e in playlist if not e.live])
     total_time_fmt: str = converter.seconds_to_youtube_format(total_time)
     embed.add_field(name="Total duration", value=f"`{total_time_fmt}`")
+    embed.add_field(
+        name=VOID_TOKEN,
+        value=f"Use command `add` or `remove` to add or remove a song.",
+        inline=False
+    )
     return embed
 
 
