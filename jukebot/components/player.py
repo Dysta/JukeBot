@@ -67,9 +67,18 @@ class Player:
             self.state = Player.State.PLAYING
             self._voice.resume()
 
-    def seek(self, sec: int) -> None:
-        if self._stream:
-            self._stream.seek(sec)
+    async def seek(self, sec: int) -> None:
+        def inner(song, x):
+            stream = AudioStream(song.stream_url, x)
+            stream.read()
+            self._voice.source = stream
+
+            self._stream = stream
+
+        loop = asyncio.get_event_loop()
+        await loop.run_in_executor(
+            None, lambda: inner(self._song, sec)
+        )
 
     def _after(self, error):
         if error:
