@@ -76,9 +76,7 @@ class Player:
             self._stream = stream
 
         loop = asyncio.get_event_loop()
-        await loop.run_in_executor(
-            None, lambda: inner(self._song, sec)
-        )
+        await loop.run_in_executor(None, lambda: inner(self._song, sec))
 
     def _after(self, error):
         if error:
