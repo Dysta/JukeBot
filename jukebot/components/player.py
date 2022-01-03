@@ -94,7 +94,11 @@ class Player:
                 force=True,
                 query=req.web_url,
             )
-            asyncio.ensure_future(func, loop=self.bot.loop)
+            fut = asyncio.run_coroutine_threadsafe(func, self.bot.loop)
+            try:
+                fut.result()
+            except:
+                pass
         else:
             self.state = Player.State.IDLE
 
