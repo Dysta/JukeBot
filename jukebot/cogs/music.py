@@ -205,6 +205,27 @@ class Music(commands.Cog):
         await ctx.send(embed=e)
 
     @commands.command(
+        aliases=["r"],
+        brief="Remove a song from the current queue.",
+        help="Remove the song at pos `idx` of the queue",
+        usage="<idx>",
+    )
+    @commands.guild_only()
+    @commands.cooldown(1, 5.0, BucketType.user)
+    @commands.check(user.bot_queue_is_not_empty)
+    @commands.check(voice.bot_is_connected)
+    @commands.check(voice.user_is_connected)
+    async def remove(self, ctx: Context, idx: int):
+        queue: ResultSet = self.bot.players[ctx.guild.id].queue
+        if not (elem := queue.remove(idx - 1)):
+            raise commands.UserInputError(f"Can't delete item number {idx}")
+
+        e: Embed = embed.basic_message(
+            ctx.author, content=f"`{elem.title}` have been removed from the queue"
+        )
+        await ctx.send(embed=e)
+
+    @commands.command(
         aliases=["q", "list"],
         brief="Show the queue of the server.",
         help="Show the queue of the server",
@@ -217,27 +238,6 @@ class Music(commands.Cog):
         queue: ResultSet = self.bot.players[ctx.guild.id].queue
         e: Embed = embed.queue_message(
             ctx.author, queue, title=f"Queue for {ctx.guild.name}"
-        )
-        await ctx.send(embed=e)
-
-    @commands.command(
-        aliases=["qr", "list_remove"],
-        brief="Remove an element of the current queue.",
-        help="Remove the element at post `idx` of the queue",
-        usage="<idx>",
-    )
-    @commands.guild_only()
-    @commands.cooldown(1, 5.0, BucketType.user)
-    @commands.check(user.bot_queue_is_not_empty)
-    @commands.check(voice.bot_is_connected)
-    @commands.check(voice.user_is_connected)
-    async def queue_remove(self, ctx: Context, idx: int):
-        queue: ResultSet = self.bot.players[ctx.guild.id].queue
-        if not (elem := queue.remove(idx - 1)):
-            raise commands.UserInputError(f"Can't delete item number {idx}")
-
-        e: Embed = embed.basic_message(
-            ctx.author, content=f"`{elem.title}` have been removed from the queue"
         )
         await ctx.send(embed=e)
 
