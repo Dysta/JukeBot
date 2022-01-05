@@ -76,17 +76,16 @@ class Player:
         self._song = None
 
         if len(self._queue):
-            req: Result = self._queue.get()
             func = self.bot.get_cog("Music").play(
                 context=self._context,
-                author=req.requester,
                 force=True,
-                query=req.web_url,
+                query="",
             )
             fut = asyncio.run_coroutine_threadsafe(func, self.bot.loop)
             try:
                 fut.result()
-            except:
+            except Exception as e:
+                print(f"fut result exception {e=}")
                 pass
         else:
             self.state = Player.State.IDLE

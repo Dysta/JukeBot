@@ -32,28 +32,29 @@ class Music(commands.Cog):
     async def play(
         self,
         ctx: Context,
-        author: Optional[Member] = None,
         force: Optional[bool] = False,
         *,
         query: str,
     ):
         # PlayerContainer create bot if needed
         player: Player = self.bot.players[ctx.guild.id]
-        author = author or ctx.author
         if not player.context:
             await ctx.invoke(self.bind)
 
+        if query:
+            await ctx.invoke(self.add, silent=bool(not player.playing), query=query)
         if not force and player.playing:
-            await ctx.invoke(self.add, query=query)
             return
 
         with ctx.typing():
-            qry: Query = Query(query)
+            rqs: Result = player.queue.get()
+            author = rqs.requester
+            qry: Query = Query(rqs.web_url)
             await qry.process()
             if not qry.success:
                 e = embed.music_not_found_message(
                     author,
-                    title=f"Nothing found for {query}, sorry..",
+                    title=f"Nothing found for {rqs.title}, sorry..",
                 )
                 await ctx.send(embed=e)
                 return
