@@ -6,6 +6,7 @@ class Extensions:
         {"package": "jukebot.cogs", "name": "music"},
         {"package": "jukebot.cogs", "name": "system"},
         {"package": "jukebot.cogs", "name": "search"},
+        {"package": "jukebot.cogs", "name": "queue"},
     ]
 
     @staticmethod
