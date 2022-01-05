@@ -8,7 +8,6 @@ from typing import Optional
 from nextcord import VoiceChannel, VoiceClient
 from nextcord.ext.commands import Bot, Context
 
-from .result import Result
 from .resultset import ResultSet
 from .song import Song
 from .audio_stream import AudioStream
@@ -75,19 +74,16 @@ class Player:
         self._stream = None
         self._song = None
 
-        if len(self._queue):
-            req: Result = self._queue.get()
+        if not self._queue.is_empty():
             func = self.bot.get_cog("Music").play(
                 context=self._context,
-                author=req.requester,
-                force=True,
-                query=req.web_url,
+                query="",
             )
             fut = asyncio.run_coroutine_threadsafe(func, self.bot.loop)
             try:
                 fut.result()
-            except:
-                pass
+            except Exception as e:
+                print(f"fut result exception {e=}")
         else:
             self.state = Player.State.IDLE
 
@@ -136,6 +132,10 @@ class Player:
     @property
     def queue(self) -> ResultSet:
         return self._queue
+
+    @queue.setter
+    def queue(self, q) -> None:
+        self._queue = q
 
     @property
     def context(self) -> Optional[Context]:

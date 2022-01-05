@@ -1,6 +1,6 @@
 from typing import Optional
 
-from nextcord import Embed, Member
+from nextcord import Embed
 from nextcord.ext import commands
 from nextcord.ext.commands import Context, BucketType, Bot
 
@@ -29,31 +29,26 @@ class Music(commands.Cog):
     @commands.guild_only()
     @commands.cooldown(1, 5.0, BucketType.user)
     @commands.check(voice.user_is_connected)
-    async def play(
-        self,
-        ctx: Context,
-        author: Optional[Member] = None,
-        force: Optional[bool] = False,
-        *,
-        query: str,
-    ):
+    async def play(self, ctx: Context, *, query: str):
         # PlayerContainer create bot if needed
         player: Player = self.bot.players[ctx.guild.id]
-        author = author or ctx.author
         if not player.context:
             await ctx.invoke(self.bind)
 
-        if not force and player.playing:
-            await ctx.invoke(self.add, query=query)
+        if query:
+            await ctx.invoke(self.add, silent=bool(not player.playing), query=query)
+        if player.playing:
             return
 
         with ctx.typing():
-            qry: Query = Query(query)
+            rqs: Result = player.queue.get()
+            author = rqs.requester
+            qry: Query = Query(rqs.web_url)
             await qry.process()
             if not qry.success:
                 e = embed.music_not_found_message(
                     author,
-                    title=f"Nothing found for {query}, sorry..",
+                    title=f"Nothing found for {rqs.title}, sorry..",
                 )
                 await ctx.send(embed=e)
                 return
@@ -183,7 +178,7 @@ class Music(commands.Cog):
     @commands.check(voice.bot_and_user_in_same_channel)
     @commands.check(voice.bot_is_connected)
     @commands.check(voice.user_is_connected)
-    async def add(self, ctx: Context, *, query: str):
+    async def add(self, ctx: Context, silent: Optional[bool] = False, *, query: str):
         query = query if regex.is_url(query) else f"ytsearch1:{query}"
         with ctx.typing():
             qry: Query = Query(query)
@@ -196,13 +191,23 @@ class Music(commands.Cog):
                 await ctx.send(embed=e)
                 return
 
-        res: Result = Result.from_query(qry)
-        res.requester = ctx.author
-        player: Player = self.bot.players[ctx.guild.id]
-        player.queue.put(res)
+        if qry.type == Query.Type.PLAYLIST:
+            res: ResultSet = ResultSet.from_query(qry, ctx.author)
+            player: Player = self.bot.players[ctx.guild.id]
+            player.queue += res
 
-        e: Embed = embed.result_enqueued(ctx.author, res)
-        await ctx.send(embed=e)
+            e: Embed = embed.queue_message(
+                ctx.author, res, title=f"Enqueued : {len(res)} songs"
+            )
+            await ctx.send(embed=e)
+        else:
+            res: Result = Result.from_query(qry)
+            res.requester = ctx.author
+            player: Player = self.bot.players[ctx.guild.id]
+            player.queue.put(res)
+            if not silent:
+                e: Embed = embed.result_enqueued(ctx.author, res)
+                await ctx.send(embed=e)
 
     @commands.command(
         aliases=["r"],
@@ -213,6 +218,7 @@ class Music(commands.Cog):
     @commands.guild_only()
     @commands.cooldown(1, 5.0, BucketType.user)
     @commands.check(user.bot_queue_is_not_empty)
+    @commands.check(voice.bot_and_user_in_same_channel)
     @commands.check(voice.bot_is_connected)
     @commands.check(voice.user_is_connected)
     async def remove(self, ctx: Context, idx: int):
@@ -223,6 +229,24 @@ class Music(commands.Cog):
         e: Embed = embed.basic_message(
             ctx.author, content=f"`{elem.title}` have been removed from the queue"
         )
+        await ctx.send(embed=e)
+
+    @commands.command(
+        aliases=["clr"],
+        brief="Clear the current queue.",
+        help="Remove all the songs of the queue",
+    )
+    @commands.guild_only()
+    @commands.cooldown(1, 5.0, BucketType.user)
+    @commands.check(user.bot_queue_is_not_empty)
+    @commands.check(voice.bot_and_user_in_same_channel)
+    @commands.check(voice.bot_is_connected)
+    @commands.check(voice.user_is_connected)
+    async def clear(self, ctx: Context):
+        player: Player = self.bot.players[ctx.guild.id]
+        player.queue = ResultSet.empty()
+
+        e: Embed = embed.basic_message(ctx.author, title="The queue have been cleared.")
         await ctx.send(embed=e)
 
     @commands.command(
@@ -254,7 +278,7 @@ class Music(commands.Cog):
     @commands.check(voice.user_is_connected)
     async def skip(self, ctx: Context):
         queue: ResultSet = self.bot.players[ctx.guild.id].queue
-        keep_playing: bool = len(queue) > 0
+        keep_playing: bool = not queue.is_empty()
         if keep_playing:
             e: embed = embed.basic_message(ctx.author, title="Skipped !")
             await ctx.send(embed=e)

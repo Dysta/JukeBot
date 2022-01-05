@@ -1,4 +1,6 @@
 import asyncio
+from enum import Enum
+
 import yt_dlp
 
 from typing import Optional, Union
@@ -8,10 +10,16 @@ yt_dlp.utils.bug_reports_message = lambda: ""
 
 
 class Query:
+    class Type(Enum):
+        TRACK = 0
+        PLAYLIST = 1
+        UNKNOWN = 2
+
     def __init__(self, query: str):
         self._query: str = query
         self._result: Optional[Union[dict, list]] = None
         self._success: bool = False
+        self._type: Optional[Query.Type] = None
 
     async def search(self):
         await self._get(process=False)
@@ -35,13 +43,22 @@ class Query:
             except:
                 self._success = False
                 return
-            info = Query._sanitize_info(info)
 
-        # with open("debug.json", "w") as f:
-        #     json.dump(info, f)
+        info = Query._sanitize_info(info)
+        type = Query._define_type(info)
 
         self._result = info
-        self._success = True
+        self._type = type
+        self._success = self._type != Query.Type.UNKNOWN
+
+    @staticmethod
+    def _define_type(info: Union[dict, list]) -> "Query.Type":
+        if isinstance(info, dict):
+            return Query.Type.TRACK
+        elif isinstance(info, list):
+            return Query.Type.PLAYLIST
+        else:
+            return Query.Type.UNKNOWN
 
     @staticmethod
     def _sanitize_info(info: dict) -> Union[dict, list]:
@@ -59,16 +76,18 @@ class Query:
     def results(self) -> list:
         return self._result
 
+    @property
+    def type(self) -> "Query.Type":
+        return self._type
+
 
 class _RequestOption:
     YTDL_FORMAT_OPTION: dict = {
         "format": "bestaudio/best",
         "outtmpl": "%(extractor)s-%(id)s-%(title)s.%(ext)s",
         "restrictfilenames": True,
-        "playlistend": 10,
-        "max_downloads": 10,
         "nocheckcertificate": True,
-        "ignoreerrors": False,
+        "ignoreerrors": True,
         "logtostderr": False,
         "quiet": True,
         "no_warnings": True,

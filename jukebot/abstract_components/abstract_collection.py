@@ -24,3 +24,8 @@ class AbstractCollection(abc.Collection, Generic[_T]):
 
     def __str__(self) -> str:
         return str(self.set)
+
+    def __add__(self, other: "AbstractCollection") -> "AbstractCollection":
+        assert isinstance(other, AbstractCollection)
+        self.set += other.set
+        return self

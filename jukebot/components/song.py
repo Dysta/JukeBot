@@ -34,12 +34,12 @@ class Song:
     @classmethod
     def from_query(cls, query: Query, entry: int = 0):
         results = query.results
-        if isinstance(results, list):
+        if query.type == Query.Type.PLAYLIST:
             try:
                 info = results[entry]
             except KeyError:
                 raise
-        elif isinstance(results, dict):
+        elif query.type == Query.Type.TRACK:
             info = results
         else:
             raise Exception(f"Query result unknown format for {results=}")
