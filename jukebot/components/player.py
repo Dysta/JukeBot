@@ -137,6 +137,10 @@ class Player:
     def queue(self) -> ResultSet:
         return self._queue
 
+    @queue.setter
+    def queue(self, q) -> None:
+        self._queue = q
+
     @property
     def context(self) -> Optional[Context]:
         return self._context

@@ -196,12 +196,22 @@ class Music(commands.Cog):
                 await ctx.send(embed=e)
                 return
 
-        res: Result = Result.from_query(qry)
-        res.requester = ctx.author
-        player: Player = self.bot.players[ctx.guild.id]
-        player.queue.put(res)
+        if qry.type == Query.Type.PLAYLIST:
+            res: ResultSet = ResultSet.from_query(qry, ctx.author)
+            player: Player = self.bot.players[ctx.guild.id]
+            player.queue += res
 
-        e: Embed = embed.result_enqueued(ctx.author, res)
+            e: Embed = embed.queue_message(
+                ctx.author, res, title=f"Enqueued : {len(res)} songs"
+            )
+        else:
+            res: Result = Result.from_query(qry)
+            res.requester = ctx.author
+            player: Player = self.bot.players[ctx.guild.id]
+            player.queue.put(res)
+
+            e: Embed = embed.result_enqueued(ctx.author, res)
+
         await ctx.send(embed=e)
 
     @commands.command(
