@@ -224,6 +224,7 @@ class Music(commands.Cog):
     @commands.guild_only()
     @commands.cooldown(1, 5.0, BucketType.user)
     @commands.check(user.bot_queue_is_not_empty)
+    @commands.check(voice.bot_and_user_in_same_channel)
     @commands.check(voice.bot_is_connected)
     @commands.check(voice.user_is_connected)
     async def remove(self, ctx: Context, idx: int):
@@ -234,6 +235,24 @@ class Music(commands.Cog):
         e: Embed = embed.basic_message(
             ctx.author, content=f"`{elem.title}` have been removed from the queue"
         )
+        await ctx.send(embed=e)
+
+    @commands.command(
+        aliases=["clr"],
+        brief="Clear the current queue.",
+        help="Remove all the songs of the queue",
+    )
+    @commands.guild_only()
+    @commands.cooldown(1, 5.0, BucketType.user)
+    @commands.check(user.bot_queue_is_not_empty)
+    @commands.check(voice.bot_and_user_in_same_channel)
+    @commands.check(voice.bot_is_connected)
+    @commands.check(voice.user_is_connected)
+    async def clear(self, ctx: Context):
+        player: Player = self.bot.players[ctx.guild.id]
+        player.queue = ResultSet.empty()
+
+        e: Embed = embed.basic_message(ctx.author, title="The queue have been cleared.")
         await ctx.send(embed=e)
 
     @commands.command(
