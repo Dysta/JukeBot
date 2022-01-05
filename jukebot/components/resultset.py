@@ -1,3 +1,5 @@
+import random
+
 from dataclasses import dataclass
 from typing import List, Optional
 
@@ -44,3 +46,6 @@ class ResultSet(AbstractCollection[Result]):
 
     def is_empty(self) -> bool:
         return len(self.set) == 0
+
+    def shuffle(self) -> None:
+        random.shuffle(self.set)
