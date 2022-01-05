@@ -8,7 +8,6 @@ from typing import Optional
 from nextcord import VoiceChannel, VoiceClient
 from nextcord.ext.commands import Bot, Context
 
-from .result import Result
 from .resultset import ResultSet
 from .song import Song
 from .audio_stream import AudioStream
@@ -85,7 +84,6 @@ class Player:
                 fut.result()
             except Exception as e:
                 print(f"fut result exception {e=}")
-                pass
         else:
             self.state = Player.State.IDLE
 
