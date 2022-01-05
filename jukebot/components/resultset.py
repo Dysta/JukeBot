@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from typing import List, Optional
 
+from nextcord import Member
+
 from jukebot.abstract_components import AbstractCollection
 from .result import Result
 from .query import Query
@@ -9,13 +11,17 @@ from .query import Query
 @dataclass
 class ResultSet(AbstractCollection[Result]):
     @classmethod
-    def from_query(cls, query: Query) -> "ResultSet":
+    def from_query(
+        cls, query: Query, requester: Optional[Member] = None
+    ) -> "ResultSet":
         result_set: List[Result] = []
         results = query.results
         if not query.type == Query.Type.PLAYLIST:
             results = [query.results]
         for r in results:
-            result_set.append(Result.from_entry(r))
+            rslt: Result = Result.from_entry(r)
+            rslt.requester = requester
+            result_set.append(rslt)
 
         return cls(set=result_set)
 
