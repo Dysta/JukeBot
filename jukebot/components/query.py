@@ -47,8 +47,6 @@ class Query:
         info = Query._sanitize_info(info)
         type = Query._define_type(info)
 
-        # with open("debug.json", "w") as f:
-        #     json.dump(info, f)
         self._result = info
         self._type = type
         self._success = self._type != Query.Type.UNKNOWN
