@@ -29,13 +29,7 @@ class Music(commands.Cog):
     @commands.guild_only()
     @commands.cooldown(1, 5.0, BucketType.user)
     @commands.check(voice.user_is_connected)
-    async def play(
-        self,
-        ctx: Context,
-        force: Optional[bool] = False,
-        *,
-        query: str,
-    ):
+    async def play(self, ctx: Context, *, query: str):
         # PlayerContainer create bot if needed
         player: Player = self.bot.players[ctx.guild.id]
         if not player.context:
@@ -43,7 +37,7 @@ class Music(commands.Cog):
 
         if query:
             await ctx.invoke(self.add, silent=bool(not player.playing), query=query)
-        if not force and player.playing:
+        if player.playing:
             return
 
         with ctx.typing():

@@ -78,7 +78,6 @@ class Player:
         if not self._queue.is_empty():
             func = self.bot.get_cog("Music").play(
                 context=self._context,
-                force=True,
                 query="",
             )
             fut = asyncio.run_coroutine_threadsafe(func, self.bot.loop)
