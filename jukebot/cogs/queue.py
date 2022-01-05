@@ -111,6 +111,22 @@ class Queue(commands.Cog):
         e: Embed = embed.basic_message(ctx.author, title="The queue have been cleared.")
         await ctx.send(embed=e)
 
+    @commands.command(
+        aliases=["sfl"],
+        brief="Shuffle the current queue.",
+        help="Shuffle the current queue.",
+    )
+    @commands.guild_only()
+    @commands.check(user.bot_queue_is_not_empty)
+    @commands.check(voice.bot_and_user_in_same_channel)
+    @commands.check(voice.bot_is_connected)
+    @commands.check(voice.user_is_connected)
+    @commands.cooldown(1, 10.0, BucketType.guild)
+    async def shuffle(self, ctx: Context):
+        self.bot.players[ctx.guild.id].queue.shuffle()
+        e: Embed = embed.basic_message(ctx.author, title="Queue shuffled.")
+        await ctx.send(embed=e)
+
 
 def setup(bot):
     bot.add_cog(Queue(bot))
