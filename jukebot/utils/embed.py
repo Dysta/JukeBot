@@ -142,7 +142,7 @@ def queue_message(author: Member, playlist: Union[ResultSet, SongSet], title="")
     embed.add_field(
         name=VOID_TOKEN,
         value=f"Use command `add` or `remove` to add or remove a song.",
-        inline=False
+        inline=False,
     )
     return embed
 
@@ -152,7 +152,7 @@ def result_enqueued(author: Member, res: Result):
     c = colors[random.randint(0, 2)]
     embed: nextcord.Embed = _base_embed(author=author, content="", color=c)
     embed.set_author(
-        name=f"Added to queue : {res.title}",
+        name=f"Enqueued : {res.title}",
         url=res.web_url,
         icon_url="https://icons.iconarchive.com/icons/papirus-team/papirus-apps/512/logisim-icon-icon.png",
     )
