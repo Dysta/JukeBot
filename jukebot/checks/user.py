@@ -11,6 +11,6 @@ def is_dysta(ctx: Context):
 
 def bot_queue_is_not_empty(ctx: Context):
     player: Player = ctx.bot.players[ctx.guild.id]
-    if not len(player.queue):
+    if player.queue.is_empty():
         raise CheckFailure("The queue is empty.")
     return True

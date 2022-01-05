@@ -284,7 +284,7 @@ class Music(commands.Cog):
     @commands.check(voice.user_is_connected)
     async def skip(self, ctx: Context):
         queue: ResultSet = self.bot.players[ctx.guild.id].queue
-        keep_playing: bool = len(queue) > 0
+        keep_playing: bool = not queue.is_empty()
         if keep_playing:
             e: embed = embed.basic_message(ctx.author, title="Skipped !")
             await ctx.send(embed=e)

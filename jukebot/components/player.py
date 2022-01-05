@@ -75,7 +75,7 @@ class Player:
         self._stream = None
         self._song = None
 
-        if len(self._queue):
+        if not self._queue.is_empty():
             func = self.bot.get_cog("Music").play(
                 context=self._context,
                 force=True,

@@ -41,3 +41,6 @@ class ResultSet(AbstractCollection[Result]):
         except:
             return None
         return e
+
+    def is_empty(self) -> bool:
+        return len(self.set) == 0
