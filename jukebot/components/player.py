@@ -8,6 +8,8 @@ from typing import Optional
 from nextcord import VoiceChannel, VoiceClient
 from nextcord.ext.commands import Bot, Context
 
+from jukebot.utils import coro
+
 from .resultset import ResultSet
 from .song import Song
 from .audio_stream import AudioStream
@@ -19,6 +21,11 @@ class Player:
         PLAYING = 1
         PAUSED = 2
         STOPPED = 3
+        SKIPPING = 4
+
+    class Loop(Enum):
+        DISABLED = 0
+        ENABLED = 1
 
     def __init__(self, bot: Bot):
         self.bot: Bot = bot
@@ -30,6 +37,7 @@ class Player:
         self._queue: ResultSet = ResultSet.empty()
         self._state: Player.State = Player.State.IDLE
         self._idle_task: Optional[Task] = None
+        self._loop: Player.Loop = Player.Loop.DISABLED
 
     async def join(self, channel: VoiceChannel):
         self._voice = await channel.connect()
@@ -51,9 +59,14 @@ class Player:
             self.state = Player.State.STOPPED
             await self._voice.disconnect()
 
+    def skip(self):
+        if self._voice:
+            self.state = Player.State.SKIPPING
+            self._voice.stop()
+
     def stop(self):
         if self._voice:
-            self.state = Player.State.IDLE
+            self.state = Player.State.STOPPED
             self._voice.stop()
 
     def pause(self):
@@ -71,6 +84,14 @@ class Player:
             print(f"_after {error=}")
         if self.state == Player.State.STOPPED:
             return
+        if (
+            self._loop == Player.Loop.ENABLED
+            and not self.state == Player.State.SKIPPING
+        ):
+            func = self.play(self.song)
+            coro.run_threadsafe(func, self.bot.loop)
+            return
+
         self._stream = None
         self._song = None
 
@@ -157,3 +178,11 @@ class Player:
     def state(self, new: State) -> None:
         self._state = new
         self._set_idle_task(new)
+
+    @property
+    def loop(self) -> "Player.Loop":
+        return self._loop
+
+    @loop.setter
+    def loop(self, lp: "Player.Loop") -> None:
+        self._loop = lp
