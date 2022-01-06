@@ -126,3 +126,11 @@ class HelpHandler(commands.HelpCommand):
         grp_embed.add_field(name=embed.VOID_TOKEN, value=note[0], inline=False)
 
         await ctx.send(embed=grp_embed)
+
+    async def subcommand_not_found(self, command, string):
+        msg = super().subcommand_not_found(command, string).replace('"', "`")
+        raise commands.UserInputError(msg)
+
+    async def command_not_found(self, string):
+        msg = super().command_not_found(string).replace('"', "`")
+        raise commands.UserInputError(msg)
