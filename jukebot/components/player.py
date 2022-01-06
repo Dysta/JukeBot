@@ -100,11 +100,7 @@ class Player:
                 context=self._context,
                 query="",
             )
-            fut = asyncio.run_coroutine_threadsafe(func, self.bot.loop)
-            try:
-                fut.result()
-            except Exception as e:
-                print(f"fut result exception {e=}")
+            coro.run_threadsafe(func, self.bot.loop)
         else:
             self.state = Player.State.IDLE
 
