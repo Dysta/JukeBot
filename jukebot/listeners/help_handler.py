@@ -83,3 +83,34 @@ class HelpHandler(commands.HelpCommand):
         )
 
         await ctx.send(embed=cmd_embed)
+
+    async def send_group_help(self, group):
+        ctx = self.context
+
+        grp_embed = embed.info_message(
+            ctx.author, title=f"Command : {group.name}", content=group.help
+        )
+
+        aliases = ", ".join([a for a in [group.name] + group.aliases])
+        grp_embed.add_field(name="Aliases", value=f"```{aliases}```", inline=False)
+
+        subcmds = ", ".join(
+            [c.name for c in sorted(group.commands, key=lambda c: c.name)]
+        )
+        grp_embed.add_field(
+            name="Subcommands",
+            value=f"```{subcmds}```",
+            inline=False,
+        )
+
+        usg_subcmds = subcmds.replace(", ", "|")
+        grp_embed.add_field(
+            name="Usage",
+            value=f"```{ctx.prefix}{group.name} <{usg_subcmds}>```",
+            inline=False,
+        )
+
+        note = self.get_ending_note()
+        grp_embed.add_field(name=embed.VOID_TOKEN, value=note[0], inline=False)
+
+        await ctx.send(embed=grp_embed)
