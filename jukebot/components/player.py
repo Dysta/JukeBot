@@ -118,6 +118,10 @@ class Player:
         self._voice = v
 
     @property
+    def streaming(self) -> bool:
+        return bool(self.stream and self.voice)
+
+    @property
     def playing(self) -> bool:
         return bool(self.stream and self.voice and self.state == Player.State.PLAYING)
 
