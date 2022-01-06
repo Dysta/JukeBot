@@ -1,5 +1,3 @@
-from typing import Optional
-
 from nextcord import Embed
 from nextcord.ext import commands
 from nextcord.ext.commands import Context, BucketType, Bot
@@ -11,7 +9,6 @@ from jukebot.components import (
     Song,
     Query,
     Result,
-    ResultSet,
 )
 from jukebot.utils import embed
 
@@ -91,11 +88,10 @@ class Music(commands.Cog):
     @commands.check(voice.bot_and_user_in_same_channel)
     @commands.check(voice.bot_is_connected)
     @commands.check(voice.user_is_connected)
-    async def stop(self, ctx: Context, silent: Optional[bool] = False):
+    async def stop(self, ctx: Context):
         self.bot.players[ctx.guild.id].stop()
-        if not silent:
-            e = embed.basic_message(ctx.author, title="Player stopped")
-            await ctx.send(embed=e)
+        e = embed.basic_message(ctx.author, title="Player stopped")
+        await ctx.send(embed=e)
 
     @commands.command(
         brief="Pause the current music",
@@ -176,17 +172,14 @@ class Music(commands.Cog):
     )
     @commands.guild_only()
     @commands.cooldown(3, 10.0, BucketType.user)
-    @commands.check(voice.bot_is_playing)
+    @commands.check(voice.bot_is_streaming)
     @commands.check(voice.bot_and_user_in_same_channel)
     @commands.check(voice.bot_is_connected)
     @commands.check(voice.user_is_connected)
     async def skip(self, ctx: Context):
-        queue: ResultSet = self.bot.players[ctx.guild.id].queue
-        keep_playing: bool = not queue.is_empty()
-        if keep_playing:
-            e: embed = embed.basic_message(ctx.author, title="Skipped !")
-            await ctx.send(embed=e)
-        await ctx.invoke(self.stop, silent=keep_playing)
+        self.bot.players[ctx.guild.id].skip()
+        e: embed = embed.basic_message(ctx.author, title="Skipped !")
+        await ctx.send(embed=e)
 
     @commands.command(
         aliases=["b", "link"],
