@@ -209,6 +209,48 @@ class Music(commands.Cog):
         ctx = await self.bot.get_context(msg)
         player.context = ctx
 
+    @commands.group(
+        aliases=["lp"],
+        brief="Loop the current song.",
+        help="Allow user to enable or disable the looping of a song.",
+    )
+    @commands.guild_only()
+    @commands.check(voice.bot_and_user_in_same_channel)
+    @commands.check(voice.bot_is_connected)
+    @commands.check(voice.user_is_connected)
+    @commands.cooldown(1, 5.0, BucketType.user)
+    async def loop(self, ctx: Context):
+        if not ctx.invoked_subcommand:
+            player: Player = self.bot.players[ctx.guild.id]
+            looping: bool = player.loop == Player.Loop.ENABLED
+
+            e: embed = embed.basic_message(
+                ctx.author, title=f"Loop is {'enabled' if looping else 'disabled'}"
+            )
+            await ctx.send(embed=e)
+
+    @loop.command(
+        name="on",
+        aliases=["enable"],
+        bried="Enable looping of the current song.",
+        help="Repeat the current song when it finish.",
+    )
+    async def loop_enabled(self, ctx: Context):
+        self.bot.players[ctx.guild.id].loop = Player.Loop.ENABLED
+        e: embed = embed.basic_message(ctx.author, title="Loop is enabled")
+        await ctx.send(embed=e)
+
+    @loop.command(
+        name="off",
+        aliases=["disable"],
+        bried="Disable looping of the current song.",
+        help="When a song is finish, pass to the next one instead of repeating itself.",
+    )
+    async def loop_disabled(self, ctx: Context):
+        self.bot.players[ctx.guild.id].loop = Player.Loop.DISABLED
+        e: embed = embed.basic_message(ctx.author, title="Loop is disabled")
+        await ctx.send(embed=e)
+
 
 def setup(bot):
     bot.add_cog(Music(bot))
