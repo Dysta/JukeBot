@@ -30,7 +30,7 @@ class HelpHandler(commands.HelpCommand):
 
         def get_category(command, *, no_category="Other:"):
             cog = command.cog
-            return cog.qualified_name if cog is not None else no_category
+            return cog.qualified_name if cog else no_category
 
         filtered = await self.filter_commands(bot.commands, sort=True, key=get_category)
         to_iterate = itertools.groupby(filtered, key=get_category)
@@ -41,28 +41,23 @@ class HelpHandler(commands.HelpCommand):
             help_embed.add_field(name=category, value=f"```{cmds_str}```", inline=False)
 
         note = self.get_ending_note()
-        if note:
-            help_embed.add_field(
-                name=embed.VOID_TOKEN, value="\n".join(note), inline=False
-            )
+        help_embed.add_field(name=embed.VOID_TOKEN, value="\n".join(note), inline=False)
 
         await ctx.send(embed=help_embed)
 
     async def send_cog_help(self, cog):
         ctx = self.context
 
-        cog_embed = embed.info_message(ctx.author, title="Available commands")
+        cog_embed = embed.info_message(ctx.author, title=f"Available commands")
 
-        filtered = await self.filter_commands(cog.get_commands(), sort=True)
-        cmds = sorted(filtered, key=lambda c: c.name)
+        cmds = await self.filter_commands(cog.get_commands(), sort=True)
         cmds_str = "\n".join([f"{c.name} - {c.short_doc}" for c in cmds])
 
         cog_embed.add_field(
             name=cog.qualified_name, value=f"```{cmds_str}```", inline=False
         )
         note = self.get_ending_note()
-        if note:
-            cog_embed.add_field(name=embed.VOID_TOKEN, value=note[0], inline=False)
+        cog_embed.add_field(name=embed.VOID_TOKEN, value=note[0], inline=False)
 
         await ctx.send(embed=cog_embed)
 
