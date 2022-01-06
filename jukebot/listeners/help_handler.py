@@ -30,7 +30,7 @@ class HelpHandler(commands.HelpCommand):
 
         def get_category(command, *, no_category="Other:"):
             cog = command.cog
-            return cog.qualified_name if cog is not None else no_category
+            return cog.qualified_name if cog else no_category
 
         filtered = await self.filter_commands(bot.commands, sort=True, key=get_category)
         to_iterate = itertools.groupby(filtered, key=get_category)
@@ -41,45 +41,91 @@ class HelpHandler(commands.HelpCommand):
             help_embed.add_field(name=category, value=f"```{cmds_str}```", inline=False)
 
         note = self.get_ending_note()
-        if note:
-            help_embed.add_field(
-                name=embed.VOID_TOKEN, value="\n".join(note), inline=False
-            )
+        help_embed.add_field(name=embed.VOID_TOKEN, value="\n".join(note), inline=False)
 
         await ctx.send(embed=help_embed)
 
     async def send_cog_help(self, cog):
         ctx = self.context
 
-        cog_embed = embed.info_message(ctx.author, title="Available commands")
+        cog_embed = embed.info_message(ctx.author, title=f"Available commands")
 
-        filtered = await self.filter_commands(cog.get_commands(), sort=True)
-        cmds = sorted(filtered, key=lambda c: c.name)
+        cmds = await self.filter_commands(cog.get_commands(), sort=True)
         cmds_str = "\n".join([f"{c.name} - {c.short_doc}" for c in cmds])
 
         cog_embed.add_field(
             name=cog.qualified_name, value=f"```{cmds_str}```", inline=False
         )
         note = self.get_ending_note()
-        if note:
-            cog_embed.add_field(name=embed.VOID_TOKEN, value=note[0], inline=False)
+        cog_embed.add_field(name=embed.VOID_TOKEN, value=note[0], inline=False)
 
         await ctx.send(embed=cog_embed)
 
     async def send_command_help(self, command):
         ctx = self.context
 
+        cmd_str = (
+            f"{command.full_parent_name } {command.name}"
+            if command.parent
+            else command.name
+        )
         cmd_embed = embed.info_message(
-            ctx.author, title=f"Command : {command.name}", content=command.help
+            ctx.author, title=f"Command : {cmd_str}", content=command.help
         )
 
         aliases = ", ".join([a for a in [command.name] + command.aliases])
         cmd_embed.add_field(name="Aliases", value=f"```{aliases}```", inline=False)
 
-        cmd_embed.add_field(
-            name="Usage",
-            value=f"```{ctx.prefix}{command.name} {command.usage if command.usage is not None else ''}```",
+        if not command.parent:
+            cmd_embed.add_field(
+                name="Usage",
+                value=f"```{ctx.prefix}{command.name} {command.usage if command.usage is not None else ''}```",
+                inline=False,
+            )
+        else:
+            cmd_embed.add_field(
+                name="Usage",
+                value=f"```{ctx.prefix}{command.full_parent_name} {command.name} {command.usage if command.usage is not None else ''}```",
+                inline=False,
+            )
+
+        await ctx.send(embed=cmd_embed)
+
+    async def send_group_help(self, group):
+        ctx = self.context
+
+        grp_embed = embed.info_message(
+            ctx.author, title=f"Command : {group.name}", content=group.help
+        )
+
+        aliases = ", ".join([a for a in [group.name] + group.aliases])
+        grp_embed.add_field(name="Aliases", value=f"```{aliases}```", inline=False)
+
+        subcmds = ", ".join(
+            [c.name for c in sorted(group.commands, key=lambda c: c.name)]
+        )
+        grp_embed.add_field(
+            name="Subcommands",
+            value=f"```{subcmds}```",
             inline=False,
         )
 
-        await ctx.send(embed=cmd_embed)
+        usg_subcmds = subcmds.replace(", ", "|")
+        grp_embed.add_field(
+            name="Usage",
+            value=f"```{ctx.prefix}{group.name} <{usg_subcmds}>```",
+            inline=False,
+        )
+
+        note = self.get_ending_note()
+        grp_embed.add_field(name=embed.VOID_TOKEN, value=note[0], inline=False)
+
+        await ctx.send(embed=grp_embed)
+
+    async def subcommand_not_found(self, command, string):
+        msg = super().subcommand_not_found(command, string).replace('"', "`")
+        raise commands.UserInputError(msg)
+
+    async def command_not_found(self, string):
+        msg = super().command_not_found(string).replace('"', "`")
+        raise commands.UserInputError(msg)

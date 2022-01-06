@@ -42,6 +42,13 @@ def bot_is_playing(ctx: Context):
     return True
 
 
+def bot_is_streaming(ctx: Context):
+    player: Player = ctx.bot.players[ctx.guild.id]
+    if not player.streaming:
+        raise CheckFailure("The bot is not currently playing.")
+    return True
+
+
 def bot_not_playing_live(ctx: Context):
     player: Player = ctx.bot.players[ctx.guild.id]
     if player.playing and player.song.live:

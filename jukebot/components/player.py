@@ -8,6 +8,8 @@ from typing import Optional
 from nextcord import VoiceChannel, VoiceClient
 from nextcord.ext.commands import Bot, Context
 
+from jukebot.utils import coro
+
 from .resultset import ResultSet
 from .song import Song
 from .audio_stream import AudioStream
@@ -19,6 +21,11 @@ class Player:
         PLAYING = 1
         PAUSED = 2
         STOPPED = 3
+        SKIPPING = 4
+
+    class Loop(Enum):
+        DISABLED = 0
+        ENABLED = 1
 
     def __init__(self, bot: Bot):
         self.bot: Bot = bot
@@ -30,6 +37,7 @@ class Player:
         self._queue: ResultSet = ResultSet.empty()
         self._state: Player.State = Player.State.IDLE
         self._idle_task: Optional[Task] = None
+        self._loop: Player.Loop = Player.Loop.DISABLED
 
     async def join(self, channel: VoiceChannel):
         self._voice = await channel.connect()
@@ -51,9 +59,14 @@ class Player:
             self.state = Player.State.STOPPED
             await self._voice.disconnect()
 
+    def skip(self):
+        if self._voice:
+            self.state = Player.State.SKIPPING
+            self._voice.stop()
+
     def stop(self):
         if self._voice:
-            self.state = Player.State.IDLE
+            self.state = Player.State.STOPPED
             self._voice.stop()
 
     def pause(self):
@@ -71,6 +84,14 @@ class Player:
             print(f"_after {error=}")
         if self.state == Player.State.STOPPED:
             return
+        if (
+            self._loop == Player.Loop.ENABLED
+            and not self.state == Player.State.SKIPPING
+        ):
+            func = self.play(self.song)
+            coro.run_threadsafe(func, self.bot.loop)
+            return
+
         self._stream = None
         self._song = None
 
@@ -79,11 +100,7 @@ class Player:
                 context=self._context,
                 query="",
             )
-            fut = asyncio.run_coroutine_threadsafe(func, self.bot.loop)
-            try:
-                fut.result()
-            except Exception as e:
-                print(f"fut result exception {e=}")
+            coro.run_threadsafe(func, self.bot.loop)
         else:
             self.state = Player.State.IDLE
 
@@ -96,12 +113,12 @@ class Player:
             func = self.bot.get_cog("Music").leave(context=self._context)
             asyncio.ensure_future(func, loop=self.bot.loop)
 
-    def _set_idle_task(self, state: State) -> None:
-        if state in (Player.State.IDLE, Player.State.PAUSED) and not self._idle_task:
+    def _set_idle_task(self) -> None:
+        if self._is_inactive() and not self._idle_task:
             task = self.bot.loop.create_task(self._idle())
             task.add_done_callback(self._idle_callback)
             self._idle_task = task
-        elif state not in (Player.State.IDLE, Player.State.PAUSED) and self._idle_task:
+        elif not self._is_inactive() and self._idle_task:
             self._idle_task.cancel()
             self._idle_task = None
 
@@ -116,6 +133,10 @@ class Player:
     @voice.setter
     def voice(self, v: VoiceClient):
         self._voice = v
+
+    @property
+    def streaming(self) -> bool:
+        return bool(self.stream and self.voice)
 
     @property
     def playing(self) -> bool:
@@ -152,4 +173,19 @@ class Player:
     @state.setter
     def state(self, new: State) -> None:
         self._state = new
-        self._set_idle_task(new)
+        self._set_idle_task()
+
+    @property
+    def loop(self) -> "Player.Loop":
+        return self._loop
+
+    @loop.setter
+    def loop(self, lp: "Player.Loop") -> None:
+        self._loop = lp
+
+    def _is_inactive(self) -> bool:
+        return self._state in (
+            Player.State.IDLE,
+            Player.State.PAUSED,
+            Player.State.STOPPED,
+        )

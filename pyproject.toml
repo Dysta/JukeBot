@@ -1,11 +1,11 @@
 [tool.poetry]
 name = "JukeBot"
 version = "0.1.0"
-description = "A music bot for Discord using Pycord"
+description = "A music bot for Discord using Nextcord"
 authors = ["Dysta <xav4098@gmail.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.8"
 python-dotenv = "^0.19.1"
 yt-dlp = "^2021.11.10"
 nextcord = {extras = ["speed", "voice"], version = "^2.0.0-alpha.3"}
