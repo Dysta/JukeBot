@@ -14,7 +14,7 @@ class Queue(commands.Cog):
         self.bot: Bot = bot
 
     @commands.command(
-        aliases=["q", "list"],
+        aliases=["queue", "q", "list"],
         brief="Show the queue of the server.",
         help="Show the queue of the server",
     )
@@ -22,7 +22,7 @@ class Queue(commands.Cog):
     @commands.cooldown(1, 3.0, BucketType.user)
     @commands.check(voice.bot_is_connected)
     @commands.check(voice.user_is_connected)
-    async def queue(self, ctx: Context):
+    async def show(self, ctx: Context):
         queue: ResultSet = self.bot.players[ctx.guild.id].queue
         e: Embed = embed.queue_message(
             ctx.author, queue, title=f"Queue for {ctx.guild.name}"
