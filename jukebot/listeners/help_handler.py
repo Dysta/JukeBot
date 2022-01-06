@@ -69,18 +69,30 @@ class HelpHandler(commands.HelpCommand):
     async def send_command_help(self, command):
         ctx = self.context
 
+        cmd_str = (
+            f"{command.full_parent_name } {command.name}"
+            if command.parent
+            else command.name
+        )
         cmd_embed = embed.info_message(
-            ctx.author, title=f"Command : {command.name}", content=command.help
+            ctx.author, title=f"Command : {cmd_str}", content=command.help
         )
 
         aliases = ", ".join([a for a in [command.name] + command.aliases])
         cmd_embed.add_field(name="Aliases", value=f"```{aliases}```", inline=False)
 
-        cmd_embed.add_field(
-            name="Usage",
-            value=f"```{ctx.prefix}{command.name} {command.usage if command.usage is not None else ''}```",
-            inline=False,
-        )
+        if not command.parent:
+            cmd_embed.add_field(
+                name="Usage",
+                value=f"```{ctx.prefix}{command.name} {command.usage if command.usage is not None else ''}```",
+                inline=False,
+            )
+        else:
+            cmd_embed.add_field(
+                name="Usage",
+                value=f"```{ctx.prefix}{command.full_parent_name} {command.name} {command.usage if command.usage is not None else ''}```",
+                inline=False,
+            )
 
         await ctx.send(embed=cmd_embed)
 
