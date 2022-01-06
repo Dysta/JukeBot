@@ -113,12 +113,12 @@ class Player:
             func = self.bot.get_cog("Music").leave(context=self._context)
             asyncio.ensure_future(func, loop=self.bot.loop)
 
-    def _set_idle_task(self, state: State) -> None:
-        if state in (Player.State.IDLE, Player.State.PAUSED) and not self._idle_task:
+    def _set_idle_task(self) -> None:
+        if self._is_inactive() and not self._idle_task:
             task = self.bot.loop.create_task(self._idle())
             task.add_done_callback(self._idle_callback)
             self._idle_task = task
-        elif state not in (Player.State.IDLE, Player.State.PAUSED) and self._idle_task:
+        elif not self._is_inactive() and self._idle_task:
             self._idle_task.cancel()
             self._idle_task = None
 
@@ -173,7 +173,7 @@ class Player:
     @state.setter
     def state(self, new: State) -> None:
         self._state = new
-        self._set_idle_task(new)
+        self._set_idle_task()
 
     @property
     def loop(self) -> "Player.Loop":
@@ -182,3 +182,10 @@ class Player:
     @loop.setter
     def loop(self, lp: "Player.Loop") -> None:
         self._loop = lp
+
+    def _is_inactive(self) -> bool:
+        return self._state in (
+            Player.State.IDLE,
+            Player.State.PAUSED,
+            Player.State.STOPPED,
+        )
