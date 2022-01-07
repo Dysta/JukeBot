@@ -56,7 +56,6 @@ class Player:
 
     async def disconnect(self):
         if self._voice:
-            self.state = Player.State.STOPPED
             await self._voice.disconnect()
 
     def skip(self):
