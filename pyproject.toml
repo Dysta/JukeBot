@@ -24,6 +24,7 @@ mongouri = ["dnspython"]
 
 [tool.taskipy.tasks]
 start = "python -m jukebot"
+black = "python -m black ."
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
