@@ -43,8 +43,6 @@ async def get_prefix(client, message):
 
 def get_ids() -> Set[int]:
     ids = os.environ["BOT_OWNER_IDS"].split(",")
-    # we must apply a map on elements bc dotenv return str
-    # and discord bot expect int
     return set(map(int, ids))
 
 
