@@ -17,9 +17,15 @@ pytest = "^5.2"
 black = "^21.10b0"
 mypy = "^0.910"
 autoflake = "^1.4"
+taskipy = "^1.9.0"
 
 [tool.poetry.extras]
 mongouri = ["dnspython"]
+
+[tool.taskipy.tasks]
+start = "python -m jukebot"
+black = "python -m black ."
+clean = "python -m autoflake . -r -i -v --ignore-init-module-imports --remove-all-unused-imports --remove-unused-variables"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
