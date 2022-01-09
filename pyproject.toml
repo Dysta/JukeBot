@@ -25,6 +25,7 @@ mongouri = ["dnspython"]
 [tool.taskipy.tasks]
 start = "python -m jukebot"
 black = "python -m black ."
+clean = "python -m autoflake . -r -i -v --ignore-init-module-imports --remove-all-unused-imports --remove-unused-variables"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
