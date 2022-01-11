@@ -14,7 +14,7 @@ from jukebot.listeners import HelpHandler
 
 
 def set_logging():
-    logger = logging.getLogger("discord")
+    logger = logging.getLogger("nextcord")
     logger.setLevel(logging.DEBUG)
     handler = logging.FileHandler(
         filename=f"./logs/{datetime.datetime.now():%Y-%m-%d}-jukebot.log",
