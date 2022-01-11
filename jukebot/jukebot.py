@@ -6,6 +6,8 @@ from datetime import datetime
 from nextcord import Guild
 from nextcord.ext import commands
 
+from loguru import logger
+
 from jukebot.abstract_components import AbstractMongoDB, AbstractMap
 from jukebot.components import Player
 
@@ -22,11 +24,11 @@ class JukeBot(commands.Bot):
         self._players: PlayerCollection = PlayerCollection(self)
 
     async def on_ready(self):
-        print(f"Logged in as {self.user} (ID: {self.user.id})")
-        print("------")
+        logger.info(f"Logged in as {self.user} (ID: {self.user.id})")
+        logger.info("------")
 
     async def on_error(self, event, *args, **kwargs):
-        print(f"{event=}{args}{kwargs}")
+        logger.error(f"{event=}{args}{kwargs}")
 
     async def on_guild_join(self, guild: Guild):
         await self._prefixes.set_item(guild.id, os.environ["BOT_PREFIX"])
