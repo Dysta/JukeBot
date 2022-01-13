@@ -22,6 +22,7 @@ class Player:
         PAUSED = 2
         STOPPED = 3
         SKIPPING = 4
+        DISCONNECTING = 5
 
     class Loop(Enum):
         DISABLED = 0
@@ -56,6 +57,7 @@ class Player:
 
     async def disconnect(self):
         if self._voice:
+            self.state = Player.State.DISCONNECTING
             await self._voice.disconnect()
 
     def skip(self):
@@ -81,7 +83,7 @@ class Player:
     def _after(self, error):
         if error:
             print(f"_after {error=}")
-        if self.state == Player.State.STOPPED:
+        if self.state in (Player.State.STOPPED, Player.State.DISCONNECTING):
             return
         if (
             self._loop == Player.Loop.ENABLED
@@ -120,6 +122,13 @@ class Player:
         elif not self._is_inactive() and self._idle_task:
             self._idle_task.cancel()
             self._idle_task = None
+
+    def _is_inactive(self) -> bool:
+        return self._state in (
+            Player.State.IDLE,
+            Player.State.PAUSED,
+            Player.State.STOPPED,
+        )
 
     @property
     def stream(self) -> Optional[AudioStream]:
@@ -181,10 +190,3 @@ class Player:
     @loop.setter
     def loop(self, lp: "Player.Loop") -> None:
         self._loop = lp
-
-    def _is_inactive(self) -> bool:
-        return self._state in (
-            Player.State.IDLE,
-            Player.State.PAUSED,
-            Player.State.STOPPED,
-        )
