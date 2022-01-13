@@ -123,6 +123,13 @@ class Player:
             self._idle_task.cancel()
             self._idle_task = None
 
+    def _is_inactive(self) -> bool:
+        return self._state in (
+            Player.State.IDLE,
+            Player.State.PAUSED,
+            Player.State.STOPPED,
+        )
+
     @property
     def stream(self) -> Optional[AudioStream]:
         return self._stream
@@ -183,10 +190,3 @@ class Player:
     @loop.setter
     def loop(self, lp: "Player.Loop") -> None:
         self._loop = lp
-
-    def _is_inactive(self) -> bool:
-        return self._state in (
-            Player.State.IDLE,
-            Player.State.PAUSED,
-            Player.State.STOPPED,
-        )
