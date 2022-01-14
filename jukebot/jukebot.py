@@ -46,6 +46,14 @@ class JukeBot(commands.Bot):
     def players(self) -> "PlayerCollection":
         return self._players
 
+    @cached_property
+    def members_count(self) -> int:
+        return len(set(self.get_all_members()))
+
+    @cached_property
+    def guilds_count(self) -> int:
+        return len(self.guilds)
+
 
 class PrefixDB(AbstractMongoDB):
     async def contains(self, guild_id: int) -> bool:
