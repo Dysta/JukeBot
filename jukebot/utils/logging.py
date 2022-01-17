@@ -1,0 +1,39 @@
+import datetime
+import logging
+import os
+
+from loguru import logger
+
+from jukebot.listeners import InterceptHandler
+from jukebot.utils import Environment
+
+
+def set_logging(
+    intercept_nextcord_log: bool = True, nextcord_loglevel: int = logging.INFO
+):
+    logger.info(f"Environment is set to '{os.environ['ENVIRONMENT']}'.")
+
+    if intercept_nextcord_log:
+        logger.info(
+            f"Intercepting nextcord log messages with level {nextcord_loglevel}."
+        )
+        logging.basicConfig(handlers=[InterceptHandler()], level=nextcord_loglevel)
+
+    if os.environ["ENVIRONMENT"] == Environment.DEVELOPMENT:
+        pass
+    elif os.environ["ENVIRONMENT"] == Environment.PRODUCTION:
+        logger.remove()
+        fmt = "{time:YYYY-MM-DD at HH:mm:ss} || {level} || {name} ||  {message}"
+        logger.add(
+            f"./logs/log-{datetime.datetime.now():%Y-%m-%d}.log",
+            level="INFO",
+            format=fmt,
+            rotation="01:00",
+            retention="10 days",
+            enqueue=True,
+            mode="w",
+            encoding="utf-8",
+        )
+    else:
+        logger.error(f"Unknown environment {os.environ['ENVIRONMENT']}.")
+        exit(1)

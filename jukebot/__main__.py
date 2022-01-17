@@ -1,5 +1,4 @@
-import datetime
-import logging
+import logging as plogging
 import os
 from typing import Set
 
@@ -10,47 +9,9 @@ from dotenv import load_dotenv
 
 from loguru import logger
 
-from jukebot.utils import Extensions, intents, Environment
+from jukebot.utils import Extensions, intents, logging, prefix
 from jukebot import JukeBot
-from jukebot.listeners import HelpHandler, InterceptHandler
-
-
-def set_logging(
-    intercept_nextcord_log: bool = True, nextcord_loglevel: int = logging.INFO
-):
-    logger.info(f"Environment is set to '{os.environ['environment']}'.")
-
-    if intercept_nextcord_log:
-        logger.info(
-            f"Intercepting nextcord log messages with level {nextcord_loglevel}."
-        )
-        logging.basicConfig(handlers=[InterceptHandler()], level=nextcord_loglevel)
-
-    if os.environ["environment"] == Environment.DEVELOPMENT:
-        pass
-    elif os.environ["environment"] == Environment.PRODUCTION:
-        logger.remove()
-        fmt = "{time:YYYY-MM-DD at HH:mm:ss} || {level} || {name} ||  {message}"
-        logger.add(
-            f"./logs/log-{datetime.datetime.now():%Y-%m-%d}.log",
-            level="INFO",
-            format=fmt,
-            rotation="01:00",
-            retention="10 days",
-            enqueue=True,
-            mode="w",
-            encoding="utf-8",
-        )
-    else:
-        logger.error(f"Unknown environment {os.environ['environment']}.")
-        exit(1)
-        await prefixes.set_item(guild_id, os.environ["BOT_PREFIX"])
-        prefix = os.environ["BOT_PREFIX"]
-    logger.opt(lazy=True).debug(
-        f"Return prefix '{prefix}' for guild {message.guild} (ID: {guild_id})"
-    )
-    return prefix
-
+from jukebot.listeners import HelpHandler
 
 
 def get_ids() -> Set[int]:
@@ -60,7 +21,7 @@ def get_ids() -> Set[int]:
 
 def main():
     load_dotenv()
-    set_logging(intercept_nextcord_log=True, nextcord_loglevel=logging.WARNING)
+    logging.set_logging(intercept_nextcord_log=True, nextcord_loglevel=plogging.WARNING)
 
     bot = JukeBot(
         command_prefix=prefix.get_prefix,
