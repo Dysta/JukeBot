@@ -30,7 +30,7 @@ def set_logging(
         pass
     elif os.environ["environment"] == Environment.PRODUCTION:
         logger.remove()
-        fmt = "{time:YYYY-MM-DD at HH:mm:ss}:{level}:{name}: {message}"
+        fmt = "{time:YYYY-MM-DD at HH:mm:ss} || {level} || {name} ||  {message}"
         logger.add(
             f"./logs/log-{datetime.datetime.now():%Y-%m-%d}.log",
             level="INFO",
