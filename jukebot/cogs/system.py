@@ -72,7 +72,9 @@ class System(commands.Cog):
             return
 
         perm: Permissions = ctx.author.guild_permissions
-        logger.opt(lazy=True).info(f"Set prefix '{prefix}' for guild '{ctx.guild.name} (ID: {ctx.guild.id})'.")
+        logger.opt(lazy=True).info(
+            f"Set prefix '{prefix}' for guild '{ctx.guild.name} (ID: {ctx.guild.id})'."
+        )
         if perm.administrator:
             await self.bot.prefixes.set_item(ctx.guild.id, prefix)
             e = embed.basic_message(
@@ -80,12 +82,16 @@ class System(commands.Cog):
                 title="Prefix changed!",
                 content=f"Prefix is set to `{prefix}` for server `{ctx.guild.name}`",
             )
-            logger.opt(lazy=True).success(f"Successfully set prefix '{prefix}' for guild '{ctx.guild.name} (ID: {ctx.guild.id})'.")
+            logger.opt(lazy=True).success(
+                f"Successfully set prefix '{prefix}' for guild '{ctx.guild.name} (ID: {ctx.guild.id})'."
+            )
         else:
             e = embed.error_message(
                 ctx.author, content="You're not administrator of this server."
             )
-            logger.opt(lazy=True).error(f"Missing permission for setting prefix '{prefix}' for guild '{ctx.guild.name} (ID: {ctx.guild.id})'.")
+            logger.opt(lazy=True).error(
+                f"Missing permission for setting prefix '{prefix}' for guild '{ctx.guild.name} (ID: {ctx.guild.id})'."
+            )
         await ctx.send(embed=e)
 
 
