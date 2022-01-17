@@ -2,8 +2,9 @@ import asyncio
 import os
 
 from datetime import datetime
+from typing import TypeVar
 
-from nextcord import Guild
+from nextcord import Guild, Message
 from nextcord.ext import commands
 
 from loguru import logger
