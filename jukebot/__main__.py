@@ -21,7 +21,9 @@ def set_logging(
     logger.info(f"Environment is set to '{os.environ['environment']}'.")
 
     if intercept_nextcord_log:
-        logger.info(f"Intercepting nextcord log messages with level {nextcord_loglevel}.")
+        logger.info(
+            f"Intercepting nextcord log messages with level {nextcord_loglevel}."
+        )
         logging.basicConfig(handlers=[InterceptHandler()], level=nextcord_loglevel)
 
     if os.environ["environment"] == Environment.DEVELOPMENT:

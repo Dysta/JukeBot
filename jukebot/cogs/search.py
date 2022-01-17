@@ -2,6 +2,9 @@ import asyncio
 import os
 
 import nextcord.ui
+
+from loguru import logger
+
 from nextcord import Interaction, Member
 from nextcord.ext import commands
 from nextcord.ext.commands import Context, Bot, BucketType
@@ -16,6 +19,9 @@ class Search(commands.Cog):
         self.bot: Bot = bot
 
     async def _search_process(self, ctx: Context, query: str, source: str):
+        logger.opt(lazy=True).debug(
+            f"search query '{source}{query}' for guild '{ctx.guild.name} (ID: {ctx.guild.id})'"
+        )
         with ctx.typing():
             qry: Query = Query(f"{source}{query}")
             if "sc" in source:
@@ -36,7 +42,7 @@ class Search(commands.Cog):
                 if not "sc" in source
                 else SongSet.from_query(qry)
             )
-            print(f"{results=}")
+            logger.opt(lazy=True).debug(f"Results of the query is {results}")
 
             e = embed.search_result_message(
                 ctx.author,
