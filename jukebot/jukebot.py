@@ -28,7 +28,6 @@ class JukeBot(commands.Bot):
 
     async def on_ready(self):
         logger.info(f"Logged in as {self.user} (ID: {self.user.id})")
-        logger.info("------")
 
     async def on_error(self, event, *args, **kwargs):
         logger.error(f"{event=}{args}{kwargs}")
