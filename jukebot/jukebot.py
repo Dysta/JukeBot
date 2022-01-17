@@ -9,7 +9,9 @@ from nextcord.ext import commands
 from loguru import logger
 
 from jukebot.abstract_components import AbstractMongoDB, AbstractMap
-from jukebot.components import Player
+from jukebot.components import Player, CustomContext
+
+CXT = TypeVar("CXT", bound="Context")
 
 
 class JukeBot(commands.Bot):
@@ -35,6 +37,9 @@ class JukeBot(commands.Bot):
 
     async def on_guild_remove(self, guild):
         await self._prefixes.del_item(guild.id)
+
+    async def get_context(self, message: Message, *, cls=CustomContext) -> CXT:
+        return await super().get_context(message, cls=cls)
 
     @property
     def start_time(self):
