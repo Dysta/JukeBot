@@ -2,6 +2,7 @@ import typing
 
 from datetime import datetime
 
+import nextcord
 from nextcord.ext import commands
 from nextcord.ext.commands import Context, BucketType, Bot
 from nextcord import Member
@@ -72,7 +73,7 @@ class Utility(commands.Cog):
     @commands.cooldown(1, 5.0, BucketType.user)
     @commands.guild_only()
     async def echo(self, ctx: Context, *, args):
-        await ctx.send(args)
+        await ctx.send(args, allowed_mentions=nextcord.AllowedMentions.none())
 
     @commands.command(
         brief="Display a user avatar",
