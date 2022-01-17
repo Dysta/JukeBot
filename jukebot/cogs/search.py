@@ -20,7 +20,7 @@ class Search(commands.Cog):
 
     async def _search_process(self, ctx: Context, query: str, source: str):
         logger.opt(lazy=True).debug(
-            f"search query '{source}{query}' for guild '{ctx.guild.name} (ID: {ctx.guild.id})'"
+            f"Search query '{source}{query}' for guild '{ctx.guild.name} (ID: {ctx.guild.id})'."
         )
         with ctx.typing():
             qry: Query = Query(f"{source}{query}")
@@ -29,6 +29,9 @@ class Search(commands.Cog):
             else:
                 await qry.search()
             if not qry.success:
+                logger.opt(lazy=True).debug(
+                    f"Query '{source}{query}' failed for guild '{ctx.guild.name} (ID: {ctx.guild.id})'.."
+                )
                 e = embed.music_not_found_message(
                     ctx.author,
                     title=f"Nothing found for {query}, sorry..",
@@ -56,12 +59,19 @@ class Search(commands.Cog):
         await msg.edit(view=None)
         result: str = v.result
         if result == SearchInteraction.CANCEL_TEXT:
+            logger.opt(lazy=True).debug(
+                f"Query '{source}{query}' canceled for guild '{ctx.guild.name} (ID: {ctx.guild.id})'."
+            )
             e = embed.music_not_found_message(
                 ctx.author,
                 title=f"Search canceled",
             )
             await msg.edit(embed=e, delete_after=5.0)
             return
+
+        logger.opt(lazy=True).debug(
+            f"Query '{source}{query}' successful for guild '{ctx.guild.name} (ID: {ctx.guild.id})'."
+        )
 
         music_cog = self.bot.get_cog("Music")
         func = ctx.invoke(music_cog.play, query=result)
