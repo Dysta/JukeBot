@@ -56,10 +56,10 @@ class Search(commands.Cog):
             )
             await msg.edit(embed=e, delete_after=5.0)
             return
-        asyncio.ensure_future(
-            self.bot.get_cog("Music").play(context=ctx, query=result),
-            loop=self.bot.loop,
-        )
+
+        music_cog = self.bot.get_cog("Music")
+        func = ctx.invoke(music_cog.play, query=result)
+        asyncio.ensure_future(func, loop=self.bot.loop)
         await msg.delete()
 
     @commands.command(

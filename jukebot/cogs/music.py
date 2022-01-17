@@ -33,8 +33,9 @@ class Music(commands.Cog):
             await ctx.invoke(self.bind)
 
         if query:
-            await self.bot.get_cog("Queue").add(
-                context=ctx, silent=bool(not player.playing), query=query
+            queue_cog = self.bot.get_cog("Queue")
+            await ctx.invoke(
+                queue_cog.add, silent=bool(not player.playing), query=query
             )
         if player.playing:
             return
