@@ -18,8 +18,8 @@ class HelpHandler(commands.HelpCommand):
     def get_ending_note(self):
         command_name = self.invoked_with
         return (
-            f"Type `{self.context.prefix}{command_name} command` for more info on a command.",
-            f"Type `{self.context.prefix}{command_name} category` for more info on a category.",
+            f"Type `{self.context.clean_prefix}{command_name} command` for more info on a command.",
+            f"Type `{self.context.clean_prefix}{command_name} category` for more info on a category.",
         )
 
     async def send_bot_help(self, mapping):
