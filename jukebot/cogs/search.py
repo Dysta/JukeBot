@@ -2,6 +2,9 @@ import asyncio
 import os
 
 import nextcord.ui
+
+from loguru import logger
+
 from nextcord import Interaction, Member
 from nextcord.ext import commands
 from nextcord.ext.commands import Context, Bot, BucketType
@@ -16,6 +19,9 @@ class Search(commands.Cog):
         self.bot: Bot = bot
 
     async def _search_process(self, ctx: Context, query: str, source: str):
+        logger.opt(lazy=True).debug(
+            f"Search query '{source}{query}' for guild '{ctx.guild.name} (ID: {ctx.guild.id})'."
+        )
         with ctx.typing():
             qry: Query = Query(f"{source}{query}")
             if "sc" in source:
@@ -23,6 +29,9 @@ class Search(commands.Cog):
             else:
                 await qry.search()
             if not qry.success:
+                logger.opt(lazy=True).debug(
+                    f"Query '{source}{query}' failed for guild '{ctx.guild.name} (ID: {ctx.guild.id})'.."
+                )
                 e = embed.music_not_found_message(
                     ctx.author,
                     title=f"Nothing found for {query}, sorry..",
@@ -36,7 +45,7 @@ class Search(commands.Cog):
                 if not "sc" in source
                 else SongSet.from_query(qry)
             )
-            print(f"{results=}")
+            logger.opt(lazy=True).debug(f"Results of the query is {results}")
 
             e = embed.search_result_message(
                 ctx.author,
@@ -50,16 +59,23 @@ class Search(commands.Cog):
         await msg.edit(view=None)
         result: str = v.result
         if result == SearchInteraction.CANCEL_TEXT:
+            logger.opt(lazy=True).debug(
+                f"Query '{source}{query}' canceled for guild '{ctx.guild.name} (ID: {ctx.guild.id})'."
+            )
             e = embed.music_not_found_message(
                 ctx.author,
                 title=f"Search canceled",
             )
             await msg.edit(embed=e, delete_after=5.0)
             return
-        asyncio.ensure_future(
-            self.bot.get_cog("Music").play(context=ctx, query=result),
-            loop=self.bot.loop,
+
+        logger.opt(lazy=True).debug(
+            f"Query '{source}{query}' successful for guild '{ctx.guild.name} (ID: {ctx.guild.id})'."
         )
+
+        music_cog = self.bot.get_cog("Music")
+        func = ctx.invoke(music_cog.play, query=result)
+        asyncio.ensure_future(func, loop=self.bot.loop)
         await msg.delete()
 
     @commands.command(
