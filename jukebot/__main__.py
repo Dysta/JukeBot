@@ -44,12 +44,6 @@ def set_logging(
     else:
         logger.error(f"Unknown environment {os.environ['environment']}.")
         exit(1)
-
-
-async def prefix_for(client, message):
-    prefixes = client.prefixes
-    guild_id = message.guild.id
-    if (prefix := await prefixes.get_item(guild_id)) is None:
         await prefixes.set_item(guild_id, os.environ["BOT_PREFIX"])
         prefix = os.environ["BOT_PREFIX"]
     logger.opt(lazy=True).debug(
@@ -57,10 +51,6 @@ async def prefix_for(client, message):
     )
     return prefix
 
-
-async def get_prefix(client, message):
-    prefix = await prefix_for(client, message)
-    return commands.when_mentioned_or(prefix)(client, message)
 
 
 def get_ids() -> Set[int]:
@@ -73,7 +63,7 @@ def main():
     set_logging(intercept_nextcord_log=True, nextcord_loglevel=logging.WARNING)
 
     bot = JukeBot(
-        command_prefix=get_prefix,
+        command_prefix=prefix.get_prefix,
         help_command=HelpHandler(),
         activity=Game(f"{os.environ['BOT_PREFIX']}help"),
         intents=intents.get(),
