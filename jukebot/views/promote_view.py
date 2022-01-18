@@ -5,7 +5,7 @@ import os
 class _VoteButton(nextcord.ui.Button):
     def __init__(self):
         url = os.environ["BOT_VOTE_URL"]
-        label = "Vote!"
+        label = "Vote"
         emoji = "📈"
 
         super().__init__(url=url, label=label, emoji=emoji)
@@ -14,7 +14,7 @@ class _VoteButton(nextcord.ui.Button):
 class _InviteButton(nextcord.ui.Button):
     def __init__(self):
         url = os.environ["BOT_INVITE_URL"]
-        label = "Invite me!"
+        label = "Invite me"
         emoji = "📥"
 
         super().__init__(url=url, label=label, emoji=emoji)
