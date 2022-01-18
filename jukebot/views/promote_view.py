@@ -1,9 +1,10 @@
 import nextcord
+import os
 
 
 class _VoteButton(nextcord.ui.Button):
     def __init__(self):
-        url = "https://top.gg/bot/899039383011885176/vote"
+        url = os.environ["BOT_VOTE_URL"]
         label = "Vote!"
         emoji = "📈"
 
@@ -12,7 +13,7 @@ class _VoteButton(nextcord.ui.Button):
 
 class _InviteButton(nextcord.ui.Button):
     def __init__(self):
-        url = "https://dsc.gg/jukebot"
+        url = os.environ["BOT_INVITE_URL"]
         label = "Invite me!"
         emoji = "📥"
 
