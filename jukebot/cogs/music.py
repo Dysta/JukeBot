@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from nextcord import Embed
 from nextcord.ext import commands
 from nextcord.ext.commands import Context, BucketType, Bot
@@ -201,6 +203,31 @@ class Music(commands.Cog):
         player: Player = self.bot.players[ctx.guild.id]
         ctx = await self.bot.get_context(msg)
         player.context = ctx
+
+    @commands.command(
+        aliases=["dump", "pick", "grab"],
+        brief="Send the current song in DM to save it.",
+        help="Send the current song in DM to save it.",
+    )
+    @commands.guild_only()
+    @commands.check(voice.bot_is_playing)
+    @commands.check(voice.bot_and_user_in_same_channel)
+    @commands.check(voice.bot_is_connected)
+    @commands.check(voice.user_is_connected)
+    @commands.cooldown(1, 10.0, BucketType.user)
+    async def save(self, ctx: Context):
+        player: Player = self.bot.players[ctx.guild.id]
+        stream: AudioStream = player.stream
+        song: Song = player.song
+        e = embed.music_message(
+            song.requester, song=song, current_duration=stream.progress
+        )
+        timestamp = int(datetime.now().timestamp())
+        await ctx.author.send(
+            content=f"Save music from `{ctx.guild.name} — {ctx.author.voice.channel.name}` at <t:{timestamp}:T>",
+            embed=e,
+        )
+        await ctx.message.add_reaction("👍")
 
     @commands.group(
         aliases=["lp"],
