@@ -7,7 +7,9 @@ from nextcord.ext import commands
 from nextcord.ext.commands import Context, BucketType, Bot
 from nextcord import Member
 
-from jukebot.utils import embed, converter
+from jukebot.checks import voice
+from jukebot.utils import embed, converter, applications
+from jukebot.views import ActivityView
 
 
 class Utility(commands.Cog):
@@ -92,6 +94,33 @@ class Utility(commands.Cog):
     @commands.guild_only()
     async def zizi(self, ctx: Context):
         await ctx.reply("caca")
+
+    @commands.command(
+        aliases=["w"],
+        brief="Launch a Youtube Together session",
+        help="Launch a Youtube Together session in the current voice channel the invoker is.",
+    )
+    @commands.cooldown(1, 15.0, BucketType.guild)
+    @commands.max_concurrency(1, BucketType.guild)
+    @commands.guild_only()
+    @commands.check(voice.user_is_connected)
+    async def watch(self, ctx: Context):
+        max_time = 180
+        invite = await ctx.author.voice.channel.create_invite(
+            max_age=max_time,
+            reason="Watch Together",
+            target_type=nextcord.InviteTarget.embedded_application,
+            target_application_id=applications.default["youtube"],
+        )
+        e = embed.activity_message(
+            ctx.author,
+            "Watch Together started!",
+            f"An activity started in `{ctx.author.voice.channel.name}`.\n",
+        )
+
+        await ctx.reply(
+            embed=e, view=ActivityView(invite.url), delete_after=float(max_time)
+        )
 
 
 def setup(bot):
