@@ -51,7 +51,7 @@ class Queue(commands.Cog):
                     title=f"Nothing found for {query}, sorry..",
                 )
                 await ctx.send(embed=e)
-                return
+                return False
 
         if qry.type == Query.Type.PLAYLIST:
             res: ResultSet = ResultSet.from_query(qry, ctx.author)
@@ -70,6 +70,7 @@ class Queue(commands.Cog):
             if not silent:
                 e: Embed = embed.result_enqueued(ctx.author, res)
                 await ctx.send(embed=e)
+        return True
 
     @commands.command(
         aliases=["r"],
