@@ -48,6 +48,17 @@ def basic_message(author: Member, title="", content=""):
     return embed
 
 
+def activity_message(author: Member, title="", content=""):
+    colors = [0xF6C333, 0xF4B400]
+    c = colors[random.randint(0, 1)]
+    embed: nextcord.Embed = _base_embed(author=author, content=content, color=c)
+    embed.set_author(
+        name="Information" if title == "" else title,
+        icon_url="https://icons.iconarchive.com/icons/papirus-team/papirus-apps/512/dragon-ball-online-global-icon.png",
+    )
+    return embed
+
+
 def music_message(author: Member, song: Song, current_duration: int = 0):
     colors = [0x736DAB, 0xFFBA58]
     c = colors[random.randint(0, 1)]
