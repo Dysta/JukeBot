@@ -29,19 +29,18 @@ class Music(commands.Cog):
     @commands.cooldown(1, 5.0, BucketType.user)
     @commands.check(voice.user_is_connected)
     async def play(self, ctx: Context, *, query: str):
-        # PlayerContainer create bot if needed
-        player: Player = self.bot.players[ctx.guild.id]
-        if not player.context:
-            await ctx.invoke(self.bind)
-
         if query:
             queue_cog = self.bot.get_cog("Queue")
             ok: bool = await ctx.invoke(
-                queue_cog.add, silent=bool(not player.playing), query=query
+                queue_cog.add, query=query
             )
             if not ok:
                 return
 
+        # PlayerContainer create bot if needed
+        player: Player = self.bot.players[ctx.guild.id]
+        if not player.context:
+            await ctx.invoke(self.bind)
         if player.playing:
             return
 

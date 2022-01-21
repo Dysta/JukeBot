@@ -40,7 +40,7 @@ class Queue(commands.Cog):
     @commands.check(voice.bot_and_user_in_same_channel)
     @commands.check(voice.bot_is_connected)
     @commands.check(voice.user_is_connected)
-    async def add(self, ctx: Context, silent: Optional[bool] = False, *, query: str):
+    async def add(self, ctx: Context, *, query: str):
         query = query if regex.is_url(query) else f"ytsearch1:{query}"
         with ctx.typing():
             qry: Query = Query(query)
@@ -67,7 +67,7 @@ class Queue(commands.Cog):
             res.requester = ctx.author
             player: Player = self.bot.players[ctx.guild.id]
             player.queue.put(res)
-            if not silent:
+            if player.playing:
                 e: Embed = embed.result_enqueued(ctx.author, res)
                 await ctx.send(embed=e)
         return True
