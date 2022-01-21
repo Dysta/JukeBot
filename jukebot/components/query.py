@@ -53,6 +53,11 @@ class Query:
         info = Query._sanitize_info(info)
         type = Query._define_type(info)
 
+        if isinstance(info, list) and len(info) == 0:
+            logger.opt(lazy=True).debug(f"No info retrieved for query {self._query}")
+            self._success = False
+            return
+
         self._result = info
         self._type = type
         self._success = self._type != Query.Type.UNKNOWN
