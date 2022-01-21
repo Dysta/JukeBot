@@ -61,7 +61,7 @@ class Query:
         self._result = info
         self._type = type
         self._success = self._type != Query.Type.UNKNOWN
-        logger.opt(lazy=True).debug(f"'{info=}' for query {self._query}")
+        logger.opt(lazy=True).debug(f"Retrieve music '{info}' for query {self._query}")
 
     @staticmethod
     def _define_type(info: Union[dict, list]) -> "Query.Type":
