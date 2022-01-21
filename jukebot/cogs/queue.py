@@ -1,12 +1,10 @@
-from typing import Optional
-
 from nextcord import Embed
 from nextcord.ext import commands
 from nextcord.ext.commands import Bot, BucketType, Context
 
 from jukebot.checks import user, voice
 from jukebot.components import ResultSet, Player, Query, Result
-from jukebot.utils import embed, regex
+from jukebot.utils import embed, regex, query_callback
 
 
 class Queue(commands.Cog):
@@ -41,16 +39,12 @@ class Queue(commands.Cog):
     @commands.check(voice.bot_is_connected)
     @commands.check(voice.user_is_connected)
     async def add(self, ctx: Context, *, query: str):
-        query = query if regex.is_url(query) else f"ytsearch1:{query}"
+        query_str = query if regex.is_url(query) else f"ytsearch1:{query}"
         with ctx.typing():
-            qry: Query = Query(query)
+            qry: Query = Query(query_str)
             await qry.search()
             if not qry.success:
-                e = embed.music_not_found_message(
-                    ctx.author,
-                    title=f"Nothing found for {query}, sorry..",
-                )
-                await ctx.send(embed=e)
+                await query_callback.failure(ctx, query, query_str)
                 return False
 
         if qry.type == Query.Type.PLAYLIST:

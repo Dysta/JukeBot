@@ -8,7 +8,7 @@ from nextcord.ext.commands import Context, Bot, BucketType
 
 from jukebot.checks import voice
 from jukebot.components import Query, ResultSet, SongSet
-from jukebot.utils import embed
+from jukebot.utils import embed, query_callback
 from jukebot.views import SearchDropdownView, SearchInteraction
 
 
@@ -27,15 +27,7 @@ class Search(commands.Cog):
             else:
                 await qry.search()
             if not qry.success:
-                logger.opt(lazy=True).debug(
-                    f"Query '{source}{query}' failed for guild '{ctx.guild.name} (ID: {ctx.guild.id})'.."
-                )
-                e = embed.music_not_found_message(
-                    ctx.author,
-                    title=f"Nothing found for {query}, sorry..",
-                )
-                msg = await ctx.send(embed=e)
-                await msg.delete(delay=5.0)
+                await query_callback.failure(ctx, query, f"{source}{query}")
                 return
 
             results: ResultSet = (
