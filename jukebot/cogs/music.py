@@ -49,13 +49,6 @@ class Music(commands.Cog):
             author = rqs.requester
             qry: Query = Query(rqs.web_url)
             await qry.process()
-            if not qry.success:
-                e = embed.music_not_found_message(
-                    author,
-                    title=f"Nothing found for {rqs.title}, sorry..",
-                )
-                await ctx.send(embed=e)
-                return
 
         song: Song = Song.from_query(qry)
         song.requester = author

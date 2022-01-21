@@ -40,8 +40,6 @@ class System(commands.Cog):
         hidden=True,
     )
     @commands.guild_only()
-    @commands.has_permissions(administrator=True)
-    @commands.check(user.is_dysta)
     @commands.is_owner()
     async def reload(self, ctx, cog_name: Optional[str] = None):
         try:
