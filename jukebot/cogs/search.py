@@ -1,5 +1,5 @@
 import asyncio
-
+from typing import Optional
 
 from loguru import logger
 
@@ -16,7 +16,8 @@ class Search(commands.Cog):
     def __init__(self, bot):
         self.bot: Bot = bot
 
-    async def _search_process(self, ctx: Context, query: str, source: str):
+    @staticmethod
+    async def _search(ctx: Context, query: str, source: str) -> Optional[ResultSet]:
         logger.opt(lazy=True).debug(
             f"Search query '{source}{query}' for guild '{ctx.guild.name} (ID: {ctx.guild.id})'."
         )
@@ -28,7 +29,7 @@ class Search(commands.Cog):
                 await qry.search()
             if not qry.success:
                 await query_callback.failure(ctx, query, f"{source}{query}")
-                return
+                return None
 
             results: ResultSet = (
                 ResultSet.from_query(qry)
@@ -36,12 +37,18 @@ class Search(commands.Cog):
                 else SongSet.from_query(qry)
             )
             logger.opt(lazy=True).debug(f"Results of the query is {results}")
+            return results
 
-            e = embed.search_result_message(
-                ctx.author,
-                playlist=results,
-                title=f"Result for {query}",
-            )
+    async def _search_process(self, ctx: Context, query: str, source: str):
+        results = await Search._search(ctx, query, source)
+        if not results:
+            return
+
+        e = embed.search_result_message(
+            ctx.author,
+            playlist=results,
+            title=f"Result for {query}",
+        )
 
         v = SearchDropdownView(ctx.author, results)
         msg = await ctx.send(embed=e, view=v)
