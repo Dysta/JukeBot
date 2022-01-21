@@ -208,7 +208,7 @@ class Music(commands.Cog):
         player.context = ctx
 
     @commands.command(
-        aliases=["dump", "pick", "grab"],
+        aliases=["dump", "pick", "save"],
         brief="Send the current song in DM to save it.",
         help="Send the current song in DM to save it.",
     )
@@ -218,7 +218,7 @@ class Music(commands.Cog):
     @commands.check(voice.bot_is_connected)
     @commands.check(voice.user_is_connected)
     @commands.cooldown(1, 10.0, BucketType.user)
-    async def save(self, ctx: Context):
+    async def grab(self, ctx: Context):
         player: Player = self.bot.players[ctx.guild.id]
         stream: AudioStream = player.stream
         song: Song = player.song
