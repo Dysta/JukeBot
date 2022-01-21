@@ -31,9 +31,7 @@ class Music(commands.Cog):
     async def play(self, ctx: Context, *, query: str):
         if query:
             queue_cog = self.bot.get_cog("Queue")
-            ok: bool = await ctx.invoke(
-                queue_cog.add, query=query
-            )
+            ok: bool = await ctx.invoke(queue_cog.add, query=query)
             if not ok:
                 return
 

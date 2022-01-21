@@ -6,7 +6,6 @@ from loguru import logger
 
 from nextcord.ext.commands import Context, BucketType
 
-from jukebot.checks import user
 from jukebot.utils import Extensions, embed
 
 
