@@ -2,6 +2,7 @@ import asyncio
 import os
 
 from datetime import datetime
+from functools import cached_property
 from typing import TypeVar
 
 from nextcord import Guild, Message
@@ -52,6 +53,14 @@ class JukeBot(commands.Bot):
     @property
     def players(self) -> "PlayerCollection":
         return self._players
+
+    @cached_property
+    def members_count(self) -> int:
+        return len(set(self.get_all_members()))
+
+    @cached_property
+    def guilds_count(self) -> int:
+        return len(self.guilds)
 
 
 class PrefixDB(AbstractMongoDB):

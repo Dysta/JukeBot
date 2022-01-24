@@ -40,11 +40,11 @@ class Utility(commands.Cog):
             inline=True,
         )
         e.add_field(
-            name="🏛️ Servers", value=f"`{len(self.bot.guilds)}`", inline=True
+            name="🏛️ Servers", value=f"`{self.bot.guilds_count}`", inline=True
         )
         e.add_field(
             name="👨‍👧‍👦 Members",
-            value=f"`{len(set(self.bot.get_all_members()))}`",
+            value=f"`{self.bot.members_count}`",
             inline=True,
         )
         e.add_field(
