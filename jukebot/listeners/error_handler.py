@@ -1,6 +1,8 @@
 from nextcord.ext import commands
 from nextcord.ext.commands import Context, CommandError
 
+from loguru import logger
+
 from jukebot.utils import embed
 
 
@@ -10,7 +12,7 @@ class ErrorHandler(commands.Cog):
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx: Context, error: CommandError):
-        print(f"method on_command_error : {error=}")
+        logger.error(error)
         if isinstance(error, commands.CommandNotFound):
             await ctx.message.add_reaction("⁉")
             return

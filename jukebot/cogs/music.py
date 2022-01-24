@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from nextcord import Embed
 from nextcord.ext import commands
 from nextcord.ext.commands import Context, BucketType, Bot
@@ -27,15 +29,16 @@ class Music(commands.Cog):
     @commands.cooldown(1, 5.0, BucketType.user)
     @commands.check(voice.user_is_connected)
     async def play(self, ctx: Context, *, query: str):
+        if query:
+            queue_cog = self.bot.get_cog("Queue")
+            ok: bool = await ctx.invoke(queue_cog.add, query=query)
+            if not ok:
+                return
+
         # PlayerContainer create bot if needed
         player: Player = self.bot.players[ctx.guild.id]
         if not player.context:
             await ctx.invoke(self.bind)
-
-        if query:
-            await self.bot.get_cog("Queue").add(
-                context=ctx, silent=bool(not player.playing), query=query
-            )
         if player.playing:
             return
 
@@ -44,13 +47,6 @@ class Music(commands.Cog):
             author = rqs.requester
             qry: Query = Query(rqs.web_url)
             await qry.process()
-            if not qry.success:
-                e = embed.music_not_found_message(
-                    author,
-                    title=f"Nothing found for {rqs.title}, sorry..",
-                )
-                await ctx.send(embed=e)
-                return
 
         song: Song = Song.from_query(qry)
         song.requester = author
@@ -200,6 +196,31 @@ class Music(commands.Cog):
         player: Player = self.bot.players[ctx.guild.id]
         ctx = await self.bot.get_context(msg)
         player.context = ctx
+
+    @commands.command(
+        aliases=["dump", "pick", "save"],
+        brief="Send the current song in DM to save it.",
+        help="Send the current song in DM to save it.",
+    )
+    @commands.guild_only()
+    @commands.check(voice.bot_is_playing)
+    @commands.check(voice.bot_and_user_in_same_channel)
+    @commands.check(voice.bot_is_connected)
+    @commands.check(voice.user_is_connected)
+    @commands.cooldown(1, 10.0, BucketType.user)
+    async def grab(self, ctx: Context):
+        player: Player = self.bot.players[ctx.guild.id]
+        stream: AudioStream = player.stream
+        song: Song = player.song
+        e = embed.music_message(
+            song.requester, song=song, current_duration=stream.progress
+        )
+        timestamp = int(datetime.now().timestamp())
+        await ctx.author.send(
+            content=f"Save music from `{ctx.guild.name} — {ctx.author.voice.channel.name}` at <t:{timestamp}:T>",
+            embed=e,
+        )
+        await ctx.message.add_reaction("👍")
 
     @commands.group(
         aliases=["lp"],

@@ -1,7 +1,9 @@
 class Extensions:
     __list__ = [
+        {"package": "jukebot.listeners", "name": "logger_handler"},
         {"package": "jukebot.listeners", "name": "error_handler"},
         {"package": "jukebot.listeners", "name": "voice_handler"},
+        {"package": "jukebot.listeners", "name": "message_handler"},
         {"package": "jukebot.cogs", "name": "utility"},
         {"package": "jukebot.cogs", "name": "music"},
         {"package": "jukebot.cogs", "name": "system"},

@@ -97,10 +97,8 @@ class Player:
         self._song = None
 
         if not self._queue.is_empty():
-            func = self.bot.get_cog("Music").play(
-                context=self._context,
-                query="",
-            )
+            music_cog = self.bot.get_cog("Music")
+            func = self.context.invoke(music_cog.play, query="")
             coro.run_threadsafe(func, self.bot.loop)
         else:
             self.state = Player.State.IDLE
@@ -111,7 +109,8 @@ class Player:
 
     def _idle_callback(self, task: Task) -> None:
         if not task.cancelled():
-            func = self.bot.get_cog("Music").leave(context=self._context)
+            music_cog = self.bot.get_cog("Music")
+            func = self.context.invoke(music_cog.leave)
             asyncio.ensure_future(func, loop=self.bot.loop)
 
     def _set_idle_task(self) -> None:

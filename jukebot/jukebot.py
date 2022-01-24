@@ -2,12 +2,17 @@ import asyncio
 import os
 
 from datetime import datetime
+from typing import TypeVar
 
-from nextcord import Guild
+from nextcord import Guild, Message
 from nextcord.ext import commands
 
+from loguru import logger
+
 from jukebot.abstract_components import AbstractMongoDB, AbstractMap
-from jukebot.components import Player
+from jukebot.components import Player, CustomContext
+
+CXT = TypeVar("CXT", bound="Context")
 
 
 class JukeBot(commands.Bot):
@@ -16,23 +21,25 @@ class JukeBot(commands.Bot):
         self._start = datetime.now()
         self._prefixes: PrefixDB = PrefixDB(
             url=os.environ["MONGO_DB_URI"],
-            database="jukebot",
-            collection="prefixes",
+            database=os.environ["MONGO_DB_DATABASE"],
+            collection=os.environ["MONGO_DB_COLLECTION"],
         )
         self._players: PlayerCollection = PlayerCollection(self)
 
     async def on_ready(self):
-        print(f"Logged in as {self.user} (ID: {self.user.id})")
-        print("------")
+        logger.info(f"Logged in as {self.user} (ID: {self.user.id})")
 
     async def on_error(self, event, *args, **kwargs):
-        print(f"{event=}{args}{kwargs}")
+        logger.error(f"{event=}{args}{kwargs}")
 
     async def on_guild_join(self, guild: Guild):
         await self._prefixes.set_item(guild.id, os.environ["BOT_PREFIX"])
 
     async def on_guild_remove(self, guild):
         await self._prefixes.del_item(guild.id)
+
+    async def get_context(self, message: Message, *, cls=CustomContext) -> CXT:
+        return await super().get_context(message, cls=cls)
 
     @property
     def start_time(self):

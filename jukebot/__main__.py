@@ -1,5 +1,4 @@
-import datetime
-import logging
+import logging as plogging
 import os
 from typing import Set
 
@@ -8,37 +7,11 @@ from nextcord.ext import commands
 
 from dotenv import load_dotenv
 
-from jukebot.utils import Extensions, intents
+from loguru import logger
+
+from jukebot.utils import Extensions, intents, logging, prefix
 from jukebot import JukeBot
 from jukebot.listeners import HelpHandler
-
-
-def set_logging():
-    logger = logging.getLogger("nextcord")
-    logger.setLevel(logging.DEBUG)
-    handler = logging.FileHandler(
-        filename=f"./logs/{datetime.datetime.now():%Y-%m-%d}-jukebot.log",
-        encoding="utf-8",
-        mode="w",
-    )
-    handler.setFormatter(
-        logging.Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s")
-    )
-    logger.addHandler(handler)
-
-
-async def prefix_for(client, message):
-    prefixes = client.prefixes
-    guild_id = message.guild.id
-    if (prefix := await prefixes.get_item(guild_id)) is None:
-        await prefixes.set_item(guild_id, os.environ["BOT_PREFIX"])
-        prefix = os.environ["BOT_PREFIX"]
-    return prefix
-
-
-async def get_prefix(client, message):
-    prefix = await prefix_for(client, message)
-    return commands.when_mentioned_or(prefix)(client, message)
 
 
 def get_ids() -> Set[int]:
@@ -48,10 +21,10 @@ def get_ids() -> Set[int]:
 
 def main():
     load_dotenv()
-    set_logging()
+    logging.set_logging(intercept_nextcord_log=True, nextcord_loglevel=plogging.WARNING)
 
     bot = JukeBot(
-        command_prefix=get_prefix,
+        command_prefix=prefix.get_prefix,
         help_command=HelpHandler(),
         activity=Game(f"{os.environ['BOT_PREFIX']}help"),
         intents=intents.get(),
@@ -61,9 +34,11 @@ def main():
     for e in Extensions.all():
         try:
             bot.load_extension(name=f"{e['package']}.{e['name']}")
+            logger.success(f"Extension '{e['package']}.{e['name']}' loaded")
         except commands.ExtensionNotFound as e:
-            print(e)
+            logger.error(e)
 
+    logger.info(f"Starting bot...")
     bot.run(os.environ["BOT_TOKEN"])
 
 

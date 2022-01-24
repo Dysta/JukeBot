@@ -1,9 +1,10 @@
 import asyncio
-from enum import Enum
-
 import yt_dlp
 
+from enum import Enum
 from typing import Optional, Union
+
+from loguru import logger
 
 # Silence useless bug reports messages
 yt_dlp.utils.bug_reports_message = lambda: ""
@@ -44,12 +45,23 @@ class Query:
                 self._success = False
                 return
 
+        if not info:
+            logger.opt(lazy=True).debug(f"No info retrieved for query {self._query}")
+            self._success = False
+            return
+
         info = Query._sanitize_info(info)
         type = Query._define_type(info)
+
+        if isinstance(info, list) and len(info) == 0:
+            logger.opt(lazy=True).debug(f"No info retrieved for query {self._query}")
+            self._success = False
+            return
 
         self._result = info
         self._type = type
         self._success = self._type != Query.Type.UNKNOWN
+        logger.opt(lazy=True).debug(f"Retrieve music '{info}' for query {self._query}")
 
     @staticmethod
     def _define_type(info: Union[dict, list]) -> "Query.Type":
