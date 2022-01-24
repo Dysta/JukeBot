@@ -40,7 +40,7 @@ class Utility(commands.Cog):
             inline=True,
         )
         e.add_field(
-            name="🏛️ Servers", value=f"`{str(len(self.bot.guilds))}`", inline=True
+            name="🏛️ Servers", value=f"`{len(self.bot.guilds)}`", inline=True
         )
         e.add_field(
             name="👨‍👧‍👦 Members",
