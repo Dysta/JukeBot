@@ -1,3 +1,4 @@
+import os
 import typing
 
 from datetime import datetime
@@ -89,6 +90,34 @@ class Utility(commands.Cog):
         e = embed.basic_message(ctx.author, title=f"{who}'s avatar")
         e.set_image(url=who.display_avatar.url)
         await ctx.send(embed=e)
+
+    @commands.command(
+        brief="Send the invite link",
+        help="Send the invite link.",
+    )
+    @commands.cooldown(1, 8.0, BucketType.user)
+    @commands.guild_only()
+    async def invite(self, ctx: Context):
+        msg: str = (
+            f"To invite `{self.bot.user.name}`, click on this link: "
+            f"{os.environ['BOT_INVITE_URL']}\n"
+            f"Thanks for support :heart:"
+        )
+        await ctx.send(content=msg)
+
+    @commands.command(
+        brief="Send the vote link",
+        help="Send the vote link.",
+    )
+    @commands.cooldown(1, 8.0, BucketType.user)
+    @commands.guild_only()
+    async def vote(self, ctx: Context):
+        msg: str = (
+            f"To vote for `{self.bot.user.name}`, click on this link: "
+            f"{os.environ['BOT_VOTE_URL']}\n"
+            f"Thanks for support :heart:"
+        )
+        await ctx.send(content=msg)
 
     @commands.command(hidden=True)
     @commands.guild_only()
