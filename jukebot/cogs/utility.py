@@ -116,6 +116,20 @@ class Utility(commands.Cog):
         )
         await ctx.send(content=msg)
 
+    @commands.command(
+        brief="Send the donate link",
+        help="Send the donate link.",
+    )
+    @commands.cooldown(1, 8.0, BucketType.user)
+    @commands.guild_only()
+    async def donate(self, ctx: Context):
+        msg: str = (
+            f"To financially support `{self.bot.user.name}`, click on this link: "
+            f"{os.environ['BOT_DONATE_URL']}\n"
+            f"Thanks for support :heart:"
+        )
+        await ctx.send(content=msg)
+
     @commands.command(hidden=True)
     @commands.guild_only()
     async def zizi(self, ctx: Context):
