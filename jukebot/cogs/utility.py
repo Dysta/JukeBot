@@ -3,10 +3,9 @@ import typing
 
 from datetime import datetime
 
-import nextcord
+from nextcord import AllowedMentions, InviteTarget, Member
 from nextcord.ext import commands
 from nextcord.ext.commands import Context, BucketType, Bot
-from nextcord import Member
 
 from jukebot.checks import voice
 from jukebot.utils import embed, converter, applications
@@ -76,7 +75,7 @@ class Utility(commands.Cog):
     @commands.cooldown(1, 5.0, BucketType.user)
     @commands.guild_only()
     async def echo(self, ctx: Context, *, args):
-        await ctx.send(args, allowed_mentions=nextcord.AllowedMentions.none())
+        await ctx.send(args, allowed_mentions=AllowedMentions.none())
 
     @commands.command(
         brief="Display a user avatar",
@@ -138,7 +137,7 @@ class Utility(commands.Cog):
         invite = await ctx.author.voice.channel.create_invite(
             max_age=max_time,
             reason="Watch Together",
-            target_type=nextcord.InviteTarget.embedded_application,
+            target_type=InviteTarget.embedded_application,
             target_application_id=applications.default["youtube"],
         )
         e = embed.activity_message(
