@@ -2,6 +2,7 @@ import asyncio
 import os
 
 from datetime import datetime
+from functools import cached_property
 from typing import TypeVar
 
 from nextcord import Guild, Message
