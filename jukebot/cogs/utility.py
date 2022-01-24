@@ -39,9 +39,7 @@ class Utility(commands.Cog):
             value=f"`{days}d, {hours}h, {minutes}m, {seconds}s`",
             inline=True,
         )
-        e.add_field(
-            name="🏛️ Servers", value=f"`{self.bot.guilds_count}`", inline=True
-        )
+        e.add_field(name="🏛️ Servers", value=f"`{self.bot.guilds_count}`", inline=True)
         e.add_field(
             name="👨‍👧‍👦 Members",
             value=f"`{self.bot.members_count}`",
