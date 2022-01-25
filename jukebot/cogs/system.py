@@ -1,12 +1,11 @@
-from nextcord import Permissions
 from nextcord.ext import commands
 from typing import Optional
 
 from loguru import logger
 
-from nextcord.ext.commands import Context, BucketType
+from nextcord.ext.commands import Context
 
-from jukebot.utils import Extensions, embed
+from jukebot.utils import Extensions
 
 
 class System(commands.Cog):
@@ -69,46 +68,6 @@ class System(commands.Cog):
             await ctx.message.add_reaction("❌")
             raise
         await ctx.message.add_reaction("✅")
-
-    @commands.command(
-        aliases=["pfx"],
-        brief="Change the prefix of the bot",
-        help="Set a new prefix for the bot.\nIf no prefix are given, sends the current server prefix.",
-        usage="[prefix]",
-    )
-    @commands.guild_only()
-    @commands.cooldown(1, 15.0, BucketType.guild)
-    async def prefix(self, ctx: Context, prefix: Optional[str] = None):
-        if not prefix:
-            e = embed.basic_message(
-                ctx.author,
-                content=f"Prefix for `{ctx.guild.name}` is `{await self.bot.prefixes.get_item(ctx.guild.id)}`",
-            )
-            await ctx.send(embed=e)
-            return
-
-        perm: Permissions = ctx.author.guild_permissions
-        logger.opt(lazy=True).info(
-            f"Set prefix '{prefix}' for guild '{ctx.guild.name} (ID: {ctx.guild.id})'."
-        )
-        if perm.administrator:
-            await self.bot.prefixes.set_item(ctx.guild.id, prefix)
-            e = embed.basic_message(
-                ctx.author,
-                title="Prefix changed!",
-                content=f"Prefix is set to `{prefix}` for server `{ctx.guild.name}`",
-            )
-            logger.opt(lazy=True).success(
-                f"Successfully set prefix '{prefix}' for guild '{ctx.guild.name} (ID: {ctx.guild.id})'."
-            )
-        else:
-            e = embed.error_message(
-                ctx.author, content="You're not administrator of this server."
-            )
-            logger.opt(lazy=True).error(
-                f"Missing permission for setting prefix '{prefix}' for guild '{ctx.guild.name} (ID: {ctx.guild.id})'."
-            )
-        await ctx.send(embed=e)
 
 
 def setup(bot):
