@@ -51,14 +51,14 @@ class System(commands.Cog):
         await ctx.message.add_reaction("✅")
 
     @commands.command(
-        aliases=["rst"],
+        aliases=["rfsh"],
         brief="Reset all cached property.",
         help="Reset all cached property of the bot.",
         hidden=True,
     )
     @commands.guild_only()
     @commands.is_owner()
-    async def reset(self, ctx: Context):
+    async def refresh(self, ctx: Context):
         try:
             del self.bot.members_count
             logger.opt(lazy=True).success("Members count reset.")
