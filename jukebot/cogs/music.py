@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from loguru import logger
 from nextcord import Embed
 from nextcord.ext import commands
 from nextcord.ext.commands import Context, BucketType, Bot
@@ -33,14 +34,14 @@ class Music(commands.Cog):
             queue_cog = self.bot.get_cog("Queue")
             ok: bool = await ctx.invoke(queue_cog.add, query=query)
             if not ok:
-                return
+                return False
 
         # PlayerContainer create bot if needed
         player: Player = self.bot.players[ctx.guild.id]
         if not player.context:
             await ctx.invoke(self.bind)
         if player.playing:
-            return
+            return True  # return True bc everything is ok
 
         with ctx.typing():
             rqs: Result = player.queue.get()
@@ -51,11 +52,26 @@ class Music(commands.Cog):
         song: Song = Song.from_query(qry)
         song.requester = author
 
-        if not player.connected:
-            await ctx.invoke(self.join)
-        await player.play(song)
+        if not player.connected and not await ctx.invoke(self.join):
+            return False
+
+        try:
+            await player.play(song)
+        except:
+            logger.opt(lazy=True).error(
+                f"Server {ctx.guild.name} ({ctx.guild.id}) can't play in its player."
+            )
+            e: Embed = embed.error_message(
+                author,
+                content="The player cannot play on the voice channel. This is because he's not connected to a voice channel or he's already playing something.\n"
+                "This situation can happen when the player has been abruptly disconnected by Discord or a user. "
+                "Use the `reset` command to reset the player in this case.",
+            )
+            await ctx.send(embed=e)
+            return False
         e: Embed = embed.music_message(author, song)
         await ctx.send(embed=e)
+        return True
 
     @commands.command(
         aliases=["l"],
@@ -153,12 +169,28 @@ class Music(commands.Cog):
     @commands.check(voice.bot_is_not_connected)
     async def join(self, ctx: Context):
         player: Player = self.bot.players[ctx.guild.id]
-        await player.join(ctx.message.author.voice.channel)
+        try:
+            await player.join(ctx.author.voice.channel)
+        except:
+            logger.opt(lazy=True).error(
+                f"Server {ctx.guild.name} ({ctx.guild.id}) can't connect his player to channel {ctx.author.voice.channel.name} ({ctx.author.voice.channel.id})."
+            )
+            logger.opt(lazy=True).debug(
+                f"Channel {ctx.author.voice.channel.name} ({ctx.author.voice.channel.id}) permissions {ctx.author.voice.channel.permissions_for(ctx.me)}."
+            )
+            e: Embed = embed.error_message(
+                ctx.author,
+                content="The player cannot connect to the voice channel. Check the bot's permissions.\n"
+                "If the problem persists, use the `reset` command to reset the player. ",
+            )
+            await ctx.send(embed=e)
+            return False
         e = embed.basic_message(
             ctx.author,
-            title=f"Player connected to {ctx.message.author.voice.channel.name}",
+            title=f"Player connected to {ctx.author.voice.channel.name}",
         )
         await ctx.send(embed=e)
+        return True
 
     @commands.command(
         aliases=["s", "next"],
