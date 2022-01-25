@@ -15,14 +15,14 @@ poetry install
 ```
 
 ## Configuration
-Rename `.env.example` into `.env` and fill the values. \
-If you want to use an Atlas MongoDB to enable custom prefix system, install extra package `poetry install -E mongouri`.
+Rename `.env.example` to `.env` and fill in the values. \
+If you want to use an Atlas MongoDB to enable the custom prefix system, install the extra package `poetry install -E mongouri`.
 
 ## Usage
 Run `poetry run python -m jukebot` or `poetry run task start` if you installed the dev dependencies.
 
 ## Other
-The bot use a MongoDB for its custom prefix system, you can have one quickly by register you on [Atlas MongoDB](https://www.mongodb.com/atlas). \
+The bot use a MongoDB database for its custom prefix system, you can have one quickly by registering on [Atlas MongoDB](https://www.mongodb.com/atlas). \
 If you want to disable custom prefix system to do a quick setup, go to `jukebot/__main__.py` and replace
 ```py
 bot = JukeBot(
@@ -45,9 +45,9 @@ bot = JukeBot(
 ```
 
 
-The bot need `ffmpeg` to work.
+The bot needs `ffmpeg` to work.
 ### Install on Windows
-Use the package manager [Chocolatey](https://community.chocolatey.org/) and run in a admin shell `choco install ffmpeg`.
+Use the package manager [Chocolatey](https://community.chocolatey.org/) and run in an admin shell `choco install ffmpeg`.
 
 ### Install on Linux
 Use apt, run `sudo apt install ffmpeg`.
