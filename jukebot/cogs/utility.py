@@ -4,11 +4,12 @@ import typing
 from datetime import datetime
 
 from loguru import logger
-from nextcord import AllowedMentions, InviteTarget, Member, Permissions
+from nextcord import AllowedMentions, InviteTarget, Member, Permissions, Embed
 from nextcord.ext import commands
 from nextcord.ext.commands import Context, BucketType, Bot
 
 from jukebot.checks import voice
+from jukebot.components import Player
 from jukebot.utils import embed, converter, applications
 from jukebot.views import ActivityView
 
@@ -201,6 +202,39 @@ class Utility(commands.Cog):
             logger.opt(lazy=True).error(
                 f"Missing permission for setting prefix '{prefix}' for guild '{ctx.guild.name} (ID: {ctx.guild.id})'."
             )
+        await ctx.send(embed=e)
+
+    @commands.command(
+        aliases=["rst"],
+        brief="Force reset the current player",
+        help="Reset the current guild player when something is wrong.\nUse it when the bot can't connect to voice channel even if everything is ok.",
+    )
+    @commands.guild_only()
+    @commands.cooldown(1, 15.0, BucketType.guild)
+    async def reset(self, ctx: Context):
+        if not ctx.guild.id in self.bot.players:
+            logger.opt(lazy=True).debug(
+                f"Server {ctx.guild.name} ({ctx.guild.id}) try to kill a player that don't exist."
+            )
+            e: Embed = embed.error_message(
+                ctx.author, content="No player detected in this server."
+            )
+            await ctx.send(embed=e)
+            return
+
+        player: Player = self.bot.players.pop(ctx.guild.id)
+        try:
+            await player.disconnect()
+        except Exception as e:
+            logger.opt(lazy=True).error(
+                f"Error when disconnecting the player of the guild {ctx.guild.name} ({ctx.guild.id}). "
+                f"Error: {e}"
+            )
+
+        logger.opt(lazy=True).success(
+            f"Server {ctx.guild.name} ({ctx.guild.id}) has successfully reset his player."
+        )
+        e: Embed = embed.info_message(ctx.author, content="The player has been reset.")
         await ctx.send(embed=e)
 
 
