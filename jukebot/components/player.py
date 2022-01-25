@@ -55,6 +55,18 @@ class Player:
         self._song = song
         self.state = Player.State.PLAYING
 
+    async def play_tts(self, filename: str):
+        stream = AudioStream(filename, before_options=None, options=None)
+        stream.read()
+
+        if self._voice and self._voice.is_playing():
+            self._voice.stop()
+
+        self._voice.play(stream, after=lambda e: os.remove(filename))
+        self._stream = stream
+        # self._song = song
+        self.state = Player.State.PLAYING
+
     async def disconnect(self):
         if self._voice:
             self.state = Player.State.DISCONNECTING

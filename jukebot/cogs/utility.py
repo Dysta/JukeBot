@@ -2,12 +2,15 @@ import os
 import typing
 
 from datetime import datetime
+from pathlib import Path
 
+import gtts.tts
 from nextcord import AllowedMentions, InviteTarget, Member
 from nextcord.ext import commands
 from nextcord.ext.commands import Context, BucketType, Bot
 
 from jukebot.checks import voice
+from jukebot.components import Player
 from jukebot.utils import embed, converter, applications
 from jukebot.views import ActivityView
 
@@ -161,6 +164,31 @@ class Utility(commands.Cog):
         await ctx.reply(
             embed=e, view=ActivityView(invite.url), delete_after=float(max_time)
         )
+
+    @commands.command(
+        brief="Speak on the voice channel",
+        help="Speak on the voice channel.",
+    )
+    @commands.cooldown(1, 8.0, BucketType.guild)
+    @commands.max_concurrency(1, BucketType.guild)
+    @commands.guild_only()
+    @commands.check(voice.user_is_connected)
+    async def tts(self, ctx: Context, *, text_to_speech: str):
+        speech = gtts.tts.gTTS(text_to_speech, lang="fr")
+        p = Path("./tts")
+        p.mkdir(parents=True, exist_ok=True)
+        filename = p / f"{ctx.guild.id}.mp3"
+
+        await self.bot.loop.run_in_executor(None, lambda: speech.save(f"{filename}"))
+
+        player: Player = self.bot.players[ctx.guild.id]
+        if not player.context:
+            music_cog = self.bot.get_cog("Music")
+            await ctx.invoke(music_cog.bind)
+        if not player.connected:
+            await player.join(ctx.author.voice.channel)
+
+        await player.play_tts(f"{filename}")
 
 
 def setup(bot):
