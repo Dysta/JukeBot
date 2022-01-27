@@ -108,12 +108,10 @@ class Player:
     def _after(self, error):
         if error:
             logger.opt(lazy=True).error(error)
-        if self.state in (Player.State.STOPPED, Player.State.DISCONNECTING):
             return
-        if (
-            self._loop == Player.Loop.ENABLED
-            and not self.state == Player.State.SKIPPING
-        ):
+        if self.state.is_leaving:
+            return
+        if self._loop.is_enabled and not self.state.is_skipping:
             func = self.play(self.song)
             coro.run_threadsafe(func, self.bot.loop)
             return
@@ -168,7 +166,7 @@ class Player:
 
     @property
     def playing(self) -> bool:
-        return bool(self.stream and self.voice and self.state == Player.State.PLAYING)
+        return bool(self.stream and self.voice and self.state.is_playing)
 
     @property
     def connected(self) -> bool:

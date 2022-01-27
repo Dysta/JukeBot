@@ -267,7 +267,7 @@ class Music(commands.Cog):
     async def loop(self, ctx: Context):
         if not ctx.invoked_subcommand:
             player: Player = self.bot.players[ctx.guild.id]
-            looping: bool = player.loop == Player.Loop.ENABLED
+            looping: bool = player.loop.is_enabled
 
             e: embed = embed.basic_message(
                 ctx.author, title=f"Loop is {'enabled' if looping else 'disabled'}"
