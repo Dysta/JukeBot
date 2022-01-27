@@ -126,31 +126,21 @@ class Player:
         else:
             self.state = Player.State.IDLE
 
-    async def _idle(self) -> None:
-        time = float(os.environ["BOT_MAX_IDLE_TIME"])
-        await asyncio.sleep(delay=time)
-
-    def _idle_callback(self, task: Task) -> None:
-        if not task.cancelled():
+    def _idle_callback(self) -> None:
+        if not self._idle_task.cancelled():
             music_cog = self.bot.get_cog("Music")
             func = self.context.invoke(music_cog.leave)
             asyncio.ensure_future(func, loop=self.bot.loop)
 
     def _set_idle_task(self) -> None:
-        if self._is_inactive() and not self._idle_task:
-            task = self.bot.loop.create_task(self._idle())
-            task.add_done_callback(self._idle_callback)
-            self._idle_task = task
-        elif not self._is_inactive() and self._idle_task:
+        if self.state.is_inactive and not self._idle_task:
+            self._idle_task = self.bot.loop.call_later(
+                delay=float(os.environ["BOT_MAX_IDLE_TIME"]),
+                callback=self._idle_callback,
+            )
+        elif not self.state.is_inactive and self._idle_task:
             self._idle_task.cancel()
             self._idle_task = None
-
-    def _is_inactive(self) -> bool:
-        return self._state in (
-            Player.State.IDLE,
-            Player.State.PAUSED,
-            Player.State.STOPPED,
-        )
 
     @property
     def stream(self) -> Optional[AudioStream]:
