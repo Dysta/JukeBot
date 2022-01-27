@@ -2,7 +2,7 @@ import asyncio
 import os
 
 from asyncio import Task
-from enum import Enum
+from enum import IntEnum
 from typing import Optional
 
 from loguru import logger
@@ -17,7 +17,7 @@ from .audio_stream import AudioStream
 
 
 class Player:
-    class State(Enum):
+    class State(IntEnum):
         IDLE = 0
         PLAYING = 1
         PAUSED = 2
@@ -25,9 +25,33 @@ class Player:
         SKIPPING = 4
         DISCONNECTING = 5
 
-    class Loop(Enum):
+        @property
+        def is_playing(self) -> bool:
+            return self == Player.State.PLAYING
+
+        @property
+        def is_skipping(self) -> bool:
+            return self == Player.State.SKIPPING
+
+        @property
+        def is_inactive(self) -> bool:
+            return self in [
+                Player.State.IDLE,
+                Player.State.PAUSED,
+                Player.State.STOPPED,
+            ]
+
+        @property
+        def is_leaving(self) -> bool:
+            return self in [Player.State.STOPPED, Player.State.DISCONNECTING]
+
+    class Loop(IntEnum):
         DISABLED = 0
         ENABLED = 1
+
+        @property
+        def is_enabled(self) -> bool:
+            return self == Player.Loop.ENABLED
 
     def __init__(self, bot: Bot):
         self.bot: Bot = bot
