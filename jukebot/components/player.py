@@ -5,6 +5,7 @@ from asyncio import Task
 from enum import Enum
 from typing import Optional
 
+from loguru import logger
 from nextcord import VoiceChannel, VoiceClient
 from nextcord.ext.commands import Bot, Context
 
@@ -82,7 +83,7 @@ class Player:
 
     def _after(self, error):
         if error:
-            print(f"_after {error=}")
+            logger.opt(lazy=True).error(error)
         if self.state in (Player.State.STOPPED, Player.State.DISCONNECTING):
             return
         if (
