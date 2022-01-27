@@ -137,10 +137,6 @@ class Player:
     def voice(self) -> Optional[VoiceClient]:
         return self._voice
 
-    @voice.setter
-    def voice(self, v: VoiceClient):
-        self._voice = v
-
     @property
     def streaming(self) -> bool:
         return bool(self.stream and self.voice)
