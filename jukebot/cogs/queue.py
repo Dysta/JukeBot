@@ -61,7 +61,7 @@ class Queue(commands.Cog):
             res.requester = ctx.author
             player: Player = self.bot.players[ctx.guild.id]
             player.queue.put(res)
-            if player.playing:
+            if player.is_playing:
                 e: Embed = embed.result_enqueued(ctx.author, res)
                 await ctx.send(embed=e)
         return True

@@ -143,24 +143,24 @@ class Player:
             self._idle_task = None
 
     @property
+    def is_streaming(self) -> bool:
+        return bool(self.stream and self.voice)
+
+    @property
+    def is_playing(self) -> bool:
+        return bool(self.stream and self.voice and self.state.is_playing)
+
+    @property
+    def is_connected(self) -> bool:
+        return bool(self._voice)
+
+    @property
     def stream(self) -> Optional[AudioStream]:
         return self._stream
 
     @property
     def voice(self) -> Optional[VoiceClient]:
         return self._voice
-
-    @property
-    def streaming(self) -> bool:
-        return bool(self.stream and self.voice)
-
-    @property
-    def playing(self) -> bool:
-        return bool(self.stream and self.voice and self.state.is_playing)
-
-    @property
-    def connected(self) -> bool:
-        return bool(self._voice)
 
     @property
     def song(self) -> Optional[Song]:

@@ -40,7 +40,7 @@ class Music(commands.Cog):
         player: Player = self.bot.players[ctx.guild.id]
         if not player.context:
             await ctx.invoke(self.bind)
-        if player.playing:
+        if player.is_playing:
             return True  # return True bc everything is ok
 
         with ctx.typing():
@@ -52,7 +52,7 @@ class Music(commands.Cog):
         song: Song = Song.from_query(qry)
         song.requester = author
 
-        if not player.connected and not await ctx.invoke(self.join):
+        if not player.is_connected and not await ctx.invoke(self.join):
             return False
 
         try:
@@ -69,6 +69,7 @@ class Music(commands.Cog):
             )
             await ctx.send(embed=e)
             return False
+
         e: Embed = embed.music_message(author, song)
         await ctx.send(embed=e)
         return True
@@ -185,9 +186,10 @@ class Music(commands.Cog):
             )
             await ctx.send(embed=e)
             return False
+
         e = embed.basic_message(
             ctx.author,
-            title=f"Player connected to {ctx.author.voice.channel.name}",
+            title=f"Connected to {ctx.author.voice.channel.name}",
         )
         await ctx.send(embed=e)
         return True
