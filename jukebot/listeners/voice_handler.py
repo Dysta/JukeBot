@@ -31,7 +31,7 @@ class VoiceHandler(commands.Cog):
             return
         if self.bot.user in channel.members:
             player: Player = self.bot.players[channel.guild.id]
-            if player.stream and not player.playing:
+            if player.stream and not player.is_playing:
                 ctx = player.context
                 await self.bot.get_cog("Music").resume(context=ctx)
 
@@ -39,7 +39,7 @@ class VoiceHandler(commands.Cog):
     async def on_voice_channel_alone(self, member: Member, channel: VoiceChannel):
         if channel.members[0].id == self.bot.user.id:
             player: Player = self.bot.players[channel.guild.id]
-            if player.playing:
+            if player.is_playing:
                 ctx = player.context
                 await self.bot.get_cog("Music").pause(context=ctx)
 
