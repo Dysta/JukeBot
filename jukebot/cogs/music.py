@@ -57,9 +57,10 @@ class Music(commands.Cog):
 
         try:
             await player.play(song)
-        except:
+        except Exception as e:
             logger.opt(lazy=True).error(
-                f"Server {ctx.guild.name} ({ctx.guild.id}) can't play in its player."
+                f"Server {ctx.guild.name} ({ctx.guild.id}) can't play in its player. Should not happen.\n"
+                f"Error: {e}"
             )
             e: Embed = embed.error_message(
                 author,
@@ -181,7 +182,8 @@ class Music(commands.Cog):
             )
             e: Embed = embed.error_message(
                 ctx.author,
-                content="The player cannot connect to the voice channel. Check the bot's permissions.\n"
+                title=f"Can't connect to {ctx.author.voice.channel.name}",
+                content="Check both __bot__ and __channel__ permissions.\n"
                 "If the problem persists, use the `reset` command to reset the player. ",
             )
             await ctx.send(embed=e)
