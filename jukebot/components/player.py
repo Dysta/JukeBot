@@ -66,7 +66,7 @@ class Player:
         self._loop: Player.Loop = Player.Loop.DISABLED
 
     async def join(self, channel: VoiceChannel):
-        self._voice = await channel.connect(timeout=4.0)
+        self._voice = await channel.connect(timeout=3.0)
 
     async def play(self, song: Song):
         stream = AudioStream(song.stream_url)
