@@ -224,10 +224,10 @@ class Utility(commands.Cog):
 
         player: Player = self.bot.players.pop(ctx.guild.id)
         try:
-            await player.disconnect()
+            await player.disconnect(force=True)
         except Exception as e:
             logger.opt(lazy=True).error(
-                f"Error when disconnecting the player of the guild {ctx.guild.name} ({ctx.guild.id}). "
+                f"Error when force disconnecting the player of the guild {ctx.guild.name} ({ctx.guild.id}). "
                 f"Error: {e}"
             )
 

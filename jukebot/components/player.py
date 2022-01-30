@@ -80,10 +80,10 @@ class Player:
         self._song = song
         self.state = Player.State.PLAYING
 
-    async def disconnect(self):
+    async def disconnect(self, force=False):
         if self._voice:
             self.state = Player.State.DISCONNECTING
-            await self._voice.disconnect()
+            await self._voice.disconnect(force=force)
 
     def skip(self):
         if self._voice:
