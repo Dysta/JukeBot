@@ -192,8 +192,8 @@ class Music(commands.Cog):
 
         e = embed.basic_message(
             ctx.author,
-            content=f"> Connected to <#{ctx.author.voice.channel.id}>\n"
-            f"> Bound to <#{ctx.channel.id}>\n",
+            content=f"Connected to <#{ctx.author.voice.channel.id}>\n"
+            f"Bound to <#{ctx.channel.id}>\n",
         )
         msg = await ctx.send(embed=e)
         # we put the bot message as a context to avoid displaying
