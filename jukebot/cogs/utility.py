@@ -28,28 +28,30 @@ class Utility(commands.Cog):
     async def info(self, ctx: Context):
         e = embed.info_message(ctx.author)
         e.set_thumbnail(url=self.bot.user.display_avatar.url)
-        e.add_field(name="🤖 Name", value=f"`{self.bot.user.display_name}`", inline=True)
         e.add_field(
-            name="📍 Ping", value=f"`{self.bot.latency * 1000:.2f}ms`", inline=True
+            name="🤖 Name", value=f"┕`{self.bot.user.display_name}`", inline=True
+        )
+        e.add_field(
+            name="📡 Ping", value=f"┕`{self.bot.latency * 1000:.2f}ms`", inline=True
         )
         uptime = datetime.now() - self.bot.start_time
         days, hours, minutes, seconds = converter.seconds_to_time(
             int(uptime.total_seconds())
         )
         e.add_field(
-            name="📊 Uptime",
-            value=f"`{days}d, {hours}h, {minutes}m, {seconds}s`",
+            name="⏱ Uptime",
+            value=f"┕`{days}d, {hours}h, {minutes}m, {seconds}s`",
             inline=True,
         )
-        e.add_field(name="🏛️ Servers", value=f"`{self.bot.guilds_count}`", inline=True)
+        e.add_field(name="🏛️ Servers", value=f"┕`{self.bot.guilds_count}`", inline=True)
         e.add_field(
-            name="👨‍👧‍👦 Members",
-            value=f"`{self.bot.members_count}`",
+            name="👥 Members",
+            value=f"┕`{self.bot.members_count}`",
             inline=True,
         )
         e.add_field(
             name="🪄 Prefix",
-            value=f"`{await self.bot.prefixes.get_item(ctx.guild.id)}`",
+            value=f"┕`{await self.bot.prefixes.get_item(ctx.guild.id)}`",
             inline=True,
         )
         await ctx.reply(embed=e)
