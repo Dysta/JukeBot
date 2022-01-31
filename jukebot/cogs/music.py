@@ -191,9 +191,14 @@ class Music(commands.Cog):
 
         e = embed.basic_message(
             ctx.author,
-            title=f"Connected to {ctx.author.voice.channel.name}",
+            content=f"> Connected to <#{ctx.author.voice.channel.id}>\n"
+            f"> Bound to <#{ctx.channel.id}>\n",
         )
-        await ctx.send(embed=e)
+        msg = await ctx.send(embed=e)
+        # we put the bot message as a context to avoid displaying
+        # the user who invoke the command to appear in system message
+        ctx = await self.bot.get_context(msg)
+        player.context = ctx
         return True
 
     @commands.command(
@@ -211,27 +216,6 @@ class Music(commands.Cog):
         self.bot.players[ctx.guild.id].skip()
         e: embed = embed.basic_message(ctx.author, title="Skipped !")
         await ctx.send(embed=e)
-
-    @commands.command(
-        aliases=["b", "link"],
-        brief="Bind a voice channel to the bot.",
-        help="Bind the current text channel to the bot. The channel will be used to send information about the bot status.",
-    )
-    @commands.guild_only()
-    @commands.check(voice.bot_and_user_in_same_channel)
-    @commands.check(voice.bot_is_connected)
-    @commands.check(voice.user_is_connected)
-    @commands.cooldown(1, 10.0, BucketType.guild)
-    async def bind(self, ctx: Context):
-        e: embed = embed.basic_message(
-            ctx.author, title=f"Binded to {ctx.channel.name}"
-        )
-        msg = await ctx.send(embed=e)
-        # we put the bot message as a context to avoid displaying
-        # the user who invoke the command to appear in system message
-        player: Player = self.bot.players[ctx.guild.id]
-        ctx = await self.bot.get_context(msg)
-        player.context = ctx
 
     @commands.command(
         aliases=["dump", "pick", "save"],
