@@ -21,27 +21,26 @@ class Search(commands.Cog):
         logger.opt(lazy=True).debug(
             f"Search query '{source}{query}' for guild '{ctx.guild.name} (ID: {ctx.guild.id})'."
         )
-        with ctx.typing():
-            qry: Query = Query(f"{source}{query}")
-            if "sc" in source:
-                await qry.process()
-            else:
-                await qry.search()
-            if not qry.success:
-                await query_callback.failure(ctx, query, f"{source}{query}")
-                return None
 
-            results: ResultSet = (
-                ResultSet.from_query(qry)
-                if not "sc" in source
-                else SongSet.from_query(qry)
-            )
-            logger.opt(lazy=True).debug(f"Results of the query is {results}")
-            return results
+        qry: Query = Query(f"{source}{query}")
+        if "sc" in source:
+            await qry.process()
+        else:
+            await qry.search()
+        if not qry.success:
+            return None
+
+        results: ResultSet = (
+            ResultSet.from_query(qry) if not "sc" in source else SongSet.from_query(qry)
+        )
+        logger.opt(lazy=True).debug(f"Results of the query is {results}")
+        return results
 
     async def _search_process(self, ctx: Context, query: str, source: str):
-        results = await Search._search(ctx, query, source)
+        with ctx.typing():
+            results = await Search._search(ctx, query, source)
         if not results:
+            await query_callback.failure(ctx, query, f"{source}{query}")
             return
 
         e = embed.search_result_message(
@@ -56,14 +55,7 @@ class Search(commands.Cog):
         await msg.edit(view=None)
         result: str = v.result
         if result == SearchInteraction.CANCEL_TEXT:
-            logger.opt(lazy=True).debug(
-                f"Query '{source}{query}' canceled for guild '{ctx.guild.name} (ID: {ctx.guild.id})'."
-            )
-            e = embed.music_not_found_message(
-                ctx.author,
-                title=f"Search canceled",
-            )
-            await msg.edit(embed=e, delete_after=5.0)
+            await query_callback.cancel(ctx, msg, query, f"{source}{query}")
             return
 
         logger.opt(lazy=True).debug(

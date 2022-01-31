@@ -2,9 +2,10 @@ import asyncio
 import os
 
 from asyncio import Task
-from enum import Enum
+from enum import IntEnum
 from typing import Optional
 
+from loguru import logger
 from nextcord import VoiceChannel, VoiceClient
 from nextcord.ext.commands import Bot, Context
 
@@ -16,7 +17,7 @@ from .audio_stream import AudioStream
 
 
 class Player:
-    class State(Enum):
+    class State(IntEnum):
         IDLE = 0
         PLAYING = 1
         PAUSED = 2
@@ -24,9 +25,33 @@ class Player:
         SKIPPING = 4
         DISCONNECTING = 5
 
-    class Loop(Enum):
+        @property
+        def is_playing(self) -> bool:
+            return self == Player.State.PLAYING
+
+        @property
+        def is_skipping(self) -> bool:
+            return self == Player.State.SKIPPING
+
+        @property
+        def is_inactive(self) -> bool:
+            return self in [
+                Player.State.IDLE,
+                Player.State.PAUSED,
+                Player.State.STOPPED,
+            ]
+
+        @property
+        def is_leaving(self) -> bool:
+            return self in [Player.State.STOPPED, Player.State.DISCONNECTING]
+
+    class Loop(IntEnum):
         DISABLED = 0
         ENABLED = 1
+
+        @property
+        def is_enabled(self) -> bool:
+            return self == Player.Loop.ENABLED
 
     def __init__(self, bot: Bot):
         self.bot: Bot = bot
@@ -41,7 +66,7 @@ class Player:
         self._loop: Player.Loop = Player.Loop.DISABLED
 
     async def join(self, channel: VoiceChannel):
-        self._voice = await channel.connect()
+        self._voice = await channel.connect(timeout=3.0)
 
     async def play(self, song: Song):
         stream = AudioStream(song.stream_url)
@@ -55,10 +80,10 @@ class Player:
         self._song = song
         self.state = Player.State.PLAYING
 
-    async def disconnect(self):
+    async def disconnect(self, force=False):
         if self._voice:
             self.state = Player.State.DISCONNECTING
-            await self._voice.disconnect()
+            await self._voice.disconnect(force=force)
 
     def skip(self):
         if self._voice:
@@ -82,13 +107,11 @@ class Player:
 
     def _after(self, error):
         if error:
-            print(f"_after {error=}")
-        if self.state in (Player.State.STOPPED, Player.State.DISCONNECTING):
+            logger.opt(lazy=True).error(error)
             return
-        if (
-            self._loop == Player.Loop.ENABLED
-            and not self.state == Player.State.SKIPPING
-        ):
+        if self.state.is_leaving:
+            return
+        if self._loop.is_enabled and not self.state.is_skipping:
             func = self.play(self.song)
             coro.run_threadsafe(func, self.bot.loop)
             return
@@ -103,31 +126,33 @@ class Player:
         else:
             self.state = Player.State.IDLE
 
-    async def _idle(self) -> None:
-        time = float(os.environ["BOT_MAX_IDLE_TIME"])
-        await asyncio.sleep(delay=time)
-
-    def _idle_callback(self, task: Task) -> None:
-        if not task.cancelled():
+    def _idle_callback(self) -> None:
+        if not self._idle_task.cancelled():
             music_cog = self.bot.get_cog("Music")
             func = self.context.invoke(music_cog.leave)
             asyncio.ensure_future(func, loop=self.bot.loop)
 
     def _set_idle_task(self) -> None:
-        if self._is_inactive() and not self._idle_task:
-            task = self.bot.loop.create_task(self._idle())
-            task.add_done_callback(self._idle_callback)
-            self._idle_task = task
-        elif not self._is_inactive() and self._idle_task:
+        if self.state.is_inactive and not self._idle_task:
+            self._idle_task = self.bot.loop.call_later(
+                delay=float(os.environ["BOT_MAX_IDLE_TIME"]),
+                callback=self._idle_callback,
+            )
+        elif not self.state.is_inactive and self._idle_task:
             self._idle_task.cancel()
             self._idle_task = None
 
-    def _is_inactive(self) -> bool:
-        return self._state in (
-            Player.State.IDLE,
-            Player.State.PAUSED,
-            Player.State.STOPPED,
-        )
+    @property
+    def is_streaming(self) -> bool:
+        return bool(self.stream and self.voice)
+
+    @property
+    def is_playing(self) -> bool:
+        return bool(self.stream and self.voice and self.state.is_playing)
+
+    @property
+    def is_connected(self) -> bool:
+        return bool(self._voice)
 
     @property
     def stream(self) -> Optional[AudioStream]:
@@ -136,22 +161,6 @@ class Player:
     @property
     def voice(self) -> Optional[VoiceClient]:
         return self._voice
-
-    @voice.setter
-    def voice(self, v: VoiceClient):
-        self._voice = v
-
-    @property
-    def streaming(self) -> bool:
-        return bool(self.stream and self.voice)
-
-    @property
-    def playing(self) -> bool:
-        return bool(self.stream and self.voice and self.state == Player.State.PLAYING)
-
-    @property
-    def connected(self) -> bool:
-        return bool(self._voice)
 
     @property
     def song(self) -> Optional[Song]:

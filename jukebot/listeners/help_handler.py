@@ -2,7 +2,7 @@ import itertools
 
 from nextcord.ext import commands
 
-from jukebot.utils import embed
+from jukebot.utils import embed, emotes
 
 
 class HelpHandler(commands.HelpCommand):
@@ -18,8 +18,8 @@ class HelpHandler(commands.HelpCommand):
     def get_ending_note(self):
         command_name = self.invoked_with
         return (
-            f"Type `{self.context.clean_prefix}{command_name} command` for more info on a command.",
-            f"Type `{self.context.clean_prefix}{command_name} category` for more info on a category.",
+            f"Type `{self.context.clean_prefix}{command_name} <command_name>` for more info on a command.",
+            f"Type `{self.context.clean_prefix}{command_name} <category_name>` for more info on a category.",
         )
 
     async def send_bot_help(self, mapping):
@@ -37,8 +37,12 @@ class HelpHandler(commands.HelpCommand):
 
         for category, cmds in to_iterate:
             cmds = sorted(cmds, key=lambda c: c.name)
-            cmds_str = ", ".join([f"{c.name}" for c in cmds])
-            help_embed.add_field(name=category, value=f"```{cmds_str}```", inline=False)
+            cmds_str = ", ".join([f"`{c.name}`" for c in cmds])
+            help_embed.add_field(
+                name=f"{emotes.cog_emote[category]}  | {category}",
+                value=cmds_str,
+                inline=False,
+            )
 
         note = self.get_ending_note()
         help_embed.add_field(name=embed.VOID_TOKEN, value="\n".join(note), inline=False)
@@ -48,14 +52,16 @@ class HelpHandler(commands.HelpCommand):
     async def send_cog_help(self, cog):
         ctx = self.context
 
-        cog_embed = embed.info_message(ctx.author, title=f"Available commands")
+        cog_embed = embed.info_message(ctx.author, title="Available commands")
 
         cmds = await self.filter_commands(cog.get_commands(), sort=True)
-        cmds_str = "\n".join([f"{c.name} - {c.short_doc}" for c in cmds])
-
+        cmds_str = "\n".join([f"{c.name} — {c.short_doc}" for c in cmds])
         cog_embed.add_field(
-            name=cog.qualified_name, value=f"```{cmds_str}```", inline=False
+            name=f"{emotes.cog_emote[cog.qualified_name]}  | {cog.qualified_name}",
+            value=f"```{cmds_str}```",
+            inline=False,
         )
+
         note = self.get_ending_note()
         cog_embed.add_field(name=embed.VOID_TOKEN, value=note[0], inline=False)
 
@@ -79,13 +85,13 @@ class HelpHandler(commands.HelpCommand):
         if not command.parent:
             cmd_embed.add_field(
                 name="Usage",
-                value=f"```{ctx.prefix}{command.name} {command.usage if command.usage is not None else ''}```",
+                value=f"```{ctx.clean_prefix}{command.name} {command.usage if command.usage is not None else ''}```",
                 inline=False,
             )
         else:
             cmd_embed.add_field(
                 name="Usage",
-                value=f"```{ctx.prefix}{command.full_parent_name} {command.name} {command.usage if command.usage is not None else ''}```",
+                value=f"```{ctx.clean_prefix}{command.full_parent_name} {command.name} {command.usage if command.usage is not None else ''}```",
                 inline=False,
             )
 
@@ -113,7 +119,7 @@ class HelpHandler(commands.HelpCommand):
         usg_subcmds = subcmds.replace(", ", "|")
         grp_embed.add_field(
             name="Usage",
-            value=f"```{ctx.prefix}{group.name} <{usg_subcmds}>```",
+            value=f"```{ctx.clean_prefix}{group.name} <{usg_subcmds}>```",
             inline=False,
         )
 

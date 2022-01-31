@@ -2,6 +2,7 @@ import asyncio
 import os
 
 from datetime import datetime
+from functools import cached_property
 from typing import TypeVar
 
 from nextcord import Guild, Message
@@ -9,7 +10,7 @@ from nextcord.ext import commands
 
 from loguru import logger
 
-from jukebot.abstract_components import AbstractMongoDB, AbstractMap
+from jukebot.abstract_components import AbstractMongoDB, AbstractMap, AbstractCache
 from jukebot.components import Player, CustomContext
 
 CXT = TypeVar("CXT", bound="Context")
@@ -53,26 +54,43 @@ class JukeBot(commands.Bot):
     def players(self) -> "PlayerCollection":
         return self._players
 
+    @cached_property
+    def members_count(self) -> int:
+        return len(set(self.get_all_members()))
+
+    @cached_property
+    def guilds_count(self) -> int:
+        return len(self.guilds)
+
+
+class PrefixesCache(AbstractCache[int, str]):
+    pass
+
 
 class PrefixDB(AbstractMongoDB):
-    async def contains(self, guild_id: int) -> bool:
-        item = {"guild_id": guild_id}
-        res = await self._collection.find_one(item)
-        return bool(res)
+    __cache: PrefixesCache = PrefixesCache()
 
     async def get_item(self, guild_id: int) -> str:
-        item = {"guild_id": guild_id}
-        res = await self._collection.find_one(item)
-        return res["prefix"] if res else None
+        if not guild_id in PrefixDB.__cache:
+            logger.opt(lazy=True).debug(f"Fetch prefix for {guild_id=}")
+            item = {"guild_id": guild_id}
+            data = await self._collection.find_one(item)
+            val = data["prefix"] if data else None
+            PrefixDB.__cache[guild_id] = val
+        return PrefixDB.__cache[guild_id]
 
     async def set_item(self, guild_id: int, prefix: str) -> None:
         key = {"guild_id": guild_id}
         value = {"$set": {"prefix": prefix}}
         asyncio.ensure_future(self._collection.update_one(key, value, upsert=True))
+        if guild_id in PrefixDB.__cache:
+            del PrefixDB.__cache[guild_id]
 
     async def del_item(self, guild_id: int) -> None:
         item = {"guild_id": guild_id}
         asyncio.ensure_future(self._collection.delete_one(item))
+        if guild_id in PrefixDB.__cache:
+            del PrefixDB.__cache[guild_id]
 
 
 class PlayerCollection(AbstractMap[int, Player]):
