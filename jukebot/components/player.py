@@ -144,11 +144,11 @@ class Player:
 
     @property
     def is_streaming(self) -> bool:
-        return bool(self.stream and self.voice)
+        return self.is_connected and bool(self.stream)
 
     @property
     def is_playing(self) -> bool:
-        return bool(self.stream and self.voice and self.state.is_playing)
+        return self.is_streaming and self.state.is_playing
 
     @property
     def is_connected(self) -> bool:
