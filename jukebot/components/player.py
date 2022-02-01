@@ -30,6 +30,14 @@ class Player:
             return self == Player.State.PLAYING
 
         @property
+        def is_paused(self) -> bool:
+            return self == Player.State.PAUSED
+
+        @property
+        def is_stopped(self) -> bool:
+            return self == Player.State.STOPPED
+
+        @property
         def is_skipping(self) -> bool:
             return self == Player.State.SKIPPING
 
@@ -144,11 +152,15 @@ class Player:
 
     @property
     def is_streaming(self) -> bool:
-        return bool(self.stream and self.voice)
+        return self.is_connected and bool(self.stream)
 
     @property
     def is_playing(self) -> bool:
-        return bool(self.stream and self.voice and self.state.is_playing)
+        return self.is_streaming and self.state.is_playing
+
+    @property
+    def is_paused(self) -> bool:
+        return self.is_streaming and self.state.is_paused
 
     @property
     def is_connected(self) -> bool:

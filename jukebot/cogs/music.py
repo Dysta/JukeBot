@@ -5,7 +5,7 @@ from nextcord import Embed
 from nextcord.ext import commands
 from nextcord.ext.commands import Context, BucketType, Bot
 
-from jukebot.checks import voice
+from jukebot.checks import voice, user
 from jukebot.components import (
     AudioStream,
     Player,
@@ -113,6 +113,7 @@ class Music(commands.Cog):
     )
     @commands.guild_only()
     @commands.cooldown(1, 5.0, BucketType.user)
+    @commands.check(voice.bot_is_playing)
     @commands.check(voice.bot_and_user_in_same_channel)
     @commands.check(voice.bot_is_connected)
     @commands.check(voice.user_is_connected)
@@ -127,13 +128,25 @@ class Music(commands.Cog):
     )
     @commands.guild_only()
     @commands.cooldown(1, 5.0, BucketType.user)
+    @commands.check(voice.bot_is_not_playing)
     @commands.check(voice.bot_and_user_in_same_channel)
     @commands.check(voice.bot_is_connected)
     @commands.check(voice.user_is_connected)
     async def resume(self, ctx: Context):
-        self.bot.players[ctx.guild.id].resume()
-        e = embed.basic_message(ctx.author, title="Player resumed")
-        await ctx.send(embed=e)
+        player: Player = self.bot.players[ctx.guild.id]
+        if player.is_paused:
+            player.resume()
+            e = embed.basic_message(ctx.author, title="Player resumed")
+            await ctx.send(embed=e)
+        elif player.state.is_stopped and not player.queue.is_empty():
+            await ctx.invoke(self.play, query="")
+        else:
+            e = embed.basic_message(
+                ctx.author,
+                title="Nothing to play",
+                content=f"Try `{ctx.prefix}play` to add a music !",
+            )
+            await ctx.send(embed=e)
 
     @commands.command(
         aliases=["np", "now", "now_playing", "curr", "c"],
