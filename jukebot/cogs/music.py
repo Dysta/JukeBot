@@ -113,6 +113,7 @@ class Music(commands.Cog):
     )
     @commands.guild_only()
     @commands.cooldown(1, 5.0, BucketType.user)
+    @commands.check(voice.bot_is_playing)
     @commands.check(voice.bot_and_user_in_same_channel)
     @commands.check(voice.bot_is_connected)
     @commands.check(voice.user_is_connected)
