@@ -42,6 +42,13 @@ def bot_is_playing(ctx: Context):
     return True
 
 
+def bot_is_not_playing(ctx: Context):
+    player: Player = ctx.bot.players[ctx.guild.id]
+    if player.is_playing:
+        raise CheckFailure("The bot is already playing.")
+    return True
+
+
 def bot_is_streaming(ctx: Context):
     player: Player = ctx.bot.players[ctx.guild.id]
     if not player.is_streaming:
