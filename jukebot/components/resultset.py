@@ -49,3 +49,6 @@ class ResultSet(AbstractCollection[Result]):
 
     def shuffle(self) -> None:
         random.shuffle(self.set)
+
+    def get_random_result(self) -> Result:
+        return self.set[random.randint(0, len(self) - 1)]

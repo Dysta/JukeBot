@@ -40,7 +40,7 @@ class HelpHandler(commands.HelpCommand):
             cmds_str = ", ".join([f"`{c.name}`" for c in cmds])
             help_embed.add_field(
                 name=f"{emotes.cog_emote[category]}  | {category}",
-                value=cmds_str,
+                value=f"┕{cmds_str}",
                 inline=False,
             )
 
