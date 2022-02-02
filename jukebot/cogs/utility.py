@@ -6,8 +6,9 @@ import typing
 from datetime import datetime
 from pathlib import Path
 
-import gtts.tts
+from gtts.tts import gTTS
 from loguru import logger
+
 from nextcord import AllowedMentions, InviteTarget, Member, Permissions, Embed
 from nextcord.ext import commands
 from nextcord.ext.commands import Context, BucketType, Bot
@@ -253,7 +254,7 @@ class Utility(commands.Cog):
     @commands.check(voice.user_is_connected)
     async def tts(self, ctx: Context, *, text_to_speech: str):
         await ctx.message.add_reaction("📥")
-        speech = gtts.tts.gTTS(text_to_speech, lang="fr")
+        speech = gTTS(text_to_speech, lang="fr")
         p = Path("./tts")
         p.mkdir(parents=True, exist_ok=True)
         name = "".join(
