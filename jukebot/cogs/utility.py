@@ -1,4 +1,6 @@
 import os
+import random
+import string
 import typing
 
 from datetime import datetime
@@ -254,7 +256,10 @@ class Utility(commands.Cog):
         speech = gtts.tts.gTTS(text_to_speech, lang="fr")
         p = Path("./tts")
         p.mkdir(parents=True, exist_ok=True)
-        filename = p / f"{ctx.guild.id}.mp3"
+        name = "".join(
+            random.choice(string.ascii_letters + string.digits) for _ in range(18)
+        )
+        filename = p / f"{name}.mp3"
         await self.bot.loop.run_in_executor(None, lambda: speech.save(f"{filename}"))
 
         player: Player = self.bot.players[ctx.guild.id]
