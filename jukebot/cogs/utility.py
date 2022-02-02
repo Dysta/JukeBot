@@ -250,6 +250,7 @@ class Utility(commands.Cog):
     @commands.guild_only()
     @commands.check(voice.user_is_connected)
     async def tts(self, ctx: Context, *, text_to_speech: str):
+        await ctx.message.add_reaction("📥")
         speech = gtts.tts.gTTS(text_to_speech, lang="fr")
         p = Path("./tts")
         p.mkdir(parents=True, exist_ok=True)
@@ -265,6 +266,7 @@ class Utility(commands.Cog):
             return False
 
         await player.play_tts(f"{filename}")
+        await ctx.message.add_reaction("👍")
         return True
 
 
