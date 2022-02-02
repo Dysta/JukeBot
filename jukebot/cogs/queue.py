@@ -52,8 +52,8 @@ class Queue(commands.Cog):
             player: Player = self.bot.players[ctx.guild.id]
             player.queue += res
 
-            e: Embed = embed.queue_message(
-                ctx.author, res, title=f"Enqueued : {len(res)} songs"
+            e: Embed = embed.basic_queue_message(
+                ctx.author, title=f"Enqueued : {len(res)} songs"
             )
             await ctx.send(embed=e)
         else:
@@ -61,7 +61,7 @@ class Queue(commands.Cog):
             res.requester = ctx.author
             player: Player = self.bot.players[ctx.guild.id]
             player.queue.put(res)
-            if player.playing:
+            if player.is_playing:
                 e: Embed = embed.result_enqueued(ctx.author, res)
                 await ctx.send(embed=e)
         return True

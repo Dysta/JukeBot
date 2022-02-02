@@ -1,5 +1,4 @@
 import asyncio
-from typing import Optional
 
 from loguru import logger
 
@@ -16,29 +15,27 @@ class Search(commands.Cog):
     def __init__(self, bot):
         self.bot: Bot = bot
 
-    @staticmethod
-    async def _search(ctx: Context, query: str, source: str) -> Optional[ResultSet]:
-        logger.opt(lazy=True).debug(
-            f"Search query '{source}{query}' for guild '{ctx.guild.name} (ID: {ctx.guild.id})'."
-        )
-
-        qry: Query = Query(f"{source}{query}")
-        if "sc" in source:
-            await qry.process()
-        else:
-            await qry.search()
-        if not qry.success:
-            return None
-
-        results: ResultSet = (
-            ResultSet.from_query(qry) if not "sc" in source else SongSet.from_query(qry)
-        )
-        logger.opt(lazy=True).debug(f"Results of the query is {results}")
-        return results
-
     async def _search_process(self, ctx: Context, query: str, source: str):
         with ctx.typing():
-            results = await Search._search(ctx, query, source)
+            logger.opt(lazy=True).debug(
+                f"Search query '{source}{query}' for guild '{ctx.guild.name} (ID: {ctx.guild.id})'."
+            )
+
+            qry: Query = Query(f"{source}{query}")
+            if "sc" in source:
+                await qry.process()
+            else:
+                await qry.search()
+            if not qry.success:
+                return None
+
+            results: ResultSet = (
+                ResultSet.from_query(qry)
+                if not "sc" in source
+                else SongSet.from_query(qry)
+            )
+            logger.opt(lazy=True).debug(f"Results of the query is {results}")
+
         if not results:
             await query_callback.failure(ctx, query, f"{source}{query}")
             return

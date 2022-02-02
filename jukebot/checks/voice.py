@@ -37,20 +37,27 @@ def bot_and_user_in_same_channel(ctx: Context):
 
 def bot_is_playing(ctx: Context):
     player: Player = ctx.bot.players[ctx.guild.id]
-    if not player.playing:
+    if not player.is_playing:
         raise CheckFailure("The bot is not currently playing.")
+    return True
+
+
+def bot_is_not_playing(ctx: Context):
+    player: Player = ctx.bot.players[ctx.guild.id]
+    if player.is_playing:
+        raise CheckFailure("The bot is already playing.")
     return True
 
 
 def bot_is_streaming(ctx: Context):
     player: Player = ctx.bot.players[ctx.guild.id]
-    if not player.streaming:
+    if not player.is_streaming:
         raise CheckFailure("The bot is not currently playing.")
     return True
 
 
 def bot_not_playing_live(ctx: Context):
     player: Player = ctx.bot.players[ctx.guild.id]
-    if player.playing and player.song.live:
+    if player.is_playing and player.song.live:
         raise CheckFailure("The bot is playing a live audio.")
     return True

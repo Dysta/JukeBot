@@ -5,7 +5,8 @@ from datetime import datetime
 from pathlib import Path
 
 import gtts.tts
-from nextcord import AllowedMentions, InviteTarget, Member
+from loguru import logger
+from nextcord import AllowedMentions, InviteTarget, Member, Permissions, Embed
 from nextcord.ext import commands
 from nextcord.ext.commands import Context, BucketType, Bot
 
@@ -29,28 +30,30 @@ class Utility(commands.Cog):
     async def info(self, ctx: Context):
         e = embed.info_message(ctx.author)
         e.set_thumbnail(url=self.bot.user.display_avatar.url)
-        e.add_field(name="🤖 Name", value=f"`{self.bot.user.display_name}`", inline=True)
         e.add_field(
-            name="📍 Ping", value=f"`{self.bot.latency * 1000:.2f}ms`", inline=True
+            name="🤖 Name", value=f"┕`{self.bot.user.display_name}`", inline=True
+        )
+        e.add_field(
+            name="📡 Ping", value=f"┕`{self.bot.latency * 1000:.2f}ms`", inline=True
         )
         uptime = datetime.now() - self.bot.start_time
         days, hours, minutes, seconds = converter.seconds_to_time(
             int(uptime.total_seconds())
         )
         e.add_field(
-            name="📊 Uptime",
-            value=f"`{days}d, {hours}h, {minutes}m, {seconds}s`",
+            name="⏱ Uptime",
+            value=f"┕`{days}d, {hours}h, {minutes}m, {seconds}s`",
             inline=True,
         )
-        e.add_field(name="🏛️ Servers", value=f"`{self.bot.guilds_count}`", inline=True)
+        e.add_field(name="🏛️ Servers", value=f"┕`{self.bot.guilds_count}`", inline=True)
         e.add_field(
-            name="👨‍👧‍👦 Members",
-            value=f"`{self.bot.members_count}`",
+            name="👥 Members",
+            value=f"┕`{self.bot.members_count}`",
             inline=True,
         )
         e.add_field(
             name="🪄 Prefix",
-            value=f"`{await self.bot.prefixes.get_item(ctx.guild.id)}`",
+            value=f"┕`{await self.bot.prefixes.get_item(ctx.guild.id)}`",
             inline=True,
         )
         await ctx.reply(embed=e)
@@ -166,6 +169,22 @@ class Utility(commands.Cog):
         )
 
     @commands.command(
+        aliases=["pfx"],
+        brief="Change/Display the prefix of the bot",
+        help="Set a new prefix for the bot.\nIf no prefix are given, sends the current server prefix.",
+        usage="[prefix]",
+    )
+    @commands.guild_only()
+    @commands.cooldown(1, 15.0, BucketType.guild)
+    async def prefix(self, ctx: Context, prefix: typing.Optional[str] = None):
+        if not prefix:
+            e = embed.basic_message(
+                ctx.author,
+                content=f"Prefix for `{ctx.guild.name}` is `{await self.bot.prefixes.get_item(ctx.guild.id)}`",
+            )
+            await ctx.send(embed=e)
+            return
+    @commands.command(
         brief="Speak on the voice channel",
         help="Speak on the voice channel.",
     )
@@ -178,6 +197,63 @@ class Utility(commands.Cog):
         p = Path("./tts")
         p.mkdir(parents=True, exist_ok=True)
         filename = p / f"{ctx.guild.id}.mp3"
+
+        perm: Permissions = ctx.author.guild_permissions
+        logger.opt(lazy=True).info(
+            f"Set prefix '{prefix}' for guild '{ctx.guild.name} (ID: {ctx.guild.id})'."
+        )
+        if perm.administrator:
+            await self.bot.prefixes.set_item(ctx.guild.id, prefix)
+            e = embed.basic_message(
+                ctx.author,
+                title="Prefix changed!",
+                content=f"Prefix is set to `{prefix}` for server `{ctx.guild.name}`",
+            )
+            logger.opt(lazy=True).success(
+                f"Successfully set prefix '{prefix}' for guild '{ctx.guild.name} (ID: {ctx.guild.id})'."
+            )
+        else:
+            e = embed.error_message(
+                ctx.author, content="You're not administrator of this server."
+            )
+            logger.opt(lazy=True).error(
+                f"Missing permission for setting prefix '{prefix}' for guild '{ctx.guild.name} (ID: {ctx.guild.id})'."
+            )
+        await ctx.send(embed=e)
+
+    @commands.command(
+        aliases=["rst"],
+        brief="Force reset the current player",
+        help="Reset the current guild player when something is wrong.\nUse it when the bot can't connect to voice channel even if everything is ok.",
+    )
+    @commands.guild_only()
+    @commands.cooldown(1, 15.0, BucketType.guild)
+    async def reset(self, ctx: Context):
+        if not ctx.guild.id in self.bot.players:
+            logger.opt(lazy=True).debug(
+                f"Server {ctx.guild.name} ({ctx.guild.id}) try to kill a player that don't exist."
+            )
+            e: Embed = embed.error_message(
+                ctx.author, content="No player detected in this server."
+            )
+            await ctx.send(embed=e)
+            return
+
+        player: Player = self.bot.players.pop(ctx.guild.id)
+        try:
+            await player.disconnect(force=True)
+        except Exception as e:
+            logger.opt(lazy=True).error(
+                f"Error when force disconnecting the player of the guild {ctx.guild.name} ({ctx.guild.id}). "
+                f"Error: {e}"
+            )
+
+        logger.opt(lazy=True).success(
+            f"Server {ctx.guild.name} ({ctx.guild.id}) has successfully reset his player."
+        )
+        e: Embed = embed.info_message(ctx.author, content="The player has been reset.")
+        await ctx.send(embed=e)
+
 
         await self.bot.loop.run_in_executor(None, lambda: speech.save(f"{filename}"))
 
