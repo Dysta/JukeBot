@@ -184,19 +184,6 @@ class Utility(commands.Cog):
             )
             await ctx.send(embed=e)
             return
-    @commands.command(
-        brief="Speak on the voice channel",
-        help="Speak on the voice channel.",
-    )
-    @commands.cooldown(1, 8.0, BucketType.guild)
-    @commands.max_concurrency(1, BucketType.guild)
-    @commands.guild_only()
-    @commands.check(voice.user_is_connected)
-    async def tts(self, ctx: Context, *, text_to_speech: str):
-        speech = gtts.tts.gTTS(text_to_speech, lang="fr")
-        p = Path("./tts")
-        p.mkdir(parents=True, exist_ok=True)
-        filename = p / f"{ctx.guild.id}.mp3"
 
         perm: Permissions = ctx.author.guild_permissions
         logger.opt(lazy=True).info(
@@ -254,17 +241,31 @@ class Utility(commands.Cog):
         e: Embed = embed.info_message(ctx.author, content="The player has been reset.")
         await ctx.send(embed=e)
 
-
+    @commands.command(
+        brief="Speak on the voice channel",
+        help="Speak on the voice channel.",
+    )
+    @commands.cooldown(1, 8.0, BucketType.guild)
+    @commands.max_concurrency(1, BucketType.guild)
+    @commands.guild_only()
+    @commands.check(voice.user_is_connected)
+    async def tts(self, ctx: Context, *, text_to_speech: str):
+        speech = gtts.tts.gTTS(text_to_speech, lang="fr")
+        p = Path("./tts")
+        p.mkdir(parents=True, exist_ok=True)
+        filename = p / f"{ctx.guild.id}.mp3"
         await self.bot.loop.run_in_executor(None, lambda: speech.save(f"{filename}"))
 
         player: Player = self.bot.players[ctx.guild.id]
-        if not player.context:
-            music_cog = self.bot.get_cog("Music")
-            await ctx.invoke(music_cog.bind)
-        if not player.connected:
-            await player.join(ctx.author.voice.channel)
+        if not player.is_connected and not await ctx.invoke(
+            self.bot.get_cog("Music").join
+        ):
+            # we delete the player because it means that we have created it for nothing
+            self.bot.players.pop(ctx.guild.id)
+            return False
 
         await player.play_tts(f"{filename}")
+        return True
 
 
 def setup(bot):

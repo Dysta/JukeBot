@@ -5,7 +5,7 @@ from nextcord import Embed
 from nextcord.ext import commands
 from nextcord.ext.commands import Context, BucketType, Bot
 
-from jukebot.checks import voice, user
+from jukebot.checks import voice
 from jukebot.components import (
     AudioStream,
     Player,
