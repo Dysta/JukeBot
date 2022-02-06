@@ -76,14 +76,22 @@ class Player:
     async def join(self, channel: VoiceChannel):
         self._voice = await channel.connect(timeout=3.0)
 
-    async def play(self, song: Song):
-        stream = AudioStream(song.stream_url)
+    async def play(self, song: Song, is_tts: bool = False):
+        if is_tts:
+            stream = AudioStream(song.stream_url, before_options="", options="")
+        else:
+            stream = AudioStream(song.stream_url)
         stream.read()
 
         if self._voice and self._voice.is_playing():
             self._voice.stop()
 
-        self._voice.play(stream, after=self._after)
+        self._voice.play(
+            stream,
+            after=lambda e: self._after(
+                error=e, is_tts=is_tts, filename=song.stream_url
+            ),
+        )
         self._stream = stream
         self._song = song
         self.state = Player.State.PLAYING
@@ -125,7 +133,9 @@ class Player:
             self.state = Player.State.PLAYING
             self._voice.resume()
 
-    def _after(self, error):
+    def _after(self, error, is_tts: bool = False, filename: str = None):
+        if is_tts:
+            os.remove(filename)
         if error:
             logger.opt(lazy=True).error(error)
             return

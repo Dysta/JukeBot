@@ -14,7 +14,7 @@ from nextcord.ext import commands
 from nextcord.ext.commands import Context, BucketType, Bot
 
 from jukebot.checks import voice
-from jukebot.components import Player
+from jukebot.components import Player, Song
 from jukebot.utils import embed, converter, applications
 from jukebot.views import ActivityView
 
