@@ -1,11 +1,12 @@
 from datetime import datetime
+from typing import Optional
 
 from loguru import logger
 from nextcord import Embed
 from nextcord.ext import commands
 from nextcord.ext.commands import Context, BucketType, Bot
 
-from jukebot.checks import voice, user
+from jukebot.checks import voice
 from jukebot.components import (
     AudioStream,
     Player,
@@ -117,10 +118,11 @@ class Music(commands.Cog):
     @commands.check(voice.bot_and_user_in_same_channel)
     @commands.check(voice.bot_is_connected)
     @commands.check(voice.user_is_connected)
-    async def pause(self, ctx: Context):
+    async def pause(self, ctx: Context, silent: Optional[bool] = False):
         self.bot.players[ctx.guild.id].pause()
-        e = embed.basic_message(ctx.author, title="Player paused")
-        await ctx.send(embed=e)
+        if not silent:
+            e = embed.basic_message(ctx.author, title="Player paused")
+            await ctx.send(embed=e)
 
     @commands.command(
         brief="Resume the current music",
@@ -132,12 +134,13 @@ class Music(commands.Cog):
     @commands.check(voice.bot_and_user_in_same_channel)
     @commands.check(voice.bot_is_connected)
     @commands.check(voice.user_is_connected)
-    async def resume(self, ctx: Context):
+    async def resume(self, ctx: Context, silent: Optional[bool] = False):
         player: Player = self.bot.players[ctx.guild.id]
         if player.is_paused:
             player.resume()
-            e = embed.basic_message(ctx.author, title="Player resumed")
-            await ctx.send(embed=e)
+            if not silent:
+                e = embed.basic_message(ctx.author, title="Player resumed")
+                await ctx.send(embed=e)
         elif player.state.is_stopped and not player.queue.is_empty():
             await ctx.invoke(self.play, query="")
         else:
