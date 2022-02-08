@@ -16,7 +16,8 @@ poetry install
 
 ## ⚙️ Configuration
 Rename `.env.example` to `.env` and fill in the values. \
-If you want to use an Atlas MongoDB to enable the custom prefix system, install the extra package `poetry install -E mongouri`.
+If you want to use an Atlas MongoDB to enable the custom prefix system, install the extra package `poetry install -E mongouri`. \
+If you are using the bot on a different OS than Windows, you can add the extra `speed` to gain speed by doing `poetry install -E speed`. 
 
 ## 🚀 Launch
 Run `poetry run python -m jukebot` or `poetry run task start` if you installed the dev dependencies.

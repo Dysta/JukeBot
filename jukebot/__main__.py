@@ -1,5 +1,6 @@
 import logging as plogging
 import os
+import sys
 from typing import Set
 
 from nextcord import Game
@@ -43,4 +44,7 @@ def main():
 
 
 if __name__ == "__main__":
+    if not sys.platform in ('win32', 'cygwin', 'cli'):
+        import uvloop
+        uvloop.install()
     main()
