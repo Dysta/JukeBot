@@ -30,7 +30,7 @@ class Music(commands.Cog):
     @commands.guild_only()
     @commands.cooldown(1, 5.0, BucketType.user)
     @commands.check(voice.user_is_connected)
-    async def play(self, ctx: Context, *, query: str):
+    async def play(self, ctx: Context, top: Optional[bool] = False, *, query: str):
         # PlayerContainer create bot if needed
         player: Player = self.bot.players[ctx.guild.id]
         with ctx.typing():
@@ -41,7 +41,7 @@ class Music(commands.Cog):
 
         if query:
             queue_cog = self.bot.get_cog("Queue")
-            ok: bool = await ctx.invoke(queue_cog.add, query=query)
+            ok: bool = await ctx.invoke(queue_cog.add, query=query, top=top)
             if not ok:
                 return False
 
@@ -76,6 +76,18 @@ class Music(commands.Cog):
         e: Embed = embed.music_message(author, song)
         await ctx.send(embed=e)
         return True
+
+    @commands.command(
+        aliases=["ptop"],
+        brief="Play music from a URL or query or put the result at the top of the queue",
+        help="Play a music from the provided URL or a query or put the result at the top of the queue.",
+        usage="<url|query_str>",
+    )
+    @commands.guild_only()
+    @commands.cooldown(1, 5.0, BucketType.user)
+    @commands.check(voice.user_is_connected)
+    async def playtop(self, ctx: Context, *, query: str):
+        await ctx.invoke(self.play, top=True, query=query)
 
     @commands.command(
         aliases=["l"],

@@ -1,3 +1,5 @@
+from typing import Optional
+
 from nextcord import Embed
 from nextcord.ext import commands
 from nextcord.ext.commands import Bot, BucketType, Context
@@ -38,7 +40,7 @@ class Queue(commands.Cog):
     @commands.check(voice.bot_and_user_in_same_channel)
     @commands.check(voice.bot_is_connected)
     @commands.check(voice.user_is_connected)
-    async def add(self, ctx: Context, *, query: str):
+    async def add(self, ctx: Context, top: Optional[bool] = False, *, query: str):
         query_str = query if regex.is_url(query) else f"ytsearch1:{query}"
         with ctx.typing():
             qry: Query = Query(query_str)
@@ -50,7 +52,10 @@ class Queue(commands.Cog):
         if qry.type == Query.Type.PLAYLIST:
             res: ResultSet = ResultSet.from_query(qry, ctx.author)
             player: Player = self.bot.players[ctx.guild.id]
-            player.queue += res
+            if top:
+                player.queue = res + player.queue
+            else:
+                player.queue += res
 
             e: Embed = embed.basic_queue_message(
                 ctx.author, title=f"Enqueued : {len(res)} songs"
@@ -60,7 +65,10 @@ class Queue(commands.Cog):
             res: Result = Result.from_query(qry)
             res.requester = ctx.author
             player: Player = self.bot.players[ctx.guild.id]
-            player.queue.put(res)
+            if top:
+                player.queue.add(res)
+            else:
+                player.queue.put(res)
             if player.is_playing:
                 e: Embed = embed.result_enqueued(ctx.author, res)
                 await ctx.send(embed=e)
