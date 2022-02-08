@@ -99,6 +99,19 @@ class Music(commands.Cog):
         await ctx.invoke(self.play, top=True, query=query)
 
     @commands.command(
+        aliases=["pskip", "ps"],
+        brief="Put music from a URL or query on the top of the queue and skip the current one.",
+        help="Play a music from the provided URL or a query, put the result at the top of the queue and skip the current one.",
+        usage="<url|query_str>",
+    )
+    @commands.guild_only()
+    @commands.cooldown(1, 5.0, BucketType.user)
+    @commands.check(voice.user_is_connected)
+    async def playskip(self, ctx: Context, *, query: str):
+        await ctx.invoke(self.play, top=True, silent=True, query=query)
+        await ctx.invoke(self.skip, silent=True)
+
+    @commands.command(
         aliases=["l"],
         brief="Disconnect the bot from a voice channel",
         help="Disconnect the bot from the current connected voice channel.",
