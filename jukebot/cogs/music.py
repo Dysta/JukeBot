@@ -78,7 +78,7 @@ class Music(commands.Cog):
         return True
 
     @commands.command(
-        aliases=["ptop"],
+        aliases=["ptop", "pt"],
         brief="Play music from a URL or query or put the result at the top of the queue",
         help="Play a music from the provided URL or a query or put the result at the top of the queue.",
         usage="<url|query_str>",
