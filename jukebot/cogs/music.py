@@ -30,7 +30,14 @@ class Music(commands.Cog):
     @commands.guild_only()
     @commands.cooldown(1, 5.0, BucketType.user)
     @commands.check(voice.user_is_connected)
-    async def play(self, ctx: Context, top: Optional[bool] = False, *, query: str):
+    async def play(
+        self,
+        ctx: Context,
+        top: Optional[bool] = False,
+        silent: Optional[bool] = False,
+        *,
+        query: str,
+    ):
         # PlayerContainer create bot if needed
         player: Player = self.bot.players[ctx.guild.id]
         with ctx.typing():
@@ -41,7 +48,9 @@ class Music(commands.Cog):
 
         if query:
             queue_cog = self.bot.get_cog("Queue")
-            ok: bool = await ctx.invoke(queue_cog.add, query=query, top=top)
+            ok: bool = await ctx.invoke(
+                queue_cog.add, query=query, top=top, silent=silent
+            )
             if not ok:
                 return False
 
@@ -78,7 +87,7 @@ class Music(commands.Cog):
         return True
 
     @commands.command(
-        aliases=["ptop"],
+        aliases=["ptop", "pt"],
         brief="Play music from a URL or query or put the result at the top of the queue",
         help="Play a music from the provided URL or a query or put the result at the top of the queue.",
         usage="<url|query_str>",
@@ -88,6 +97,19 @@ class Music(commands.Cog):
     @commands.check(voice.user_is_connected)
     async def playtop(self, ctx: Context, *, query: str):
         await ctx.invoke(self.play, top=True, query=query)
+
+    @commands.command(
+        aliases=["pskip", "ps"],
+        brief="Put music from a URL or query on the top of the queue and skip the current one.",
+        help="Play a music from the provided URL or a query, put the result at the top of the queue and skip the current one.",
+        usage="<url|query_str>",
+    )
+    @commands.guild_only()
+    @commands.cooldown(1, 5.0, BucketType.user)
+    @commands.check(voice.user_is_connected)
+    async def playskip(self, ctx: Context, *, query: str):
+        await ctx.invoke(self.play, top=True, silent=True, query=query)
+        await ctx.invoke(self.skip, silent=True)
 
     @commands.command(
         aliases=["l"],
@@ -241,10 +263,11 @@ class Music(commands.Cog):
     @commands.check(voice.bot_and_user_in_same_channel)
     @commands.check(voice.bot_is_connected)
     @commands.check(voice.user_is_connected)
-    async def skip(self, ctx: Context):
+    async def skip(self, ctx: Context, silent: Optional[bool] = False):
         self.bot.players[ctx.guild.id].skip()
-        e: embed = embed.basic_message(ctx.author, title="Skipped !")
-        await ctx.send(embed=e)
+        if not silent:
+            e: embed = embed.basic_message(ctx.author, title="Skipped !")
+            await ctx.send(embed=e)
 
     @commands.command(
         aliases=["dump", "pick", "save"],
