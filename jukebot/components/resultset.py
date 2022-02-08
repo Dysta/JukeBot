@@ -37,6 +37,9 @@ class ResultSet(AbstractCollection[Result]):
     def put(self, result: Result) -> None:
         self.set.append(result)
 
+    def add(self, result: Result) -> None:
+        self.set.insert(0, result)
+
     def remove(self, idx: int) -> Optional[Result]:
         try:
             e = self.set.pop(idx)
