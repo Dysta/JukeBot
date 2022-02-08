@@ -30,7 +30,14 @@ class Music(commands.Cog):
     @commands.guild_only()
     @commands.cooldown(1, 5.0, BucketType.user)
     @commands.check(voice.user_is_connected)
-    async def play(self, ctx: Context, top: Optional[bool] = False, *, query: str):
+    async def play(
+        self,
+        ctx: Context,
+        top: Optional[bool] = False,
+        silent: Optional[bool] = False,
+        *,
+        query: str,
+    ):
         # PlayerContainer create bot if needed
         player: Player = self.bot.players[ctx.guild.id]
         with ctx.typing():
@@ -41,7 +48,9 @@ class Music(commands.Cog):
 
         if query:
             queue_cog = self.bot.get_cog("Queue")
-            ok: bool = await ctx.invoke(queue_cog.add, query=query, top=top)
+            ok: bool = await ctx.invoke(
+                queue_cog.add, query=query, top=top, silent=silent
+            )
             if not ok:
                 return False
 
@@ -241,10 +250,11 @@ class Music(commands.Cog):
     @commands.check(voice.bot_and_user_in_same_channel)
     @commands.check(voice.bot_is_connected)
     @commands.check(voice.user_is_connected)
-    async def skip(self, ctx: Context):
+    async def skip(self, ctx: Context, silent: Optional[bool] = False):
         self.bot.players[ctx.guild.id].skip()
-        e: embed = embed.basic_message(ctx.author, title="Skipped !")
-        await ctx.send(embed=e)
+        if not silent:
+            e: embed = embed.basic_message(ctx.author, title="Skipped !")
+            await ctx.send(embed=e)
 
     @commands.command(
         aliases=["dump", "pick", "save"],
