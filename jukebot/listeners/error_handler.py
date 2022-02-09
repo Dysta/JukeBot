@@ -13,13 +13,13 @@ class ErrorHandler(commands.Cog):
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx: Context, error: CommandError):
-        logger.error(error)
+        logger.opt(lazy=True).error(error)
         if isinstance(error, commands.CommandNotFound):
             await ctx.message.add_reaction("⁉")
             return
 
         if isinstance(error, exceptions.QueryException):
-            logger.opt(lazy=True).debug(
+            logger.opt(lazy=True).info(
                 f"Query Exception [{error.__class__.__name__}] '{error.query}' ({error.full_query}) for guild '{ctx.guild.name} (ID: {ctx.guild.id})'."
             )
             e = embed.music_not_found_message(
