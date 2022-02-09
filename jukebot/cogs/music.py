@@ -109,7 +109,9 @@ class Music(commands.Cog):
     @commands.check(voice.user_is_connected)
     async def playskip(self, ctx: Context, *, query: str):
         await ctx.invoke(self.play, top=True, silent=True, query=query)
-        await ctx.invoke(self.skip, silent=True)
+        player: Player = self.bot.players[ctx.guild.id]
+        if not player.queue.is_empty():
+            await ctx.invoke(self.skip, silent=True)
 
     @commands.command(
         aliases=["l"],
