@@ -7,7 +7,8 @@ from nextcord.ext.commands import Context, Bot, BucketType
 
 from jukebot.checks import voice
 from jukebot.components import Query, ResultSet, SongSet
-from jukebot.utils import embed, query_callback
+from jukebot.exceptions import QueryFailed, QueryCanceled
+from jukebot.utils import embed
 from jukebot.views import SearchDropdownView, SearchInteraction
 
 
@@ -27,7 +28,11 @@ class Search(commands.Cog):
             else:
                 await qry.search()
             if not qry.success:
-                return None
+                raise QueryFailed(
+                    f"Nothing found for {query}",
+                    query=query,
+                    full_query=f"{source}{query}",
+                )
 
             results: ResultSet = (
                 ResultSet.from_query(qry)
@@ -37,8 +42,9 @@ class Search(commands.Cog):
             logger.opt(lazy=True).debug(f"Results of the query is {results}")
 
         if not results:
-            await query_callback.failure(ctx, query, f"{source}{query}")
-            return
+            raise QueryFailed(
+                f"Nothing found for {query}", query=query, full_query=f"{source}{query}"
+            )
 
         e = embed.search_result_message(
             ctx.author,
@@ -52,8 +58,10 @@ class Search(commands.Cog):
         await msg.edit(view=None)
         result: str = v.result
         if result == SearchInteraction.CANCEL_TEXT:
-            await query_callback.cancel(ctx, msg, query, f"{source}{query}")
-            return
+            await msg.delete()
+            raise QueryCanceled(
+                "Search Canceled", query=query, full_query=f"{source}{query}"
+            )
 
         logger.opt(lazy=True).debug(
             f"Query '{source}{query}' successful for guild '{ctx.guild.name} (ID: {ctx.guild.id})'."

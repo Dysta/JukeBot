@@ -6,7 +6,8 @@ from nextcord.ext.commands import Bot, BucketType, Context
 
 from jukebot.checks import user, voice
 from jukebot.components import ResultSet, Player, Query, Result
-from jukebot.utils import embed, regex, query_callback
+from jukebot.exceptions import QueryFailed
+from jukebot.utils import embed, regex
 
 
 class Queue(commands.Cog):
@@ -53,8 +54,9 @@ class Queue(commands.Cog):
             qry: Query = Query(query_str)
             await qry.search()
             if not qry.success:
-                await query_callback.failure(ctx, query, query_str)
-                return False
+                raise QueryFailed(
+                    f"Nothing found for {query}", query=query, full_query=query_str
+                )
 
         if qry.type == Query.Type.PLAYLIST:
             res: ResultSet = ResultSet.from_query(qry, ctx.author)
