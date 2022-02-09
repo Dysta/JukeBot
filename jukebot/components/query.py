@@ -41,7 +41,8 @@ class Query:
                 info = await loop.run_in_executor(
                     None, lambda: ytdl.extract_info(url=self._query, **ytdl_kwargs)
                 )
-            except:
+            except Exception as e:
+                logger.opt(lazy=True).error(f"Exception in query {self._query}. {e}")
                 self._success = False
                 return
 
