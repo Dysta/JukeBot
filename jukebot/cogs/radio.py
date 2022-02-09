@@ -16,7 +16,7 @@ class Radio(commands.Cog):
         query: str = random.choice(choices)
         logger.opt(lazy=True).debug(f"Choice is {query}")
         music_cog = self.bot.get_cog("Music")
-        await ctx.invoke(music_cog.play, query=query)
+        await ctx.invoke(music_cog.playskip, query=query)
 
     @commands.command(
         brief="Launch a random lofi radio", help="Launch a random lofi radio"
