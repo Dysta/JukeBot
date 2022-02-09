@@ -4,7 +4,9 @@
 </div>
 
 # JukeBot
-Discord music bot using [Nextcord](https://github.com/nextcord/nextcord/) and [Poetry](https://python-poetry.org/)
+[![Powered by Nextcord](https://custom-icon-badges.herokuapp.com/badge/-Powered%20by%20Nextcord-0d1620?logo=nextcord)](https://github.com/nextcord/nextcord "Powered by Nextcord")
+[![Powered by Poetry](https://custom-icon-badges.herokuapp.com/badge/-Powered%20by%20Poetry-0d1620?logo=poetry)](https://python-poetry.org "Powered by Poetry")
+
 ___
 
 ## 🧩 Installation
