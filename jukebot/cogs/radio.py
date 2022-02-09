@@ -13,9 +13,8 @@ class Radio(commands.Cog):
         self.bot: Bot = bot
 
     async def _radio_process(self, ctx: Context, choices: list):
-        n: int = random.randint(0, len(choices) - 1)
-        query: str = choices[n]
-        logger.opt(lazy=True).debug(f"Choice number {n} is {query}")
+        query: str = random.choice(choices)
+        logger.opt(lazy=True).debug(f"Choice is {query}")
         music_cog = self.bot.get_cog("Music")
         await ctx.invoke(music_cog.play, query=query)
 
