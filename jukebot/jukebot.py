@@ -2,7 +2,7 @@ import asyncio
 import os
 
 from datetime import datetime
-from functools import cached_property
+from functools import cached_property, lru_cache
 from typing import TypeVar
 
 from nextcord import Guild, Message
@@ -11,6 +11,7 @@ from nextcord.ext import commands
 from loguru import logger
 
 from jukebot.abstract_components import AbstractMongoDB, AbstractMap, AbstractCache
+from jukebot.checks import user
 from jukebot.components import Player, CustomContext
 
 CXT = TypeVar("CXT", bound="Context")
@@ -26,6 +27,8 @@ class JukeBot(commands.Bot):
             collection=os.environ["MONGO_DB_COLLECTION"],
         )
         self._players: PlayerCollection = PlayerCollection(self)
+        self._blacklist: list = kwargs.get("blacklist", [])
+        self.add_check(user.guild_is_blacklist)
 
     async def on_ready(self):
         logger.info(f"Logged in as {self.user} (ID: {self.user.id})")
@@ -41,6 +44,10 @@ class JukeBot(commands.Bot):
 
     async def get_context(self, message: Message, *, cls=CustomContext) -> CXT:
         return await super().get_context(message, cls=cls)
+
+    @lru_cache(maxsize=1024)
+    def is_blacklist(self, guild_id) -> bool:
+        return guild_id in self._blacklist
 
     @property
     def start_time(self):

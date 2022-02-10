@@ -14,3 +14,9 @@ def bot_queue_is_not_empty(ctx: Context):
     if player.queue.is_empty():
         raise CheckFailure("The queue is empty.")
     return True
+
+
+def guild_is_blacklist(ctx: Context):
+    if ctx.bot.is_blacklist(ctx.guild.id):
+        raise CheckFailure("Your guild is banned.")
+    return True

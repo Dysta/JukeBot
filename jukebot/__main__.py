@@ -20,6 +20,11 @@ def get_ids() -> Set[int]:
     return set(map(int, ids))
 
 
+def init_blacklist():
+    ids = os.environ["BLACKLIST_GUILD_IDS"].split(",")
+    return list(map(int, ids))
+
+
 def main():
     load_dotenv()
     logging.set_logging(intercept_nextcord_log=True, nextcord_loglevel=plogging.WARNING)
@@ -30,6 +35,7 @@ def main():
         activity=Game(f"{os.environ['BOT_PREFIX']}help"),
         intents=intents.get(),
         owner_ids=get_ids(),
+        blacklist=init_blacklist(),
     )
 
     for e in Extensions.all():
