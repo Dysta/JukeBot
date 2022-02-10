@@ -13,7 +13,7 @@ class MessageHandler(commands.Cog):
             pure_content = message.content.replace(mention, "")
             if pure_content == "":
                 ctx = await self._bot.get_context(message)
-                system_cog = self._bot.get_cog("System")
+                system_cog = self._bot.get_cog("Utility")
                 await ctx.invoke(system_cog.prefix)
 
 
