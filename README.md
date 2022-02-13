@@ -55,51 +55,49 @@ Use the package manager [Chocolatey](https://community.chocolatey.org/) and run 
 ### Install on Linux
 Use apt, run `sudo apt install ffmpeg`.
 
-## 🗨 Features & Commands
-
-### Song
-- [X] **`join`**
-- [X] **`play`**
-- [X] **`playtop`**
-- [X] **`playskip`**
-- [X] **`search`**
-- [X] **`nowplaying`**
-- [X] **`grab`**
-- [ ] **`seek`**
-- [X] **`loop`**
-- [X] **`pause`**
-- [X] **`resume`**
-- [ ] **`lyrics`**
-- [X] **`disconnect`**
-
-### Queue
-- [X] **`queue`**
-- [ ] **`loopqueue`**
-- [ ] **`move`**
-- [ ] **`skipto`**
-- [X] **`shuffle`**
-- [X] **`remove`**
-- [X] **`clear`**
-- [ ] **`removedupes`**
-
-### Utility
-- [X] **`prefix`**
-- [X] **`reset`**
-
-### Effect
-- [ ] **`speed`**
-- [ ] **`bass`**
-- [ ] **`nightcore`**
-- [ ] **`slowed`**
-
-### Others
-- [X] **`avatar`**
-- [X] **`info`**
-- [X] **`invite`**
-- [X] **`donate`**
-- [X] **`watch`**
-- [X] **`help`**
-
+<details>
+  <summary><h2>🗨 Features & Commands</h2></summary>
+  <br>
+    
+  ### Song
+  - [X] **`join`**
+  - [X] **`play`**
+  - [X] **`playtop`**
+  - [X] **`playskip`**
+  - [X] **`search`**
+  - [X] **`nowplaying`**
+  - [X] **`grab`**
+  - [ ] **`seek`**
+  - [X] **`loop`**
+  - [X] **`pause`**
+  - [X] **`resume`**
+  - [ ] **`lyrics`**
+  - [X] **`disconnect`**
+   ### Queue
+  - [X] **`queue`**
+  - [ ] **`loopqueue`**
+  - [ ] **`move`**
+  - [ ] **`skipto`**
+  - [X] **`shuffle`**
+  - [X] **`remove`**
+  - [X] **`clear`**
+  - [ ] **`removedupes`**
+   ### Utility
+  - [X] **`prefix`**
+  - [X] **`reset`**
+   ### Effect
+  - [ ] **`speed`**
+  - [ ] **`bass`**
+  - [ ] **`nightcore`**
+  - [ ] **`slowed`**
+  ### Others
+  - [X] **`avatar`**
+  - [X] **`info`**
+  - [X] **`invite`**
+  - [X] **`donate`**
+  - [X] **`watch`**
+  - [X] **`help`**
+</details>
 
 ## 🤝 Contributing
 
@@ -116,4 +114,4 @@ inspire, and create. Any contributions you make are **greatly appreciated**.
 
 ## ❤️ Credits
 
-Realized with ❤️ by [Dysta](https://github.com/Dysta).
+Released with ❤️ by [Dysta](https://github.com/Dysta).
