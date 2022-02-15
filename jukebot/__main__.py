@@ -44,8 +44,11 @@ def main():
 
 
 if __name__ == "__main__":
-    if not sys.platform in ("win32", "cygwin", "cli"):
-        import uvloop
+    try:
+        if not sys.platform in ("win32", "cygwin", "cli"):
+            import uvloop
 
-        uvloop.install()
+            uvloop.install()
+    except ImportError:
+        logger.opt(lazy=True).info("Bot launch without speed extra.")
     main()
