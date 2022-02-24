@@ -16,15 +16,13 @@ cd JukeBot
 poetry install
 ```
 
-## ⚙️ Configuration
-Rename `.env.example` to `.env` and fill in the values. \
-If you want to use an Atlas MongoDB to enable the custom prefix system, install the extra package `poetry install -E mongouri`. \
-If you are using the bot on a different OS than Windows, you can add the extra `speed` to gain speed by doing `poetry install -E speed`. 
+## ⚙ Configuration
+Rename `.env.example` to `.env` and fill in the values.
 
 ## 🚀 Launch
-Run `poetry run python -m jukebot` or `poetry run task start` if you installed the dev dependencies.
+Run `poetry run task start`.
 
-## ⁉️ Other
+## ⁉ Other
 The bot use a MongoDB database for its custom prefix system, you can have one quickly by registering on [Atlas MongoDB](https://www.mongodb.com/atlas). \
 If you want to disable custom prefix system to do a quick setup, go to `jukebot/__main__.py` and replace
 ```py
@@ -54,6 +52,17 @@ Use the package manager [Chocolatey](https://community.chocolatey.org/) and run 
 
 ### Install on Linux
 Use apt, run `sudo apt install ffmpeg`.
+
+___
+
+## 🌐 Deployment
+Rename `.env.example` to `.env` and fill in the values. \
+Edit `MONGO_INITDB_ROOT_USERNAME` and `MONGO_INITDB_ROOT_PASSWORD` in the `docker-compose.yml` file to choose your own mongodb user and pass. \
+Go to your `.env` file and set the `MONGO_DB_URI` key to `mongodb://<user>:<pass>@mongo/` and replace `<user>`/`<pass>` with the same value as the previous key.
+
+Run `docker-compose up -d`.
+
+___
 
 <details>
   <summary><h2>🗨 Features & Commands</h2></summary>

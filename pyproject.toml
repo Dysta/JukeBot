@@ -6,29 +6,28 @@ authors = ["Dysta <xav4098@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.8"
-python-dotenv = "^0.19.1"
 yt-dlp = "^2021.11.10"
 nextcord = {extras = ["speed", "voice"], version = "^2.0.0-alpha.3"}
 motor = "^2.5.1"
-dnspython = {version = "^2.1.0", optional = true}
 loguru = "^0.5.3"
 uvloop = {version = "^0.16.0", optional = true}
+taskipy = "^1.10.1"
+python-dotenv = "^0.19.2"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
 black = "^21.10b0"
 mypy = "^0.910"
 autoflake = "^1.4"
-taskipy = "^1.9.0"
+dnspython = "^2.2.0"
 
 [tool.poetry.extras]
-mongouri = ["dnspython"]
 speed = ["uvloop"]
 
 [tool.taskipy.tasks]
-start = "python -m jukebot"
-black = "python -m black ."
-clean = "python -m autoflake . -r -i -v --ignore-init-module-imports --remove-all-unused-imports --remove-unused-variables"
+start = { cmd = "python -m jukebot", help = "run the bot" }
+black = { cmd = "python -m black .", help = "blakify the code" }
+clean = { cmd = "python -m autoflake . -r -i -v --ignore-init-module-imports --remove-all-unused-imports --remove-unused-variables", help = "remove unused code/import/variable" }
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

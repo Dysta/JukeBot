@@ -21,7 +21,7 @@ def get_ids() -> Set[int]:
 
 
 def main():
-    load_dotenv()
+    load_dotenv(".env")
     logging.set_logging(intercept_nextcord_log=True, nextcord_loglevel=plogging.WARNING)
 
     bot = JukeBot(
