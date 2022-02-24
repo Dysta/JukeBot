@@ -23,9 +23,10 @@ def set_logging(
         pass
     elif os.environ["ENVIRONMENT"] == Environment.PRODUCTION:
         logger.remove()
+        path: str = os.environ["LOGS_PATH"] if "LOGS_PATH" in os.environ else "./logs"
         fmt = "{time:YYYY-MM-DD at HH:mm:ss} || {level} || {name} ||  {message}"
         logger.add(
-            f"./logs/log-{datetime.datetime.now():%Y-%m-%d}.log",
+            f"{path}/log-{datetime.datetime.now():%Y-%m-%d}.log",
             level="INFO",
             format=fmt,
             rotation="01:00",

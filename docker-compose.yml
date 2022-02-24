@@ -1,0 +1,33 @@
+services:
+
+  jukebot:
+    build: .
+    container_name: jukebot-app
+    tty: true
+    deploy:
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+        window: 20s
+    env_file:
+      - .env
+    environment:
+      LOGS_PATH: "/data/logs"
+    depends_on:
+      - mongo
+    volumes:
+      - jukelogs:/data/logs
+
+  mongo:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin
+    volumes:
+      - jukedbdata:/data/db
+
+volumes:
+  jukedbdata:
+  jukelogs:
+
