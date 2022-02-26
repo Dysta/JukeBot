@@ -1,4 +1,3 @@
-from datetime import datetime
 from typing import Optional
 
 from loguru import logger
@@ -286,14 +285,15 @@ class Music(commands.Cog):
         player: Player = self.bot.players[ctx.guild.id]
         stream: AudioStream = player.stream
         song: Song = player.song
-        e = embed.music_message(
+        e = embed.grab_message(
             song.requester, song=song, current_duration=stream.progress
         )
-        timestamp = int(datetime.now().timestamp())
-        await ctx.author.send(
-            content=f"Save music from `{ctx.guild.name} — {ctx.author.voice.channel.name}` at <t:{timestamp}:T>",
-            embed=e,
+        e.add_field(
+            name="Voice channel",
+            value=f"`{ctx.guild.name} — {ctx.author.voice.channel.name}`",
         )
+
+        await ctx.author.send(embed=e)
         await ctx.message.add_reaction("👍")
 
     @commands.group(

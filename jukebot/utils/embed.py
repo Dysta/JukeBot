@@ -170,3 +170,19 @@ def result_enqueued(author: Member, res: Result):
     embed.add_field(name="Channel", value=res.channel, inline=True)
     embed.add_field(name="Duration", value=res.fmt_duration)
     return embed
+
+
+def grab_message(author: Member, song: Song, current_duration: int = 0):
+    embed: nextcord.Embed = _base_embed(
+        author=author, content=f"[{song.title}]({song.web_url})", color=0x366ADB
+    )
+    embed.set_author(
+        name="Saved music",
+        icon_url="https://icons.iconarchive.com/icons/papirus-team/papirus-apps/512/cantata-icon.png",
+    )
+    embed.add_field(name="Channel", value=song.channel)
+    fmt_current: str = converter.seconds_to_youtube_format(current_duration)
+    embed.add_field(name="Time code", value=f"`{fmt_current}/{song.fmt_duration}`")
+    if song.thumbnail:
+        embed.set_thumbnail(url=song.thumbnail)
+    return embed
