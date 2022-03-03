@@ -1,6 +1,6 @@
 <div align="center">
 
-[![JukeBot](juke-logo.png)](#readme)
+[![juke-banner](https://cdn.discordapp.com/attachments/829356508696412231/948936347752747038/juke-banner.png)](#readme)
 </div>
 
 # JukeBot
