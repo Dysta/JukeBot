@@ -307,35 +307,16 @@ class Music(commands.Cog):
     @commands.check(voice.user_is_connected)
     @commands.cooldown(1, 5.0, BucketType.user)
     async def loop(self, ctx: Context):
-        if not ctx.invoked_subcommand:
-            player: Player = self.bot.players[ctx.guild.id]
-            looping: bool = player.loop.is_enabled
+        player: Player = self.bot.players[ctx.guild.id]
+        looping: bool = player.loop.is_enabled
+        if looping:
+            player.loop = Player.Loop.DISABLED
+            new_status = "disabled"
+        else:
+            player.loop = Player.Loop.ENABLED
+            new_status = "enabled"
 
-            e: embed = embed.basic_message(
-                ctx.author, title=f"Loop is {'enabled' if looping else 'disabled'}"
-            )
-            await ctx.send(embed=e)
-
-    @loop.command(
-        name="on",
-        aliases=["enable"],
-        bried="Enable looping of the current song.",
-        help="Repeat the current song when it finish.",
-    )
-    async def loop_enabled(self, ctx: Context):
-        self.bot.players[ctx.guild.id].loop = Player.Loop.ENABLED
-        e: embed = embed.basic_message(ctx.author, title="Loop is enabled")
-        await ctx.send(embed=e)
-
-    @loop.command(
-        name="off",
-        aliases=["disable"],
-        bried="Disable looping of the current song.",
-        help="When a song is finish, pass to the next one instead of repeating itself.",
-    )
-    async def loop_disabled(self, ctx: Context):
-        self.bot.players[ctx.guild.id].loop = Player.Loop.DISABLED
-        e: embed = embed.basic_message(ctx.author, title="Loop is disabled")
+        e: embed = embed.basic_message(ctx.author, title=f"Loop is {new_status}")
         await ctx.send(embed=e)
 
 
