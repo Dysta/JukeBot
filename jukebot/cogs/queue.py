@@ -50,13 +50,15 @@ class Queue(commands.Cog):
         query: str,
     ):
         query_str = query if regex.is_url(query) else f"ytsearch1:{query}"
-        with ctx.typing():
-            qry: Query = Query(query_str)
-            await qry.search()
-            if not qry.success:
-                raise QueryFailed(
-                    f"Nothing found for {query}", query=query, full_query=query_str
-                )
+        if not silent:
+            ctx.typing()
+
+        qry: Query = Query(query_str)
+        await qry.search()
+        if not qry.success:
+            raise QueryFailed(
+                f"Nothing found for {query}", query=query, full_query=query_str
+            )
 
         if qry.type == Query.Type.PLAYLIST:
             res: ResultSet = ResultSet.from_query(qry, ctx.author)
@@ -137,6 +139,31 @@ class Queue(commands.Cog):
     async def shuffle(self, ctx: Context):
         self.bot.players[ctx.guild.id].queue.shuffle()
         e: Embed = embed.basic_message(ctx.author, title="Queue shuffled.")
+        await ctx.send(embed=e)
+
+    @commands.group(
+        name="qloop",
+        aliases=["qlp"],
+        brief="Loop the current queue.",
+        help="Allow user to enable or disable the looping of the queue.",
+    )
+    @commands.guild_only()
+    @commands.check(user.bot_queue_is_not_empty)
+    @commands.check(voice.bot_and_user_in_same_channel)
+    @commands.check(voice.bot_is_connected)
+    @commands.check(voice.user_is_connected)
+    @commands.cooldown(1, 5.0, BucketType.user)
+    async def queue_loop(self, ctx: Context):
+        player: Player = self.bot.players[ctx.guild.id]
+        looping: bool = player.loop.is_queue_loop
+        if looping:
+            player.loop = Player.Loop.DISABLED
+            new_status = "disabled"
+        else:
+            player.loop = Player.Loop.QUEUE
+            new_status = "enabled"
+
+        e: embed = embed.basic_message(ctx.author, title=f"Queue loop is {new_status}")
         await ctx.send(embed=e)
 
 
