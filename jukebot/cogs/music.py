@@ -297,7 +297,8 @@ class Music(commands.Cog):
         await ctx.message.add_reaction("👍")
 
     @commands.group(
-        aliases=["lp"],
+        name="loop",
+        aliases=["sloop", "slp", "lp"],
         brief="Loop the current song.",
         help="Allow user to enable or disable the looping of a song.",
     )
@@ -306,17 +307,17 @@ class Music(commands.Cog):
     @commands.check(voice.bot_is_connected)
     @commands.check(voice.user_is_connected)
     @commands.cooldown(1, 5.0, BucketType.user)
-    async def loop(self, ctx: Context):
+    async def song_loop(self, ctx: Context):
         player: Player = self.bot.players[ctx.guild.id]
-        looping: bool = player.loop.is_enabled
+        looping: bool = player.loop.is_song_loop
         if looping:
             player.loop = Player.Loop.DISABLED
             new_status = "disabled"
         else:
-            player.loop = Player.Loop.ENABLED
+            player.loop = Player.Loop.SONG
             new_status = "enabled"
 
-        e: embed = embed.basic_message(ctx.author, title=f"Loop is {new_status}")
+        e: embed = embed.basic_message(ctx.author, title=f"Song loop is {new_status}")
         await ctx.send(embed=e)
 
 
