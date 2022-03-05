@@ -50,13 +50,15 @@ class Queue(commands.Cog):
         query: str,
     ):
         query_str = query if regex.is_url(query) else f"ytsearch1:{query}"
-        with ctx.typing():
-            qry: Query = Query(query_str)
-            await qry.search()
-            if not qry.success:
-                raise QueryFailed(
-                    f"Nothing found for {query}", query=query, full_query=query_str
-                )
+        if not silent:
+            ctx.typing()
+
+        qry: Query = Query(query_str)
+        await qry.search()
+        if not qry.success:
+            raise QueryFailed(
+                f"Nothing found for {query}", query=query, full_query=query_str
+            )
 
         if qry.type == Query.Type.PLAYLIST:
             res: ResultSet = ResultSet.from_query(qry, ctx.author)
