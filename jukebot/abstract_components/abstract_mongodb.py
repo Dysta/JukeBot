@@ -12,7 +12,11 @@ class AbstractMongoDB:
     def __new__(cls, **kwargs):
         if cls._instance is None:
             cls._instance = super(AbstractMongoDB, cls).__new__(cls)
-            cls._client = AsyncIOMotorClient(kwargs.get("url"))
+            cls._client = AsyncIOMotorClient(
+                kwargs.get("url"),
+                connectTimeoutMS=3000,
+                serverSelectionTimeoutMS=3000,
+            )
         return cls._instance
 
     async def len(self) -> int:
