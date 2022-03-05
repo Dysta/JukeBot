@@ -141,7 +141,7 @@ class Queue(commands.Cog):
         e: Embed = embed.basic_message(ctx.author, title="Queue shuffled.")
         await ctx.send(embed=e)
 
-    @commands.group(
+    @commands.command(
         name="qloop",
         aliases=["qlp"],
         brief="Loop the current queue.",

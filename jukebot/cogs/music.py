@@ -296,7 +296,7 @@ class Music(commands.Cog):
         await ctx.author.send(embed=e)
         await ctx.message.add_reaction("👍")
 
-    @commands.group(
+    @commands.command(
         name="loop",
         aliases=["sloop", "slp", "lp"],
         brief="Loop the current song.",
