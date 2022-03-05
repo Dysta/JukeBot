@@ -107,7 +107,7 @@ class _RequestOption:
         "source_address": "0.0.0.0",
         "usenetrc": True,
         "socket_timeout": 3,
-        "compat_opts": "no-youtube-unavailable-videos",
+        "compat_opts": ["no-youtube-unavailable-videos"],
         "noplaylist": True,
         # "skip_download": True,
     }
