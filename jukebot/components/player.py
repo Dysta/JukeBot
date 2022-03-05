@@ -55,11 +55,16 @@ class Player:
 
     class Loop(IntEnum):
         DISABLED = 0
-        ENABLED = 1
+        SONG = 1
+        QUEUE = 2
 
         @property
-        def is_enabled(self) -> bool:
-            return self == Player.Loop.ENABLED
+        def is_song_loop(self) -> bool:
+            return self == Player.Loop.SONG
+
+        @property
+        def is_queue_loop(self) -> bool:
+            return self == Player.Loop.QUEUE
 
     def __init__(self, bot: Bot):
         self.bot: Bot = bot
@@ -119,10 +124,15 @@ class Player:
             return
         if self.state.is_leaving:
             return
-        if self._loop.is_enabled and not self.state.is_skipping:
+        if self._loop.is_song_loop and not self.state.is_skipping:
             func = self.play(self.song)
             coro.run_threadsafe(func, self.bot.loop)
             return
+        if self._loop.is_queue_loop:
+            queue_music = self.bot.get_cog("Queue")
+            enqueue_func = self.context.invoke(
+                queue_music.add, query=self.song.web_url, silent=True
+            )
 
         self._stream = None
         self._song = None
@@ -131,6 +141,10 @@ class Player:
             music_cog = self.bot.get_cog("Music")
             func = self.context.invoke(music_cog.play, query="")
             coro.run_threadsafe(func, self.bot.loop)
+            if self._loop.is_queue_loop:
+                #  We call the enqueue function after the play to
+                #  add the previous song in background and avoid latency
+                coro.run_threadsafe(enqueue_func, self.bot.loop)
         else:
             self.state = Player.State.IDLE
 
