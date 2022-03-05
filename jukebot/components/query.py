@@ -29,17 +29,16 @@ class Query:
         await self._get(process=True)
 
     async def _get(self, process: bool = True):
-        ytdl_kwargs = dict(
-            download=False,
-            process=process,
-        )
         with yt_dlp.YoutubeDL(params=_RequestOption.YTDL_FORMAT_OPTION) as ytdl:
             ytdl.cache.remove()
 
             loop = asyncio.get_event_loop()
             try:
                 info = await loop.run_in_executor(
-                    None, lambda: ytdl.extract_info(url=self._query, **ytdl_kwargs)
+                    None,
+                    lambda: ytdl.extract_info(
+                        url=self._query, download=False, process=process
+                    ),
                 )
             except Exception as e:
                 logger.opt(lazy=True).error(f"Exception in query {self._query}. {e}")
