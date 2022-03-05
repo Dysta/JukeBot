@@ -1,6 +1,7 @@
 import logging as plogging
 import os
 import sys
+
 from typing import Set
 
 from nextcord import Game
@@ -22,7 +23,11 @@ def get_ids() -> Set[int]:
 
 def main():
     load_dotenv(".env")
-    logging.set_logging(intercept_nextcord_log=True, nextcord_loglevel=plogging.WARNING)
+    logging.set_logging(
+        plogging.INFO,
+        intercept_nextcord_log=True,
+        nextcord_loglevel=plogging.WARNING,
+    )
 
     bot = JukeBot(
         command_prefix=prefix.get_prefix,

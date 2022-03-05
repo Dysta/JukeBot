@@ -9,9 +9,13 @@ from jukebot.utils import Environment
 
 
 def set_logging(
-    intercept_nextcord_log: bool = True, nextcord_loglevel: int = logging.INFO
+    jukebot_loglevel: int,
+    /,
+    intercept_nextcord_log: bool = True,
+    nextcord_loglevel: int = logging.INFO,
 ):
     logger.info(f"Environment is set to '{os.environ['ENVIRONMENT']}'.")
+    logger.info(f"Jukebot log messages with level {jukebot_loglevel}.")
 
     if intercept_nextcord_log:
         logger.info(
@@ -27,7 +31,7 @@ def set_logging(
         fmt = "{time:YYYY-MM-DD at HH:mm:ss} || {level} || {name} ||  {message}"
         logger.add(
             f"{path}/log-{datetime.datetime.now():%Y-%m-%d}.log",
-            level="INFO",
+            level=jukebot_loglevel,
             format=fmt,
             rotation="01:00",
             retention="10 days",
