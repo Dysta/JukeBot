@@ -23,11 +23,10 @@ class Utility(commands.Cog):
         brief="Get info about the bot",
         help="Get information about the bot like the ping and the uptime.",
     )
-    @commands.cooldown(1, 15.0, BucketType.user)
+    @commands.cooldown(1, 10.0, BucketType.user)
     @commands.guild_only()
     async def info(self, ctx: Context):
         e = embed.info_message(ctx.author)
-        e.set_thumbnail(url=self.bot.user.display_avatar.url)
         e.add_field(
             name="🤖 Name", value=f"┕`{self.bot.user.display_name}`", inline=True
         )
@@ -53,6 +52,9 @@ class Utility(commands.Cog):
             name="🪄 Prefix",
             value=f"┕`{await self.bot.prefixes.get_item(ctx.guild.id)}`",
             inline=True,
+        )
+        e.set_image(
+            url="https://cdn.discordapp.com/attachments/829356508696412231/948936347752747038/juke-banner.png"
         )
         await ctx.reply(embed=e)
 
