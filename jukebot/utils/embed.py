@@ -191,7 +191,7 @@ def grab_message(author: Member, song: Song, current_duration: int = 0):
     )
     embed.set_author(
         name="Saved music",
-        icon_url="https://icons.iconarchive.com/icons/papirus-team/papirus-apps/512/cantata-icon.png",
+        icon_url="https://icons.iconarchive.com/icons/papirus-team/papirus-apps/512/atunes-icon.png",
     )
     embed.add_field(name="Channel", value=song.channel)
     fmt_current: str = converter.seconds_to_youtube_format(current_duration)
