@@ -4,7 +4,7 @@ import sys
 
 from typing import Set
 
-from nextcord import Game
+from nextcord import Activity, ActivityType
 from nextcord.ext import commands
 
 from dotenv import load_dotenv
@@ -32,7 +32,9 @@ def main():
     bot = JukeBot(
         command_prefix=prefix.get_prefix,
         help_command=HelpHandler(),
-        activity=Game(f"{os.environ['BOT_PREFIX']}help"),
+        activity=Activity(
+            name=f"{os.environ['BOT_PREFIX']}help", type=ActivityType.listening
+        ),
         intents=intents.get(),
         owner_ids=get_ids(),
     )
