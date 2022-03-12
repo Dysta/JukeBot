@@ -12,8 +12,10 @@ from jukebot.components import (
     Song,
     Query,
     Result,
+    ShazamQuery,
 )
-from jukebot.utils import embed
+from jukebot.exceptions import QueryFailed
+from jukebot.utils import embed, regex
 
 
 class Music(commands.Cog):
@@ -318,6 +320,31 @@ class Music(commands.Cog):
             new_status = "enabled"
 
         e: embed = embed.basic_message(ctx.author, title=f"Song loop is {new_status}")
+        await ctx.send(embed=e)
+
+    @commands.command(
+        aliases=["shazam", "shzm"],
+        brief="Shazam the song at the given url",
+        help="Shazam the song at the given url. It take the 20 first seconds of the media then Shazam it.",
+        usage="<query>",
+    )
+    @commands.cooldown(1, 15.0, BucketType.guild)
+    @commands.max_concurrency(1, BucketType.guild)
+    @commands.guild_only()
+    async def find(self, ctx: Context, *, query: str):
+        if not regex.is_url(query):
+            raise commands.UserInputError("Query must be an url to a media")
+
+        with ctx.typing():
+            async with ShazamQuery(query) as qry:
+                await qry.process()
+
+        if not qry.success:
+            raise QueryFailed(
+                f"No music found for this media..", query="", full_query=query
+            )
+
+        e: Embed = embed.music_found_message(ctx.author, qry.info)
         await ctx.send(embed=e)
 
 
