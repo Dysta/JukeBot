@@ -5,6 +5,7 @@ import random
 from typing import Union
 
 from nextcord import Member
+from shazamio.models import YoutubeData
 
 from jukebot.components import Song, Result, SongSet, ResultSet
 from jukebot.utils import converter
@@ -102,6 +103,18 @@ def music_not_found_message(author: Member, title="", content=""):
         name="Error" if title == "" else title,
         icon_url="https://icons.iconarchive.com/icons/papirus-team/papirus-apps/512/plasma-search-icon.png",
     )
+    return embed
+
+
+def music_found_message(author: Member, music: YoutubeData, title=""):
+    embed: nextcord.Embed = _base_embed(
+        author=author, content=f"[{music.caption}]({music.uri})", color=0x54B23F
+    )
+    embed.set_author(
+        name="Music found!" if title == "" else title,
+        icon_url="https://cdn.discordapp.com/attachments/573225654452092930/952197615221612594/d-feet-icon.png",
+    )
+    embed.set_thumbnail(url=music.image.url)
     return embed
 
 
