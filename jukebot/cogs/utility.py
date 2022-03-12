@@ -10,7 +10,7 @@ from nextcord.ext.commands import Context, BucketType, Bot
 
 from jukebot.checks import voice
 from jukebot.components import Player
-from jukebot.utils import embed, converter, applications
+from jukebot.utils import applications, converter, embed
 from jukebot.views import ActivityView
 
 
