@@ -1,5 +1,6 @@
 from .player import Player
 from .query import Query
+from .shazam_query import ShazamQuery
 from .song import Song
 from .result import Result
 from .resultset import ResultSet
