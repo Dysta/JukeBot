@@ -37,6 +37,7 @@ class ShazamQuery:
         params: dict = {"outtmpl": f"{self._path}"}
         params.update(_RequestOption.YTDL_FORMAT_OPTION)
         logger.opt(lazy=True).debug(params)
+
         with yt_dlp.YoutubeDL(params=params) as ytdl:
             ytdl.cache.remove()
 
@@ -93,7 +94,7 @@ class _RequestOption:
         "format": "bestaudio/best",
         "external_downloader": "ffmpeg",
         "external_downloader_args": {
-            "ffmpeg_i": ["-ss", "00:00", "-to", "00:30"],
+            "ffmpeg_i": ["-vn", "-ss", "00:00", "-to", "00:30"],
             "ffmpeg": ["-t", "20"],
         },
         "nopart": True,
