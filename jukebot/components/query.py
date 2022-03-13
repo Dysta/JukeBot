@@ -109,5 +109,4 @@ class _RequestOption:
         "socket_timeout": 3,
         "compat_opts": ["no-youtube-unavailable-videos"],
         "noplaylist": True,
-        # "skip_download": True,
     }
