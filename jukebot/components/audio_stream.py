@@ -24,7 +24,13 @@ class AudioStream(FFmpegOpusAudio):
 
 class _PlayerOption:
     FFMPEG_BEFORE_OPTIONS = " ".join(
-        ["-reconnect 1", "-reconnect_streamed 1", "-reconnect_delay_max 3", "-nostdin"]
+        [
+            "-vn",
+            "-reconnect 1",
+            "-reconnect_streamed 1",
+            "-reconnect_delay_max 3",
+            "-nostdin",
+        ]
     )
 
-    FFMPEG_OPTIONS = "-vn"
+    FFMPEG_OPTIONS = ""
