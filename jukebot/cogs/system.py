@@ -1,11 +1,12 @@
-from nextcord.ext import commands
+from datetime import datetime
 from typing import Optional
 
 from loguru import logger
 
+from nextcord.ext import commands
 from nextcord.ext.commands import Context
 
-from jukebot.utils import Extensions
+from jukebot.utils import Extensions, embed, converter
 
 
 class System(commands.Cog):
@@ -68,6 +69,43 @@ class System(commands.Cog):
             await ctx.message.add_reaction("❌")
             raise
         await ctx.message.add_reaction("✅")
+
+    @commands.command(
+        brief="Share stats about the bot.",
+        help="Share stats about the bot.",
+        hidden=True,
+    )
+    @commands.guild_only()
+    @commands.is_owner()
+    async def stats(self, ctx: Context):
+        e = embed.info_message(ctx.author, title=f"Stats about {self.bot.user.name}")
+        e.add_field(name="📡 Ping", value=f"┕`{self.bot.latency * 1000:.2f}ms`")
+        uptime = datetime.now() - self.bot.start_time
+        days, hours, minutes, seconds = converter.seconds_to_time(
+            int(uptime.total_seconds())
+        )
+        e.add_field(
+            name="⏱ Uptime",
+            value=f"┕`{days}d, {hours}h, {minutes}m, {seconds}s`",
+        )
+        e.add_field(name=embed.VOID_TOKEN, value=embed.VOID_TOKEN)
+        e.add_field(name="🏛️ Servers", value=f"┕`{len(self.bot.guilds)}`", inline=True)
+        e.add_field(
+            name="👥 Members",
+            value=f"┕`{len(set(self.bot.get_all_members()))}`",
+        )
+        e.add_field(name=embed.VOID_TOKEN, value=embed.VOID_TOKEN)
+        e.add_field(
+            name="📻 Players created",
+            value=f"┕`{len(self.bot.players)}`",
+        )
+        e.add_field(
+            name="🎶 Players playing",
+            value=f"┕`{len(self.bot.players.playing())}`",
+        )
+        e.add_field(name=embed.VOID_TOKEN, value=embed.VOID_TOKEN)
+
+        await ctx.reply(embed=e, mention_author=False)
 
 
 def setup(bot):
