@@ -3,7 +3,7 @@ import os
 
 from datetime import datetime
 from functools import cached_property
-from typing import TypeVar
+from typing import TypeVar, List
 
 from nextcord import Guild, Message
 from nextcord.ext import commands
@@ -106,3 +106,6 @@ class PlayerCollection(AbstractMap[int, Player]):
         if not key in self._collection:
             self._collection[key] = Player(self.bot)
         return self._collection[key]
+
+    def playing(self) -> List[Player]:
+        return [p for p in self._collection.values() if p.is_playing]
