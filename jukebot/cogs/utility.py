@@ -56,7 +56,7 @@ class Utility(commands.Cog):
         e.set_image(
             url="https://cdn.discordapp.com/attachments/829356508696412231/948936347752747038/juke-banner.png"
         )
-        await ctx.reply(embed=e)
+        await ctx.reply(embed=e, mention_author=False)
 
     @commands.command(
         aliases=["say"],
