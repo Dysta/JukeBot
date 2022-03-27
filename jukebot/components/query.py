@@ -48,6 +48,13 @@ class Query:
             self._success = False
             return
 
+        if False:
+            # fmt: off
+            import json
+            with open("debug.json", "w") as f:
+                json.dump(ytdl.sanitize_info(info), f)
+            # fmt: on
+
         info = Query._sanitize_info(info)
         type = Query._define_type(info)
 
