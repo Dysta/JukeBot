@@ -91,6 +91,24 @@ class Query:
         return self._type
 
 
+class _QueryLogger:
+    def debug(self, msg) -> None:
+        if msg.startswith("[debug] "):
+            logger.opt(lazy=True).debug(msg)
+        else:
+            self.info(msg)
+
+    def info(self, msg) -> None:
+        if len(msg) > 1:
+            logger.opt(lazy=True).info(msg)
+
+    def warning(self, msg) -> None:
+        logger.opt(lazy=True).warning(msg)
+
+    def error(self, msg) -> None:
+        logger.opt(lazy=True).error(msg)
+
+
 class _RequestOption:
     YTDL_FORMAT_OPTION: dict = {
         "format": "bestaudio/best",
@@ -108,4 +126,5 @@ class _RequestOption:
         "compat_opts": ["no-youtube-unavailable-videos"],
         "noplaylist": True,
         "cachedir": False,
+        "logger": _QueryLogger(),
     }

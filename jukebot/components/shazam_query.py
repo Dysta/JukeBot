@@ -76,7 +76,7 @@ class ShazamQuery:
         loop = asyncio.get_event_loop()
         try:
             await loop.run_in_executor(None, lambda: os.remove(self._path))
-            logger.opt(lazy=True).debug(f"Query {self._query} deleted at {self._path}")
+            logger.opt(lazy=True).info(f"Query {self._query} deleted at {self._path}")
         except Exception as e:
             logger.error(e)
 
@@ -85,6 +85,24 @@ class ShazamQuery:
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         await self.delete_file()
+
+
+class _QueryLogger:
+    def debug(self, msg) -> None:
+        if msg.startswith("[debug] "):
+            logger.opt(lazy=True).debug(msg)
+        else:
+            self.info(msg)
+
+    def info(self, msg) -> None:
+        if len(msg) > 1:
+            logger.opt(lazy=True).info(msg)
+
+    def warning(self, msg) -> None:
+        logger.opt(lazy=True).warning(msg)
+
+    def error(self, msg) -> None:
+        logger.opt(lazy=True).error(msg)
 
 
 class _RequestOption:
@@ -97,4 +115,5 @@ class _RequestOption:
         },
         "nopart": True,
         "cachedir": False,
+        "logger": _QueryLogger(),
     }
