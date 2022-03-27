@@ -5,8 +5,8 @@
 
 # JukeBot
 [![Powered by Nextcord](https://custom-icon-badges.herokuapp.com/badge/-Powered%20by%20Nextcord-0d1620?logo=nextcord)](https://github.com/nextcord/nextcord "Powered by Nextcord")
-[![Powered by Poetry](https://custom-icon-badges.herokuapp.com/badge/-Powered%20by%20Poetry-0d1620?logo=poetry)](https://python-poetry.org "Powered by Poetry")
-
+[![Powered by Poetry](https://custom-icon-badges.herokuapp.com/badge/-Powered%20by%20Poetry-0d1620?logo=poetry)](https://python-poetry.org "Powered by Poetry") \
+Discord music bot written in Python 3 
 ___
 
 ## 🧩 Installation
@@ -84,7 +84,7 @@ ___
   - [X] **`disconnect`**
    ### Queue
   - [X] **`queue`**
-  - [ ] **`loopqueue`**
+  - [X] **`loopqueue`**
   - [ ] **`move`**
   - [ ] **`skipto`**
   - [X] **`shuffle`**
