@@ -83,6 +83,9 @@ class Player:
 
     async def play(self, song: Song):
         stream = AudioStream(song.stream_url)
+        logger.opt(lazy=True).info(
+            f"Player create an ffmpeg process ({song.duration}s) for song '{song.title}' at {song.web_url} ({song.stream_url})"
+        )
         stream.read()
 
         if self._voice and self._voice.is_playing():

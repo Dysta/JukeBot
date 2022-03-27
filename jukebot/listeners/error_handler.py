@@ -19,7 +19,7 @@ class ErrorHandler(commands.Cog):
             return
 
         if isinstance(error, exceptions.QueryException):
-            logger.opt(lazy=True).info(
+            logger.opt(lazy=True).warning(
                 f"Query Exception [{error.__class__.__name__}] '{error.query}' ({error.full_query}) for guild '{ctx.guild.name} (ID: {ctx.guild.id})'."
             )
             e = embed.music_not_found_message(
