@@ -39,8 +39,6 @@ class ShazamQuery:
         logger.opt(lazy=True).debug(params)
 
         with yt_dlp.YoutubeDL(params=params) as ytdl:
-            ytdl.cache.remove()
-
             loop = asyncio.get_event_loop()
             try:
                 await loop.run_in_executor(
@@ -98,4 +96,5 @@ class _RequestOption:
             "ffmpeg": ["-t", "20"],
         },
         "nopart": True,
+        "cachedir": False,
     }

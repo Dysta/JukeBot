@@ -30,8 +30,6 @@ class Query:
 
     async def _get(self, process: bool = True):
         with yt_dlp.YoutubeDL(params=_RequestOption.YTDL_FORMAT_OPTION) as ytdl:
-            ytdl.cache.remove()
-
             loop = asyncio.get_event_loop()
             try:
                 info = await loop.run_in_executor(
@@ -109,4 +107,5 @@ class _RequestOption:
         "socket_timeout": 3,
         "compat_opts": ["no-youtube-unavailable-videos"],
         "noplaylist": True,
+        "cachedir": False,
     }
