@@ -182,7 +182,7 @@ python-versions = ">=3.6"
 
 [[package]]
 name = "dnspython"
-version = "2.2.0"
+version = "2.2.1"
 description = "DNS toolkit"
 category = "dev"
 optional = false
@@ -300,7 +300,7 @@ python-versions = "*"
 
 [[package]]
 name = "nextcord"
-version = "2.0.0a9"
+version = "2.0.0a10"
 description = "A Python wrapper for the Discord API forked from discord.py"
 category = "main"
 optional = false
@@ -908,8 +908,8 @@ dataclass-factory = [
     {file = "dataclass_factory-2.14-py3-none-any.whl", hash = "sha256:0e39cda94f89c03c0353a2f6f78af2a9217f1c8e5652cd56e69da8f5c1326b3e"},
 ]
 dnspython = [
-    {file = "dnspython-2.2.0-py3-none-any.whl", hash = "sha256:081649da27ced5e75709a1ee542136eaba9842a0fe4c03da4fb0a3d3ed1f3c44"},
-    {file = "dnspython-2.2.0.tar.gz", hash = "sha256:e79351e032d0b606b98d38a4b0e6e2275b31a5b85c873e587cc11b73aca026d6"},
+    {file = "dnspython-2.2.1-py3-none-any.whl", hash = "sha256:a851e51367fb93e9e1361732c1d60dab63eff98712e503ea7d92e6eccb109b4f"},
+    {file = "dnspython-2.2.1.tar.gz", hash = "sha256:0f7569a4a6ff151958b64304071d370daa3243d15941a7beedf0c9fe5105603e"},
 ]
 frozenlist = [
     {file = "frozenlist-1.3.0-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:d2257aaba9660f78c7b1d8fea963b68f3feffb1a9d5d05a18401ca9eb3e8d0a3"},
@@ -1087,7 +1087,7 @@ mypy-extensions = [
     {file = "mypy_extensions-0.4.3.tar.gz", hash = "sha256:2d82818f5bb3e369420cb3c4060a7970edba416647068eb4c5343488a6c604a8"},
 ]
 nextcord = [
-    {file = "nextcord-2.0.0a9.tar.gz", hash = "sha256:d31431007c340082eeb717fd6aa94b665efbec529d2418af5ee1ecddb5299e80"},
+    {file = "nextcord-2.0.0a10.tar.gz", hash = "sha256:5126ac396748df07df7c32c2d4dadf060d29f794c35762609228e19b85a58cdf"},
 ]
 numpy = [
     {file = "numpy-1.22.3-cp310-cp310-macosx_10_14_x86_64.whl", hash = "sha256:92bfa69cfbdf7dfc3040978ad09a48091143cffb778ec3b03fa170c494118d75"},
