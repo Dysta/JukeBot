@@ -9,7 +9,7 @@ from loguru import logger
 from nextcord import VoiceChannel, VoiceClient
 from nextcord.ext.commands import Bot, Context
 
-from jukebot.utils import coro
+from .query import Query
 
 from .resultset import ResultSet
 from .song import Song
@@ -121,33 +121,28 @@ class Player:
             self.state = Player.State.PLAYING
             self._voice.resume()
 
-    def _after(self, error):
+    async def _after(self, error):
         if error:
             logger.opt(lazy=True).error(error)
             return
         if self.state.is_leaving:
             return
         if self._loop.is_song_loop and not self.state.is_skipping:
-            func = self.play(self.song)
-            coro.run_threadsafe(func, self.bot.loop)
+            await self.play(self.song)
             return
         if self._loop.is_queue_loop:
-            queue_music = self.bot.get_cog("Queue")
-            enqueue_func = self.context.invoke(
-                queue_music.add, query=self.song.web_url, silent=True
+            queue_cog = self.bot.get_cog("Queue")
+            func = self.context.invoke(
+                queue_cog.add, query=self.song.web_url, silent=True
             )
+            asyncio.ensure_future(func)
 
         self._stream = None
         self._song = None
 
         if not self._queue.is_empty():
             music_cog = self.bot.get_cog("Music")
-            func = self.context.invoke(music_cog.play, query="")
-            coro.run_threadsafe(func, self.bot.loop)
-            if self._loop.is_queue_loop:
-                #  We call the enqueue function after the play to
-                #  add the previous song in background and avoid latency
-                coro.run_threadsafe(enqueue_func, self.bot.loop)
+            await self.context.invoke(music_cog.play, query="")
         else:
             self.state = Player.State.IDLE
 
