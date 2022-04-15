@@ -10,7 +10,6 @@ from nextcord import VoiceChannel, VoiceClient
 from nextcord.ext.commands import Bot, Context
 
 from .query import Query
-
 from .resultset import ResultSet
 from .song import Song
 from .audio_stream import AudioStream
@@ -81,7 +80,16 @@ class Player:
     async def join(self, channel: VoiceChannel):
         self._voice = await channel.connect(timeout=3.0)
 
-    async def play(self, song: Song):
+    async def play(self, song: Song, replay: bool = False):
+        if replay:
+            #  we must requery the song to refresh the stream URL
+            #  some website can invalidate the stream URL after some times
+            author = song.requester
+            qry: Query = Query(song.web_url)
+            await qry.process()
+            song: Song = Song.from_query(qry)
+            song.requester = author
+
         stream = AudioStream(song.stream_url)
         logger.opt(lazy=True).info(
             f"Player create an ffmpeg process ({song.duration}s) for song '{song.title}' at {song.web_url} ({song.stream_url})"
@@ -128,7 +136,7 @@ class Player:
         if self.state.is_leaving:
             return
         if self._loop.is_song_loop and not self.state.is_skipping:
-            await self.play(self.song)
+            await self.play(self.song, replay=True)
             return
         if self._loop.is_queue_loop:
             queue_cog = self.bot.get_cog("Queue")
