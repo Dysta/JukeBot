@@ -478,14 +478,14 @@ tests = ["pytest (>=3.2.1,!=3.3.0)", "hypothesis (>=3.27.0)"]
 
 [[package]]
 name = "pyparsing"
-version = "3.0.7"
-description = "Python parsing module"
+version = "3.0.8"
+description = "pyparsing module - Classes and methods to define and execute parsing grammars"
 category = "dev"
 optional = false
-python-versions = ">=3.6"
+python-versions = ">=3.6.8"
 
 [package.extras]
-diagrams = ["jinja2", "railroad-diagrams"]
+diagrams = ["railroad-diagrams", "jinja2"]
 
 [[package]]
 name = "pytest"
@@ -522,7 +522,7 @@ cli = ["click (>=5.0)"]
 
 [[package]]
 name = "shazamio"
-version = "0.1.0.1"
+version = "0.1.1.0"
 description = "Is a asynchronous framework from reverse engineered Shazam API written in Python 3.6+ with asyncio and aiohttp."
 category = "main"
 optional = false
@@ -652,7 +652,7 @@ speed = ["uvloop"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "13bb03a6cf2371e503cb56e8d8bcc276e4b13e5d66acb017213de655fc919433"
+content-hash = "233eb2dc8f800158993eccb605e011f80a82ad09e47698f4d095157e182e25dd"
 
 [metadata.files]
 aiodns = [
@@ -1403,8 +1403,8 @@ pynacl = [
     {file = "PyNaCl-1.4.0.tar.gz", hash = "sha256:54e9a2c849c742006516ad56a88f5c74bf2ce92c9f67435187c3c5953b346505"},
 ]
 pyparsing = [
-    {file = "pyparsing-3.0.7-py3-none-any.whl", hash = "sha256:a6c06a88f252e6c322f65faf8f418b16213b51bdfaece0524c1c1bc30c63c484"},
-    {file = "pyparsing-3.0.7.tar.gz", hash = "sha256:18ee9022775d270c55187733956460083db60b37d0d0fb357445f3094eed3eea"},
+    {file = "pyparsing-3.0.8-py3-none-any.whl", hash = "sha256:ef7b523f6356f763771559412c0d7134753f037822dad1b16945b7b846f7ad06"},
+    {file = "pyparsing-3.0.8.tar.gz", hash = "sha256:7bf433498c016c4314268d95df76c81b842a4cb2b276fa3312cfb1e1d85f6954"},
 ]
 pytest = [
     {file = "pytest-5.4.3-py3-none-any.whl", hash = "sha256:5c0db86b698e8f170ba4582a492248919255fcd4c79b1ee64ace34301fb589a1"},
@@ -1415,8 +1415,8 @@ python-dotenv = [
     {file = "python_dotenv-0.19.2-py2.py3-none-any.whl", hash = "sha256:32b2bdc1873fd3a3c346da1c6db83d0053c3c62f28f1f38516070c4c8971b1d3"},
 ]
 shazamio = [
-    {file = "shazamio-0.1.0.1-py3-none-any.whl", hash = "sha256:83cf144227338ec74c7cb14c364ac5960041be9465618c0c55d59e7ad19745cb"},
-    {file = "shazamio-0.1.0.1.tar.gz", hash = "sha256:64813aa5d0aaab8595abef90d74c49f96ef4907adff0ab9f6abda40f3949317a"},
+    {file = "shazamio-0.1.1.0-py3-none-any.whl", hash = "sha256:a22229840f813f100cb91ab6e52c85e3a8c17bba757f23dd33c158c7b61318e1"},
+    {file = "shazamio-0.1.1.0.tar.gz", hash = "sha256:0609b946cca3a3c4248ae5e0940d56122e059cca9d425642d769378de58943d1"},
 ]
 six = [
     {file = "six-1.16.0-py2.py3-none-any.whl", hash = "sha256:8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254"},
