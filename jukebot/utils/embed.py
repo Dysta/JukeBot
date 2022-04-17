@@ -199,3 +199,15 @@ def grab_message(author: Member, song: Song, current_duration: int = 0):
     if song.thumbnail:
         embed.set_thumbnail(url=song.thumbnail)
     return embed
+
+
+def share_message(author: Member, content, title="", url="", img=""):
+    embed: nextcord.Embed = _base_embed(author=author, content=content, color=0x366ADB)
+    embed.set_author(
+        name=title if title else f"Music shared by {author}",
+        icon_url="https://icons.iconarchive.com/icons/papirus-team/papirus-apps/512/atunes-icon.png",
+        url=url,
+    )
+    if img:
+        embed.set_thumbnail(url=img)
+    return embed
