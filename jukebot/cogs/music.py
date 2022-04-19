@@ -1,4 +1,5 @@
 from typing import Optional
+from urllib import parse
 
 from loguru import logger
 from nextcord import Embed
@@ -15,7 +16,7 @@ from jukebot.components import (
     ShazamQuery,
 )
 from jukebot.exceptions import QueryFailed
-from jukebot.utils import embed, regex
+from jukebot.utils import aioweb, embed, regex
 
 
 class Music(commands.Cog):
@@ -345,6 +346,48 @@ class Music(commands.Cog):
             )
 
         e: Embed = embed.music_found_message(ctx.author, qry.info)
+        await ctx.send(embed=e)
+
+    @commands.command(
+        aliases=["shr"],
+        brief="Share the song at the given url",
+        help="Share the song at the given url. It return all the available streaming platform for the track.",
+        usage="<url>",
+    )
+    @commands.cooldown(1, 10.0, BucketType.guild)
+    @commands.max_concurrency(1, BucketType.guild)
+    @commands.guild_only()
+    async def share(self, ctx: Context, *, url: str):
+        if not regex.is_url(url):
+            raise commands.UserInputError("You must provide an URL.")
+
+        with ctx.typing():
+            base_url = "https://api.song.link/v1-alpha.1/links?url=%s"
+            code, data = await aioweb.cached_query(base_url % parse.quote(url))
+
+        if code != 200:
+            raise commands.UserInputError("The URL didn't return anything")
+
+        content = " | ".join(
+            f"[{k.capitalize()}]({v['url']})"
+            for k, v in sorted(data["linksByPlatform"].items(), key=lambda x: x)
+        )
+        title: str = data["entitiesByUniqueId"][data["entityUniqueId"]].get(
+            "title", "Unknown title"
+        )
+        artist: str = data["entitiesByUniqueId"][data["entityUniqueId"]].get(
+            "artistName", "Unknown artist"
+        )
+        img: str = data["entitiesByUniqueId"][data["entityUniqueId"]].get(
+            "thumbnailUrl", ""
+        )
+        e: Embed = embed.share_message(
+            ctx.author,
+            title=f"{artist} - {title}",
+            content=content,
+            url=data["pageUrl"],
+            img=img,
+        )
         await ctx.send(embed=e)
 
 
