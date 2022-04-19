@@ -68,7 +68,7 @@ ___
   <summary><h2>🗨 Features & Commands</h2></summary>
   <br>
     
-  ### Song
+  ### Music
   - [X] **`join`**
   - [X] **`play`**
   - [X] **`playtop`**
@@ -82,6 +82,7 @@ ___
   - [X] **`resume`**
   - [ ] **`lyrics`**
   - [X] **`disconnect`**
+  - [X] **`share`**
    ### Queue
   - [X] **`queue`**
   - [X] **`loopqueue`**

@@ -57,6 +57,18 @@ optional = false
 python-versions = ">=3.6"
 
 [[package]]
+name = "asyncstdlib"
+version = "3.10.4"
+description = "The missing async toolbox"
+category = "main"
+optional = false
+python-versions = "~=3.6"
+
+[package.extras]
+doc = ["sphinx", "sphinxcontrib-trio"]
+test = ["pytest", "flake8", "flake8-bugbear", "black", "coverage", "pytest-cov", "flake8-2020", "mypy"]
+
+[[package]]
 name = "atomicwrites"
 version = "1.4.0"
 description = "Atomic file writes."
@@ -652,7 +664,7 @@ speed = ["uvloop"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "233eb2dc8f800158993eccb605e011f80a82ad09e47698f4d095157e182e25dd"
+content-hash = "6cb65b9a1f3fc06f4e74a0c16e6d5b8fd94d76efece40ab9388d2334a6413851"
 
 [metadata.files]
 aiodns = [
@@ -744,6 +756,10 @@ aiosignal = [
 async-timeout = [
     {file = "async-timeout-4.0.2.tar.gz", hash = "sha256:2163e1640ddb52b7a8c80d0a67a08587e5d245cc9c553a74a847056bc2976b15"},
     {file = "async_timeout-4.0.2-py3-none-any.whl", hash = "sha256:8ca1e4fcf50d07413d66d1a5e416e42cfdf5851c981d679a09851a6853383b3c"},
+]
+asyncstdlib = [
+    {file = "asyncstdlib-3.10.4-py2.py3-none-any.whl", hash = "sha256:b291491a22a5fb1fa6785fc6762d9819fec8636ff3d88334edc8faeaf5e93763"},
+    {file = "asyncstdlib-3.10.4.tar.gz", hash = "sha256:8367c218ace639814f6c5c6a359cc11878ee75f9eac1edc4142cd930050c973d"},
 ]
 atomicwrites = [
     {file = "atomicwrites-1.4.0-py2.py3-none-any.whl", hash = "sha256:6d1784dea7c0c8d4a5172b6c620f40b6e4cbfdf96d783691f2e1302a7b88e197"},
