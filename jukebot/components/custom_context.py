@@ -1,7 +1,7 @@
 import os
 import random
 
-from nextcord.ext.commands import Context
+from disnake.ext.commands import Context
 
 from jukebot.views import PromoteView
 

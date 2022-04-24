@@ -1,8 +1,8 @@
 from typing import Optional
 
-from nextcord import Embed
-from nextcord.ext import commands
-from nextcord.ext.commands import Bot, BucketType, Context
+from disnake import Embed
+from disnake.ext import commands
+from disnake.ext.commands import Bot, BucketType, Context
 
 from jukebot.checks import user, voice
 from jukebot.components import ResultSet, Player, Query, Result

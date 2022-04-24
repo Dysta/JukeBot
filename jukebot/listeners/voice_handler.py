@@ -1,6 +1,6 @@
-from nextcord import Member, VoiceState, VoiceChannel
-from nextcord.ext import commands
-from nextcord.ext.commands import Bot
+from disnake import Member, VoiceState, VoiceChannel
+from disnake.ext import commands
+from disnake.ext.commands import Bot
 
 from jukebot.components import Player
 

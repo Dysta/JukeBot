@@ -3,8 +3,8 @@ from typing import Optional
 
 from loguru import logger
 
-from nextcord.ext import commands
-from nextcord.ext.commands import Context
+from disnake.ext import commands
+from disnake.ext.commands import Context
 
 from jukebot.utils import Extensions, embed, converter
 

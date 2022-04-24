@@ -5,8 +5,8 @@ from datetime import datetime
 from functools import cached_property
 from typing import TypeVar, List
 
-from nextcord import Guild, Message
-from nextcord.ext import commands
+from disnake import Guild, Message
+from disnake.ext import commands
 
 from loguru import logger
 

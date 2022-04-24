@@ -1,4 +1,4 @@
-from nextcord import Intents
+from disnake import Intents
 
 
 def get() -> Intents:

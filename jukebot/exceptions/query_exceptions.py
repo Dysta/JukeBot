@@ -1,6 +1,6 @@
 from typing import Optional
 
-from nextcord.ext.commands import CommandError
+from disnake.ext.commands import CommandError
 
 
 class QueryException(CommandError):

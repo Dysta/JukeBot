@@ -1,5 +1,5 @@
-from nextcord import Message
-from nextcord.ext import commands
+from disnake import Message
+from disnake.ext import commands
 
 
 class MessageHandler(commands.Cog):

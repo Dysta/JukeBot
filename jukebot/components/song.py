@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Optional
 
-from nextcord import Member
+from disnake import Member
 
 from jukebot.utils import converter
 from .query import Query

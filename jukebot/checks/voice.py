@@ -1,5 +1,5 @@
-from nextcord import VoiceClient
-from nextcord.ext.commands import Context, CheckFailure
+from disnake import VoiceClient
+from disnake.ext.commands import Context, CheckFailure
 
 from jukebot.components import Player
 

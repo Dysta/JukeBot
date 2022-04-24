@@ -4,9 +4,9 @@ import typing
 from datetime import datetime
 
 from loguru import logger
-from nextcord import AllowedMentions, InviteTarget, Member, Permissions, Embed
-from nextcord.ext import commands
-from nextcord.ext.commands import Context, BucketType, Bot
+from disnake import AllowedMentions, Embed, InviteTarget, Member, Permissions
+from disnake.ext import commands
+from disnake.ext.commands import Context, BucketType, Bot
 
 from jukebot.checks import voice
 from jukebot.components import Player
@@ -139,7 +139,7 @@ class Utility(commands.Cog):
             max_age=max_time,
             reason="Watch Together",
             target_type=InviteTarget.embedded_application,
-            target_application_id=applications.default["youtube"],
+            target_application=applications.default["youtube"],
         )
         e = embed.activity_message(
             ctx.author,

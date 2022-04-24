@@ -1,4 +1,4 @@
-from nextcord import FFmpegOpusAudio
+from disnake import FFmpegOpusAudio
 
 
 class AudioStream(FFmpegOpusAudio):

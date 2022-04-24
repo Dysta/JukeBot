@@ -2,9 +2,9 @@ from typing import Optional
 from urllib import parse
 
 from loguru import logger
-from nextcord import Embed
-from nextcord.ext import commands
-from nextcord.ext.commands import Context, BucketType, Bot
+from disnake import Embed
+from disnake.ext import commands
+from disnake.ext.commands import Context, BucketType, Bot
 
 from jukebot.checks import voice
 from jukebot.components import (

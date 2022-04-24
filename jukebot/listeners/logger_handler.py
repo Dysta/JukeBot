@@ -1,6 +1,6 @@
 from loguru import logger
-from nextcord.ext import commands
-from nextcord.ext.commands import Context, Command
+from disnake.ext import commands
+from disnake.ext.commands import Context, Command
 
 
 class LoggerHandler(commands.Cog):

@@ -3,7 +3,7 @@ import random
 from dataclasses import dataclass
 from typing import List, Optional
 
-from nextcord import Member
+from disnake import Member
 
 from jukebot.abstract_components import AbstractCollection
 from .result import Result

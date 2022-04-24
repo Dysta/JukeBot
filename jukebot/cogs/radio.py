@@ -2,8 +2,8 @@ import random
 
 from loguru import logger
 
-from nextcord.ext import commands
-from nextcord.ext.commands import Bot, Context, BucketType
+from disnake.ext import commands
+from disnake.ext.commands import Bot, Context, BucketType
 
 from jukebot.checks import voice
 

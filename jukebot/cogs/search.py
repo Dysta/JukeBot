@@ -2,8 +2,8 @@ import asyncio
 
 from loguru import logger
 
-from nextcord.ext import commands
-from nextcord.ext.commands import Context, Bot, BucketType
+from disnake.ext import commands
+from disnake.ext.commands import Context, Bot, BucketType
 
 from jukebot.checks import voice
 from jukebot.components import Query, ResultSet, SongSet

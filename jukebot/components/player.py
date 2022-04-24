@@ -6,8 +6,8 @@ from enum import IntEnum
 from typing import Optional
 
 from loguru import logger
-from nextcord import VoiceChannel, VoiceClient
-from nextcord.ext.commands import Bot, Context
+from disnake import VoiceChannel, VoiceClient
+from disnake.ext.commands import Bot, Context
 
 from .query import Query
 from .resultset import ResultSet

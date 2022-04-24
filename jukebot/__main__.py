@@ -4,8 +4,8 @@ import sys
 
 from typing import Set
 
-from nextcord import Activity, ActivityType
-from nextcord.ext import commands
+from disnake import Activity, ActivityType
+from disnake.ext import commands
 
 from dotenv import load_dotenv
 
@@ -25,8 +25,8 @@ def main():
     load_dotenv(".env")
     logging.set_logging(
         plogging.INFO,
-        intercept_nextcord_log=True,
-        nextcord_loglevel=plogging.WARNING,
+        intercept_disnake_log=True,
+        disnake_loglevel=plogging.WARNING,
     )
 
     bot = JukeBot(

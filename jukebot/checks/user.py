@@ -1,4 +1,4 @@
-from nextcord.ext.commands import Context, CheckFailure
+from disnake.ext.commands import Context, CheckFailure
 
 from jukebot.components import Player
 

@@ -1,5 +1,5 @@
-from nextcord.ext import commands
-from nextcord.ext.commands import Context, CommandError
+from disnake.ext import commands
+from disnake.ext.commands import Context, CommandError
 
 from loguru import logger
 
