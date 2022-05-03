@@ -29,7 +29,9 @@ If you want to disable custom prefix system to do a quick setup, go to `jukebot/
 bot = JukeBot(
     command_prefix=prefix.get_prefix,
     help_command=HelpHandler(),
-    activity=Game(f"{os.environ['BOT_PREFIX']}help"),
+    activity=Activity(
+        name=f"{os.environ['BOT_PREFIX']}help", type=ActivityType.listening
+    ),
     intents=intents.get(),
     owner_ids=get_ids(),
 )
@@ -39,7 +41,9 @@ with
 bot = JukeBot(
     command_prefix=commands.when_mentioned_or(os.environ['BOT_PREFIX']),
     help_command=HelpHandler(),
-    activity=Game(f"{os.environ['BOT_PREFIX']}help"),
+    activity=Activity(
+        name=f"{os.environ['BOT_PREFIX']}help", type=ActivityType.listening
+    ),
     intents=intents.get(),
     owner_ids=get_ids(),
 )
@@ -111,8 +115,8 @@ ___
 
 ## 🤝 Contributing
 
-Contributions are what make the open source community such an amazing place to be learn, 
-inspire, and create. Any contributions you make are **greatly appreciated**.
+Contributions are what make the open source community an amazing place to learn, be inspired, and create. 
+Any contributions you make are **greatly appreciated**.
 
 1. [Fork the repository](https://github.com/Dysta/JukeBot/fork)
 2. Clone your fork `git clone https://github.com/Dysta/JukeBot.git`
