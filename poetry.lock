@@ -194,7 +194,7 @@ python-versions = ">=3.6"
 
 [[package]]
 name = "disnake"
-version = "2.4.0"
+version = "2.5.1"
 description = "A Python wrapper for the Discord API"
 category = "main"
 optional = false
@@ -245,6 +245,20 @@ description = "Internationalized Domain Names in Applications (IDNA)"
 category = "main"
 optional = false
 python-versions = ">=3.5"
+
+[[package]]
+name = "isort"
+version = "5.10.1"
+description = "A Python utility / library to sort Python imports."
+category = "dev"
+optional = false
+python-versions = ">=3.6.1,<4.0"
+
+[package.extras]
+pipfile_deprecated_finder = ["pipreqs", "requirementslib"]
+requirements_deprecated_finder = ["pipreqs", "pip-api"]
+colors = ["colorama (>=0.4.3,<0.5.0)"]
+plugins = ["setuptools"]
 
 [[package]]
 name = "loguru"
@@ -535,7 +549,7 @@ cli = ["click (>=5.0)"]
 
 [[package]]
 name = "shazamio"
-version = "0.1.1.0"
+version = "0.1.1.1"
 description = "Is a asynchronous framework from reverse engineered Shazam API written in Python 3.6+ with asyncio and aiohttp."
 category = "main"
 optional = false
@@ -665,7 +679,7 @@ speed = ["uvloop"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "2d6db6cfad033aefef437450ee65e9e88f4b801dee29569ee835f1703e0f077c"
+content-hash = "241886259ef250f5db2a3547cb6c3ec46a1318d5868a8594d68b6e26b2085647"
 
 [metadata.files]
 aiodns = [
@@ -925,8 +939,8 @@ dataclass-factory = [
     {file = "dataclass_factory-2.14-py3-none-any.whl", hash = "sha256:0e39cda94f89c03c0353a2f6f78af2a9217f1c8e5652cd56e69da8f5c1326b3e"},
 ]
 disnake = [
-    {file = "disnake-2.4.0-py3-none-any.whl", hash = "sha256:390250a55ed8bbcc8c5753a72fb8fff2376a30295476edfebd0d2301855fb919"},
-    {file = "disnake-2.4.0.tar.gz", hash = "sha256:d7a9c83d5cbfcec42441dae1d96744f82c2a22403934db5d8862a8279ca4989c"},
+    {file = "disnake-2.5.1-py3-none-any.whl", hash = "sha256:6ced40c52551408a13df454ab00063edcc30889d517a8e82c2b7fd04f1ce39c1"},
+    {file = "disnake-2.5.1.tar.gz", hash = "sha256:3890a6df75db4db8d4a81f0cbcb0051acf3ccbf88dabca3f76f67243c4e42921"},
 ]
 dnspython = [
     {file = "dnspython-2.2.1-py3-none-any.whl", hash = "sha256:a851e51367fb93e9e1361732c1d60dab63eff98712e503ea7d92e6eccb109b4f"},
@@ -996,6 +1010,10 @@ frozenlist = [
 idna = [
     {file = "idna-3.3-py3-none-any.whl", hash = "sha256:84d9dd047ffa80596e0f246e2eab0b391788b0503584e8945f2368256d2735ff"},
     {file = "idna-3.3.tar.gz", hash = "sha256:9d643ff0a55b762d5cdb124b8eaa99c66322e2157b69160bc32796e824360e6d"},
+]
+isort = [
+    {file = "isort-5.10.1-py3-none-any.whl", hash = "sha256:6f62d78e2f89b4500b080fe3a81690850cd254227f27f75c3a0c491a1f351ba7"},
+    {file = "isort-5.10.1.tar.gz", hash = "sha256:e8443a5e7a020e9d7f97f1d7d9cd17c88bcb3bc7e218bf9cf5095fe550be2951"},
 ]
 loguru = [
     {file = "loguru-0.5.3-py3-none-any.whl", hash = "sha256:f8087ac396b5ee5f67c963b495d615ebbceac2796379599820e324419d53667c"},
@@ -1433,8 +1451,8 @@ python-dotenv = [
     {file = "python_dotenv-0.19.2-py2.py3-none-any.whl", hash = "sha256:32b2bdc1873fd3a3c346da1c6db83d0053c3c62f28f1f38516070c4c8971b1d3"},
 ]
 shazamio = [
-    {file = "shazamio-0.1.1.0-py3-none-any.whl", hash = "sha256:a22229840f813f100cb91ab6e52c85e3a8c17bba757f23dd33c158c7b61318e1"},
-    {file = "shazamio-0.1.1.0.tar.gz", hash = "sha256:0609b946cca3a3c4248ae5e0940d56122e059cca9d425642d769378de58943d1"},
+    {file = "shazamio-0.1.1.1-py3-none-any.whl", hash = "sha256:3beb35d62298b51fb446d136ef93c4efc5adf20d319fbe979e66b2cad17de66e"},
+    {file = "shazamio-0.1.1.1.tar.gz", hash = "sha256:1d789175dbe2780d50a714df56deac1037d0871dd37d2557aa9c3fef5cc34651"},
 ]
 six = [
     {file = "six-1.16.0-py2.py3-none-any.whl", hash = "sha256:8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254"},
