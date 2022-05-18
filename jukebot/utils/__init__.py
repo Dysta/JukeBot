@@ -1,2 +1,2 @@
-from .extensions import Extensions
 from .environment import Environment
+from .extensions import Extensions

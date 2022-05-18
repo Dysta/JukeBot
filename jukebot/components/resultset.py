@@ -1,13 +1,15 @@
-import random
+from __future__ import annotations
 
+import random
 from dataclasses import dataclass
 from typing import List, Optional
 
 from disnake import Member
 
 from jukebot.abstract_components import AbstractCollection
-from .result import Result
+
 from .query import Query
+from .result import Result
 
 
 @dataclass

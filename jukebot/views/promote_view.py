@@ -1,5 +1,6 @@
-import disnake
 import os
+
+import disnake
 
 
 class _VoteButton(disnake.ui.Button):

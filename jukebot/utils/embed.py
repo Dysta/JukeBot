@@ -1,14 +1,17 @@
+from __future__ import annotations
+
 import itertools
-import disnake
 import random
+from typing import TYPE_CHECKING, Union
 
-from typing import Union
-
+import disnake
 from disnake import Member
 from shazamio.models import YoutubeData
 
-from jukebot.components import Song, Result, SongSet, ResultSet
 from jukebot.utils import converter
+
+if TYPE_CHECKING:
+    from jukebot.components import Result, ResultSet, Song, SongSet
 
 VOID_TOKEN = "\u200B"
 

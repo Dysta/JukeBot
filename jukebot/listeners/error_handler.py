@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from disnake.ext import commands
 from disnake.ext.commands import Context, CommandError
 

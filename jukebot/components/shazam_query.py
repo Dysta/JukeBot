@@ -3,14 +3,12 @@ import os
 import random
 import string
 import tempfile
+from pathlib import Path
+from typing import Optional
 
 import yt_dlp
-
-from typing import Optional
-from pathlib import Path
-
 from loguru import logger
-from shazamio import Shazam, Serialize
+from shazamio import Serialize, Shazam
 from shazamio.models import YoutubeData
 
 # Silence useless bug reports messages

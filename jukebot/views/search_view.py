@@ -1,9 +1,13 @@
+from __future__ import annotations
+
 import os
+from typing import TYPE_CHECKING
+
 import disnake
+from disnake import Interaction, Member
 
-from disnake import Member, Interaction
-
-from jukebot.components import ResultSet
+if TYPE_CHECKING:
+    from jukebot.components import ResultSet
 
 
 class SearchInteraction:

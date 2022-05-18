@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import datetime
 import logging
 import os
@@ -5,7 +7,8 @@ import os
 from loguru import logger
 
 from jukebot.listeners import InterceptHandler
-from jukebot.utils import Environment
+
+from .environment import Environment
 
 
 def set_logging(

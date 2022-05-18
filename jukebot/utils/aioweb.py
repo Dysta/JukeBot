@@ -1,8 +1,9 @@
+from __future__ import annotations
+
 from urllib import parse
 
 import aiohttp
 import asyncstdlib as alib
-
 from loguru import logger
 
 _MOZ_HEADER = {"User-Agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64)"}

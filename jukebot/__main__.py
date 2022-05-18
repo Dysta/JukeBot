@@ -1,19 +1,18 @@
+from __future__ import annotations
+
 import logging as plogging
 import os
 import sys
-
 from typing import Set
 
 from disnake import Activity, ActivityType
 from disnake.ext import commands
-
 from dotenv import load_dotenv
-
 from loguru import logger
 
-from jukebot.utils import Extensions, intents, logging, prefix
 from jukebot import JukeBot
 from jukebot.listeners import HelpHandler
+from jukebot.utils import Extensions, intents, logging, prefix
 
 
 def get_ids() -> Set[int]:

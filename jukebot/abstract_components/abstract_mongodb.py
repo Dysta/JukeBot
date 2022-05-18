@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 from abc import abstractmethod
+
 from motor.motor_asyncio import AsyncIOMotorClient
 
 
