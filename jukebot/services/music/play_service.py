@@ -9,6 +9,7 @@ from jukebot import components
 from jukebot.abstract_components import AbstractService
 from jukebot.utils import embed
 
+from .. import ResetService
 from ..queue.add_service import AddService
 from .join_service import JoinService
 
@@ -57,12 +58,38 @@ class PlayService(AbstractService):
         song: Song = components.Song.from_query(qry)
         song.requester = author
 
-        try:
-            await player.play(song)
-        except Exception as e:
+        async def inner(attempt: int) -> bool:
+            logger.opt(lazy=True).info(
+                f"Attempt {attempt} to play in guild {interaction.guild.name} ({interaction.guild.id})"
+            )
+            try:
+                await player.play(song)
+            except:
+                logger.opt(lazy=True).error(
+                    f"Server {interaction.guild.name} ({interaction.guild.id}) can't play in its player at attempt {attempt}."
+                )
+                return False
+            return True
+
+        for i in range(2):
+            if not await inner(i):
+                with ResetService(self.bot) as rs, JoinService(self.bot) as js:
+                    await rs(interaction=interaction, silent=True)
+                    logger.opt(lazy=True).info(
+                        f"Server {interaction.guild.name} ({interaction.guild.id}) player reset."
+                    )
+                    await js(interaction=interaction, silent=True)
+                    logger.opt(lazy=True).info(
+                        f"Server {interaction.guild.name} ({interaction.guild.id}) player connected."
+                    )
+            else:
+                break
+        else:
+            with ResetService(self.bot) as rs:
+                await rs(interaction=interaction, silent=True)
             logger.opt(lazy=True).error(
-                f"Server {interaction.guild.name} ({interaction.guild.id}) can't play in its player. Should not happen.\n"
-                f"Error: {e}"
+                f"Server {interaction.guild.name} ({interaction.guild.id}) can't play in its player after 2 attempts. "
+                f"Shouldn't happen."
             )
             e: Embed = embed.error_message(
                 author,
@@ -73,6 +100,9 @@ class PlayService(AbstractService):
             await interaction.edit_original_message(embed=e)
             return False
 
+        logger.opt(lazy=True).success(
+            f"Server {interaction.guild.name} ({interaction.guild.id}) can play in its player.\n"
+        )
         e: Embed = embed.music_message(author, song)
         await interaction.edit_original_message(embed=e)
         return True
