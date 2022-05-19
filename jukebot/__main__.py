@@ -36,6 +36,7 @@ def main():
         ),
         intents=intents.get(),
         owner_ids=get_ids(),
+        test_guilds=[492677155180904448, 359423771540455425],
     )
 
     for e in Extensions.all():

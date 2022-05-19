@@ -1,17 +1,18 @@
+from __future__ import annotations
+
 import asyncio
 import os
-
+import traceback
 from datetime import datetime
 from functools import cached_property
-from typing import TypeVar, List
+from typing import List, TypeVar
 
-from disnake import Guild, Message
+from disnake import Guild
 from disnake.ext import commands
-
 from loguru import logger
 
-from jukebot.abstract_components import AbstractMongoDB, AbstractMap, AbstractCache
-from jukebot.components import Player, CustomContext
+from jukebot.abstract_components import AbstractCache, AbstractMap, AbstractMongoDB
+from jukebot.components import Player
 
 CXT = TypeVar("CXT", bound="Context")
 
@@ -32,15 +33,13 @@ class JukeBot(commands.Bot):
 
     async def on_error(self, event, *args, **kwargs):
         logger.error(f"{event=}{args}{kwargs}")
+        traceback.print_exc()
 
     async def on_guild_join(self, guild: Guild):
         await self._prefixes.set_item(guild.id, os.environ["BOT_PREFIX"])
 
     async def on_guild_remove(self, guild):
         await self._prefixes.del_item(guild.id)
-
-    async def get_context(self, message: Message, *, cls=CustomContext) -> CXT:
-        return await super().get_context(message, cls=cls)
 
     @property
     def start_time(self):

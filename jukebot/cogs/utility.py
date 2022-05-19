@@ -1,32 +1,31 @@
-import os
-import typing
+from __future__ import annotations
 
 from datetime import datetime
+from typing import TYPE_CHECKING, Optional
 
-from loguru import logger
-from disnake import AllowedMentions, Embed, InviteTarget, Member, Permissions
+from disnake import CommandInteraction, Embed, InviteTarget, Member
 from disnake.ext import commands
-from disnake.ext.commands import Context, BucketType, Bot
+from disnake.ext.commands import Bot, BucketType
+from loguru import logger
 
 from jukebot.checks import voice
-from jukebot.components import Player
 from jukebot.utils import applications, converter, embed
-from jukebot.views import ActivityView
+from jukebot.views import ActivityView, PromoteView
+
+if TYPE_CHECKING:
+    from jukebot.components import Player
 
 
 class Utility(commands.Cog):
     def __init__(self, bot):
         self.bot: Bot = bot
 
-    @commands.command(
-        aliases=["i"],
-        brief="Get info about the bot",
-        help="Get information about the bot like the ping and the uptime.",
+    @commands.slash_command(
+        description="Get information about the bot like the ping and the uptime.",
     )
     @commands.cooldown(1, 10.0, BucketType.user)
-    @commands.guild_only()
-    async def info(self, ctx: Context):
-        e = embed.info_message(ctx.author)
+    async def info(self, inter: CommandInteraction):
+        e = embed.info_message(inter.author)
         e.add_field(
             name="🤖 Name", value=f"┕`{self.bot.user.display_name}`", inline=True
         )
@@ -50,179 +49,85 @@ class Utility(commands.Cog):
         )
         e.add_field(
             name="🪄 Prefix",
-            value=f"┕`{await self.bot.prefixes.get_item(ctx.guild.id)}`",
+            value=f"┕`/`",
             inline=True,
         )
         e.set_image(
             url="https://cdn.discordapp.com/attachments/829356508696412231/948936347752747038/juke-banner.png"
         )
-        await ctx.reply(embed=e, mention_author=False)
+        await inter.send(embed=e, ephemeral=True)
 
-    @commands.command(
-        aliases=["say"],
-        brief="Repeat a message",
-        help="Repeat message",
-        usage="<message>",
+    @commands.slash_command(
+        name="avatar",
+        description="Display a user avatar in a embed message. If no user, it will show the command invoker avatar.",
     )
     @commands.cooldown(1, 5.0, BucketType.user)
-    @commands.guild_only()
-    async def echo(self, ctx: Context, *, args):
-        await ctx.send(args, allowed_mentions=AllowedMentions.none())
+    async def avatar(self, inter: CommandInteraction, user: Optional[Member] = None):
+        user: Member = inter.author if user is None else user
+        e = embed.basic_message(inter.author, title=f"{user.name}'s avatar")
+        e.set_image(url=user.display_avatar.url)
+        await inter.send(embed=e)
 
-    @commands.command(
-        brief="Display a user avatar",
-        help="Display a user avatar in a embed message.\nIf no user is provided, it will show the command invoker avatar.",
-        usage="[member]",
-    )
-    @commands.cooldown(1, 5.0, BucketType.user)
-    @commands.guild_only()
-    async def avatar(self, ctx: Context, who: typing.Optional[Member] = None):
-        who: Member = ctx.author if who is None else who
-        e = embed.basic_message(ctx.author, title=f"{who}'s avatar")
-        e.set_image(url=who.display_avatar.url)
-        await ctx.send(embed=e)
-
-    @commands.command(
-        brief="Send the invite link",
-        help="Send the invite link.",
-    )
+    @commands.slash_command(description="Send all links to support the bot")
     @commands.cooldown(1, 8.0, BucketType.user)
-    @commands.guild_only()
-    async def invite(self, ctx: Context):
-        msg: str = (
-            f"To invite `{self.bot.user.name}`, click on this link: "
-            f"{os.environ['BOT_INVITE_URL']}\n"
-            f"Thanks for support :heart:"
-        )
-        await ctx.send(content=msg)
+    async def links(self, inter: CommandInteraction):
+        await inter.send(view=PromoteView())
 
-    @commands.command(
-        brief="Send the vote link",
-        help="Send the vote link.",
-    )
-    @commands.cooldown(1, 8.0, BucketType.user)
-    @commands.guild_only()
-    async def vote(self, ctx: Context):
-        msg: str = (
-            f"To vote for `{self.bot.user.name}`, click on this link: "
-            f"{os.environ['BOT_VOTE_URL']}\n"
-            f"Thanks for support :heart:"
-        )
-        await ctx.send(content=msg)
-
-    @commands.command(
-        brief="Send the donate link",
-        help="Send the donate link.",
-    )
-    @commands.cooldown(1, 8.0, BucketType.user)
-    @commands.guild_only()
-    async def donate(self, ctx: Context):
-        msg: str = (
-            f"To financially support `{self.bot.user.name}`, click on this link: "
-            f"{os.environ['BOT_DONATE_URL']}\n"
-            f"Thanks for support :heart:"
-        )
-        await ctx.send(content=msg)
-
-    @commands.command(
-        aliases=["w"],
-        brief="Launch a Youtube Together session",
-        help="Launch a Youtube Together session in the current voice channel the invoker is.",
+    @commands.slash_command(
+        description="Launch a Youtube Together session in the current voice channel the invoker is.",
     )
     @commands.cooldown(1, 15.0, BucketType.guild)
     @commands.max_concurrency(1, BucketType.guild)
-    @commands.guild_only()
     @commands.check(voice.user_is_connected)
-    async def watch(self, ctx: Context):
+    async def watch(self, inter: CommandInteraction):
         max_time = 180
-        invite = await ctx.author.voice.channel.create_invite(
+        invite = await inter.author.voice.channel.create_invite(
             max_age=max_time,
             reason="Watch Together",
             target_type=InviteTarget.embedded_application,
             target_application=applications.default["youtube"],
         )
         e = embed.activity_message(
-            ctx.author,
+            inter.author,
             "Watch Together started!",
-            f"An activity started in `{ctx.author.voice.channel.name}`.\n",
+            f"An activity started in `{inter.author.voice.channel.name}`.\n",
         )
 
-        await ctx.reply(
+        await inter.send(
             embed=e, view=ActivityView(invite.url), delete_after=float(max_time)
         )
 
-    @commands.command(
-        aliases=["pfx"],
-        brief="Change/Display the prefix of the bot",
-        help="Set a new prefix for the bot.\nIf no prefix are given, sends the current server prefix.",
-        usage="[prefix]",
+    @commands.slash_command(
+        description="Reset the current guild player when something is wrong.",
     )
-    @commands.guild_only()
     @commands.cooldown(1, 15.0, BucketType.guild)
-    async def prefix(self, ctx: Context, prefix: typing.Optional[str] = None):
-        if not prefix:
-            e = embed.basic_message(
-                ctx.author,
-                content=f"Prefix for `{ctx.guild.name}` is `{await self.bot.prefixes.get_item(ctx.guild.id)}`",
-            )
-            await ctx.send(embed=e)
-            return
-
-        perm: Permissions = ctx.author.guild_permissions
-        logger.opt(lazy=True).info(
-            f"Set prefix '{prefix}' for guild '{ctx.guild.name} (ID: {ctx.guild.id})'."
-        )
-        if perm.administrator:
-            await self.bot.prefixes.set_item(ctx.guild.id, prefix)
-            e = embed.basic_message(
-                ctx.author,
-                title="Prefix changed!",
-                content=f"Prefix is set to `{prefix}` for server `{ctx.guild.name}`",
-            )
-            logger.opt(lazy=True).success(
-                f"Successfully set prefix '{prefix}' for guild '{ctx.guild.name} (ID: {ctx.guild.id})'."
-            )
-        else:
-            e = embed.error_message(
-                ctx.author, content="You're not administrator of this server."
-            )
-            logger.opt(lazy=True).error(
-                f"Missing permission for setting prefix '{prefix}' for guild '{ctx.guild.name} (ID: {ctx.guild.id})'."
-            )
-        await ctx.send(embed=e)
-
-    @commands.command(
-        aliases=["rst"],
-        brief="Force reset the current player",
-        help="Reset the current guild player when something is wrong.\nUse it when the bot can't connect to voice channel even if everything is ok.",
-    )
-    @commands.guild_only()
-    @commands.cooldown(1, 15.0, BucketType.guild)
-    async def reset(self, ctx: Context):
-        if not ctx.guild.id in self.bot.players:
+    async def reset(self, inter: CommandInteraction):
+        if not inter.guild.id in self.bot.players:
             logger.opt(lazy=True).debug(
-                f"Server {ctx.guild.name} ({ctx.guild.id}) try to kill a player that don't exist."
+                f"Server {inter.guild.name} ({inter.guild.id}) try to kill a player that don't exist."
             )
             e: Embed = embed.error_message(
-                ctx.author, content="No player detected in this server."
+                inter.author, content="No player detected in this server."
             )
-            await ctx.send(embed=e)
+            await inter.send(embed=e, ephemeral=True)
             return
 
-        player: Player = self.bot.players.pop(ctx.guild.id)
+        player: Player = self.bot.players.pop(inter.guild.id)
         try:
             await player.disconnect(force=True)
         except Exception as e:
             logger.opt(lazy=True).error(
-                f"Error when force disconnecting the player of the guild {ctx.guild.name} ({ctx.guild.id}). "
+                f"Error when force disconnecting the player of the guild {inter.guild.name} ({inter.guild.id}). "
                 f"Error: {e}"
             )
 
         logger.opt(lazy=True).success(
-            f"Server {ctx.guild.name} ({ctx.guild.id}) has successfully reset his player."
+            f"Server {inter.guild.name} ({inter.guild.id}) has successfully reset his player."
         )
-        e: Embed = embed.info_message(ctx.author, content="The player has been reset.")
-        await ctx.send(embed=e)
+        e: Embed = embed.info_message(
+            inter.author, content="The player has been reset."
+        )
+        await inter.send(embed=e)
 
 
 def setup(bot):

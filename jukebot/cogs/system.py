@@ -1,12 +1,13 @@
+from __future__ import annotations
+
 from datetime import datetime
 from typing import Optional
 
-from loguru import logger
-
 from disnake.ext import commands
 from disnake.ext.commands import Context
+from loguru import logger
 
-from jukebot.utils import Extensions, embed, converter
+from jukebot.utils import Extensions, converter, embed
 
 
 class System(commands.Cog):
