@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging as plogging
 import os
 import sys
-from typing import Set
+from typing import List, Set
 
 from disnake import Activity, ActivityType
 from disnake.ext import commands
@@ -20,12 +20,17 @@ def get_ids() -> Set[int]:
     return set(map(int, ids))
 
 
+def get_test_guild_ids() -> List[int]:
+    ids = os.environ["BOT_TEST_GUILD_IDS"].split(",")
+    return list(map(int, ids))
+
+
 def main():
     load_dotenv(".env")
     logging.set_logging(
         plogging.INFO,
         intercept_disnake_log=True,
-        disnake_loglevel=plogging.WARNING,
+        disnake_loglevel=plogging.DEBUG,
     )
 
     bot = JukeBot(
@@ -36,7 +41,7 @@ def main():
         ),
         intents=intents.get(),
         owner_ids=get_ids(),
-        test_guilds=[492677155180904448, 359423771540455425],
+        test_guilds=get_test_guild_ids(),
     )
 
     for e in Extensions.all():
