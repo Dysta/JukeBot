@@ -1,19 +1,16 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import TYPE_CHECKING, Optional
+from typing import Optional
 
-from disnake import CommandInteraction, Embed, InviteTarget, Member
+from disnake import CommandInteraction, InviteTarget, Member
 from disnake.ext import commands
 from disnake.ext.commands import Bot, BucketType
-from loguru import logger
 
 from jukebot.checks import voice
+from jukebot.services import ResetService
 from jukebot.utils import applications, converter, embed
 from jukebot.views import ActivityView, PromoteView
-
-if TYPE_CHECKING:
-    from jukebot.components import Player
 
 
 class Utility(commands.Cog):
@@ -102,32 +99,8 @@ class Utility(commands.Cog):
     )
     @commands.cooldown(1, 15.0, BucketType.guild)
     async def reset(self, inter: CommandInteraction):
-        if not inter.guild.id in self.bot.players:
-            logger.opt(lazy=True).debug(
-                f"Server {inter.guild.name} ({inter.guild.id}) try to kill a player that don't exist."
-            )
-            e: Embed = embed.error_message(
-                inter.author, content="No player detected in this server."
-            )
-            await inter.send(embed=e, ephemeral=True)
-            return
-
-        player: Player = self.bot.players.pop(inter.guild.id)
-        try:
-            await player.disconnect(force=True)
-        except Exception as e:
-            logger.opt(lazy=True).error(
-                f"Error when force disconnecting the player of the guild {inter.guild.name} ({inter.guild.id}). "
-                f"Error: {e}"
-            )
-
-        logger.opt(lazy=True).success(
-            f"Server {inter.guild.name} ({inter.guild.id}) has successfully reset his player."
-        )
-        e: Embed = embed.info_message(
-            inter.author, content="The player has been reset."
-        )
-        await inter.send(embed=e)
+        with ResetService(self.bot) as rs:
+            await rs(interaction=inter)
 
 
 def setup(bot):
