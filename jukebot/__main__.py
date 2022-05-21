@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging as plogging
 import os
 import sys
-from typing import List, Set
+from typing import List, Optional, Set
 
 from disnake import Activity, ActivityType
 from disnake.ext import commands
@@ -20,8 +20,10 @@ def get_ids() -> Set[int]:
     return set(map(int, ids))
 
 
-def get_test_guild_ids() -> List[int]:
-    ids = os.environ["BOT_TEST_GUILD_IDS"].split(",")
+def get_test_guild_ids() -> Optional[List[int]]:
+    ids = list(filter(lambda x: x, os.environ["BOT_TEST_GUILD_IDS"].split(",")))
+    if not ids:
+        return None
     return list(map(int, ids))
 
 
