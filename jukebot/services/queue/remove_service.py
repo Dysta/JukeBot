@@ -13,10 +13,10 @@ if TYPE_CHECKING:
 
 
 class RemoveService(AbstractService):
-    async def __call__(self, /, interaction: CommandInteraction, idx: int):
+    async def __call__(self, /, interaction: CommandInteraction, song: str):
         queue: ResultSet = self.bot.players[interaction.guild.id].queue
-        if not (elem := queue.remove(idx - 1)):
-            raise commands.UserInputError(f"Can't delete item number {idx}")
+        if not (elem := queue.remove(song)):
+            raise commands.UserInputError(f"Can't delete item `{song}`")
 
         e: Embed = embed.basic_message(
             interaction.author,

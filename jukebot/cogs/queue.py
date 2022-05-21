@@ -66,28 +66,32 @@ class Queue(commands.Cog):
         with AddService(self.bot) as asr:
             await asr(interaction=inter, query=query, top=top)
 
-    @queue.sub_command(
-        description="Remove the song at pos `idx` of the queue",
-    )
+    @queue.sub_command()
     @commands.cooldown(1, 5.0, BucketType.user)
     @commands.check(user.bot_queue_is_not_empty)
     @commands.check(voice.bot_and_user_in_same_channel)
     @commands.check(voice.bot_is_connected)
     @commands.check(voice.user_is_connected)
-    async def remove(self, inter: CommandInteraction, pos: commands.Range[1, ...]):
+    async def remove(self, inter: CommandInteraction, song: str):
         """
         Remove a song from the queue
         Parameters
         ----------
         inter: The interaction
-        pos: The position of the song to remove
+        song: The song to remove
 
         Returns
         -------
 
         """
         with RemoveService(self.bot) as rs:
-            await rs(interaction=inter, idx=pos)  # type:ignore
+            await rs(interaction=inter, song=song)  # type:ignore
+
+    @remove.autocomplete("song")
+    async def remove_autocomplete(self, inter: CommandInteraction, data: str):
+        data = data.lower()
+        queue: ResultSet = self.bot.players[inter.guild.id].queue
+        return [e.title for e in queue if data in e.title.lower()][:25]
 
     @queue.sub_command(
         description="Remove all the songs of the queue",

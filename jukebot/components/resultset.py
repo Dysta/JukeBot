@@ -42,12 +42,11 @@ class ResultSet(AbstractCollection[Result]):
     def add(self, result: Result) -> None:
         self.set.insert(0, result)
 
-    def remove(self, idx: int) -> Optional[Result]:
-        try:
-            e = self.set.pop(idx)
-        except:
-            return None
-        return e
+    def remove(self, elem: str) -> Optional[Result]:
+        for i, e in enumerate(self.set):
+            if e.title.lower() == elem.lower():
+                return self.set.pop(i)
+        return None
 
     def is_empty(self) -> bool:
         return len(self.set) == 0
