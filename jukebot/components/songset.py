@@ -1,7 +1,10 @@
+from __future__ import annotations
+
 from dataclasses import dataclass
 from typing import List
 
 from jukebot.abstract_components import AbstractCollection
+
 from .query import Query
 from .song import Song
 

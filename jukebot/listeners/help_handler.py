@@ -1,6 +1,8 @@
+from __future__ import annotations
+
 import itertools
 
-from nextcord.ext import commands
+from disnake.ext import commands
 
 from jukebot.utils import embed, emotes
 

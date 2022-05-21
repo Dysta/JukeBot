@@ -1,4 +1,4 @@
-from nextcord import Intents
+from disnake import Intents
 
 
 def get() -> Intents:
@@ -7,4 +7,5 @@ def get() -> Intents:
     intents.guilds = True
     intents.voice_states = True
     intents.members = True
+    intents.message_content = True
     return intents

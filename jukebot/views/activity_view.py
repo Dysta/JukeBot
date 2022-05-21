@@ -1,7 +1,7 @@
-import nextcord
+import disnake
 
 
-class _JoinActivityButton(nextcord.ui.Button):
+class _JoinActivityButton(disnake.ui.Button):
     def __init__(self, url):
         label = "Join the activity"
         emoji = "🌠"
@@ -9,7 +9,7 @@ class _JoinActivityButton(nextcord.ui.Button):
         super().__init__(url=url, label=label, emoji=emoji)
 
 
-class ActivityView(nextcord.ui.View):
+class ActivityView(disnake.ui.View):
     def __init__(self, code):
         super(ActivityView, self).__init__()
         self.add_item(_JoinActivityButton(code))

@@ -1,6 +1,9 @@
+from __future__ import annotations
+
+from disnake import CommandInteraction
+from disnake.ext import commands
+from disnake.ext.commands import Command, Context
 from loguru import logger
-from nextcord.ext import commands
-from nextcord.ext.commands import Context, Command
 
 
 class LoggerHandler(commands.Cog):
@@ -26,6 +29,16 @@ class LoggerHandler(commands.Cog):
             f"command: '{ctx.command.cog.qualified_name if ctx.command else 'None'}:{ctx.command.name if ctx.command else 'None'} | "
             f"invoked command: '{cmd.cog.qualified_name}:{cmd.name}' | "
             f"raw message: '{ctx.message.content}'."
+        )
+
+    @commands.Cog.listener()
+    async def on_slash_command(self, inter: CommandInteraction):
+        logger.opt(lazy=True).info(
+            f"Server: '{inter.guild.name}' (ID: {inter.guild.id}) | "
+            f"Channel: '{inter.channel.name}' (ID: {inter.channel.id}) | "
+            f"Invoker: '{inter.author}' | "
+            f"Command: '{inter.application_command.cog.qualified_name}:{inter.application_command.name}' | "
+            f"raw options: '{inter.options}'."
         )
 
 

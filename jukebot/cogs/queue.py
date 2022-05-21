@@ -1,170 +1,121 @@
-from typing import Optional
+from __future__ import annotations
 
-from nextcord import Embed
-from nextcord.ext import commands
-from nextcord.ext.commands import Bot, BucketType, Context
+from typing import TYPE_CHECKING, Optional
+
+from disnake import CommandInteraction, Embed
+from disnake.ext import commands
+from disnake.ext.commands import Bot, BucketType
 
 from jukebot.checks import user, voice
-from jukebot.components import ResultSet, Player, Query, Result
-from jukebot.exceptions import QueryFailed
-from jukebot.utils import embed, regex
+from jukebot.services.queue import (
+    AddService,
+    ClearService,
+    RemoveService,
+    ShuffleService,
+)
+from jukebot.utils import embed
+
+if TYPE_CHECKING:
+    from jukebot.components import ResultSet
 
 
 class Queue(commands.Cog):
     def __init__(self, bot):
         self.bot: Bot = bot
 
-    @commands.command(
-        aliases=["queue", "q", "list"],
-        brief="Show the queue of the server.",
-        help="Show the queue of the server",
+    @commands.slash_command(description="Manipulate the queue of the player.")
+    async def queue(self, inter: CommandInteraction):
+        pass
+
+    @queue.sub_command(
+        description="Show the queue of the server",
     )
-    @commands.guild_only()
     @commands.cooldown(1, 3.0, BucketType.user)
     @commands.check(voice.bot_is_connected)
     @commands.check(voice.user_is_connected)
-    async def show(self, ctx: Context):
-        queue: ResultSet = self.bot.players[ctx.guild.id].queue
+    async def show(self, inter: CommandInteraction):
+        queue: ResultSet = self.bot.players[inter.guild.id].queue
         e: Embed = embed.queue_message(
-            ctx.author, queue, title=f"Queue for {ctx.guild.name}"
+            inter.author, queue, title=f"Queue for {inter.guild.name}"
         )
-        await ctx.send(embed=e)
+        await inter.send(embed=e)
 
-    @commands.command(
-        aliases=["a"],
-        brief="Add a song to the current queue.",
-        help="Add a song to the current player queue",
-        usage="<url|query_str>",
-    )
-    @commands.guild_only()
+    @queue.sub_command()
     @commands.cooldown(1, 5.0, BucketType.user)
     @commands.check(voice.bot_and_user_in_same_channel)
     @commands.check(voice.bot_is_connected)
     @commands.check(voice.user_is_connected)
     async def add(
         self,
-        ctx: Context,
-        top: Optional[bool] = False,
-        silent: Optional[bool] = False,
-        *,
+        inter: CommandInteraction,
         query: str,
+        top: Optional[bool] = False,
     ):
-        query_str = query if regex.is_url(query) else f"ytsearch1:{query}"
-        if not silent:
-            ctx.typing()
+        """
+        Add a song to the current queue
+        Parameters
+        ----------
+        inter: The interaction
+        query: the URL or query to play
+        top: Put the requested song at the top of the queue
 
-        qry: Query = Query(query_str)
-        await qry.search()
-        if not qry.success:
-            raise QueryFailed(
-                f"Nothing found for {query}", query=query, full_query=query_str
-            )
+        Returns
+        -------
 
-        if qry.type == Query.Type.PLAYLIST:
-            res: ResultSet = ResultSet.from_query(qry, ctx.author)
-            player: Player = self.bot.players[ctx.guild.id]
-            if top:
-                player.queue = res + player.queue
-            else:
-                player.queue += res
+        """
+        with AddService(self.bot) as asr:
+            await asr(interaction=inter, query=query, top=top)
 
-            e: Embed = embed.basic_queue_message(
-                ctx.author, title=f"Enqueued : {len(res)} songs"
-            )
-            await ctx.send(embed=e)
-        else:
-            res: Result = Result.from_query(qry)
-            res.requester = ctx.author
-            player: Player = self.bot.players[ctx.guild.id]
-            if top:
-                player.queue.add(res)
-            else:
-                player.queue.put(res)
-            if not silent and player.is_playing:
-                e: Embed = embed.result_enqueued(ctx.author, res)
-                await ctx.send(embed=e)
-        return True
-
-    @commands.command(
-        aliases=["r"],
-        brief="Remove a song from the current queue.",
-        help="Remove the song at pos `idx` of the queue",
-        usage="<idx>",
-    )
-    @commands.guild_only()
+    @queue.sub_command()
     @commands.cooldown(1, 5.0, BucketType.user)
     @commands.check(user.bot_queue_is_not_empty)
     @commands.check(voice.bot_and_user_in_same_channel)
     @commands.check(voice.bot_is_connected)
     @commands.check(voice.user_is_connected)
-    async def remove(self, ctx: Context, idx: int):
-        queue: ResultSet = self.bot.players[ctx.guild.id].queue
-        if not (elem := queue.remove(idx - 1)):
-            raise commands.UserInputError(f"Can't delete item number {idx}")
+    async def remove(self, inter: CommandInteraction, song: str):
+        """
+        Remove a song from the queue
+        Parameters
+        ----------
+        inter: The interaction
+        song: The song to remove
 
-        e: Embed = embed.basic_message(
-            ctx.author, content=f"`{elem.title}` have been removed from the queue"
-        )
-        await ctx.send(embed=e)
+        Returns
+        -------
 
-    @commands.command(
-        aliases=["clr"],
-        brief="Clear the current queue.",
-        help="Remove all the songs of the queue",
+        """
+        with RemoveService(self.bot) as rs:
+            await rs(interaction=inter, song=song)  # type:ignore
+
+    @remove.autocomplete("song")
+    async def remove_autocomplete(self, inter: CommandInteraction, data: str):
+        data = data.lower()
+        queue: ResultSet = self.bot.players[inter.guild.id].queue
+        return [e.title for e in queue if data in e.title.lower()][:25]
+
+    @queue.sub_command(
+        description="Remove all the songs of the queue",
     )
-    @commands.guild_only()
     @commands.cooldown(1, 5.0, BucketType.user)
     @commands.check(user.bot_queue_is_not_empty)
     @commands.check(voice.bot_and_user_in_same_channel)
     @commands.check(voice.bot_is_connected)
     @commands.check(voice.user_is_connected)
-    async def clear(self, ctx: Context):
-        player: Player = self.bot.players[ctx.guild.id]
-        player.queue = ResultSet.empty()
+    async def clear(self, inter: CommandInteraction):
+        with ClearService(self.bot) as cs:
+            await cs(interaction=inter)
 
-        e: Embed = embed.basic_message(ctx.author, title="The queue have been cleared.")
-        await ctx.send(embed=e)
-
-    @commands.command(
-        aliases=["sfl"],
-        brief="Shuffle the current queue.",
-        help="Shuffle the current queue.",
+    @queue.sub_command(
+        description="Shuffle the current queue.",
     )
-    @commands.guild_only()
     @commands.check(user.bot_queue_is_not_empty)
     @commands.check(voice.bot_and_user_in_same_channel)
     @commands.check(voice.bot_is_connected)
     @commands.check(voice.user_is_connected)
     @commands.cooldown(1, 10.0, BucketType.guild)
-    async def shuffle(self, ctx: Context):
-        self.bot.players[ctx.guild.id].queue.shuffle()
-        e: Embed = embed.basic_message(ctx.author, title="Queue shuffled.")
-        await ctx.send(embed=e)
-
-    @commands.command(
-        name="qloop",
-        aliases=["qlp"],
-        brief="Loop the current queue.",
-        help="Allow user to enable or disable the looping of the queue.",
-    )
-    @commands.guild_only()
-    @commands.check(user.bot_queue_is_not_empty)
-    @commands.check(voice.bot_and_user_in_same_channel)
-    @commands.check(voice.bot_is_connected)
-    @commands.check(voice.user_is_connected)
-    @commands.cooldown(1, 5.0, BucketType.user)
-    async def queue_loop(self, ctx: Context):
-        player: Player = self.bot.players[ctx.guild.id]
-        looping: bool = player.loop.is_queue_loop
-        if looping:
-            player.loop = Player.Loop.DISABLED
-            new_status = "disabled"
-        else:
-            player.loop = Player.Loop.QUEUE
-            new_status = "enabled"
-
-        e: embed = embed.basic_message(ctx.author, title=f"Queue loop is {new_status}")
-        await ctx.send(embed=e)
+    async def shuffle(self, inter: CommandInteraction):
+        with ShuffleService(self.bot) as ss:
+            await ss(interaction=inter)
 
 
 def setup(bot):

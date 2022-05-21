@@ -1,9 +1,13 @@
+from __future__ import annotations
+
 import os
-import nextcord
+from typing import TYPE_CHECKING
 
-from nextcord import Member, Interaction
+import disnake
+from disnake import Interaction, Member
 
-from jukebot.components import ResultSet
+if TYPE_CHECKING:
+    from jukebot.components import ResultSet
 
 
 class SearchInteraction:
@@ -23,11 +27,11 @@ class SearchInteraction:
     ]
 
 
-class _SearchDropdown(nextcord.ui.Select):
+class _SearchDropdown(disnake.ui.Select):
     def __init__(self, results: ResultSet):
         self._results = results
         options = [
-            nextcord.SelectOption(
+            disnake.SelectOption(
                 label=r.title,
                 value=r.web_url,
                 description=f"on {r.channel} — {r.fmt_duration}",
@@ -36,7 +40,7 @@ class _SearchDropdown(nextcord.ui.Select):
             for i, r in enumerate(results)
         ]
         options.append(
-            nextcord.SelectOption(
+            disnake.SelectOption(
                 label="Cancel",
                 value=SearchInteraction.CANCEL_TEXT,
                 description="Cancel the current search",
@@ -52,7 +56,7 @@ class _SearchDropdown(nextcord.ui.Select):
         )
 
 
-class SearchDropdownView(nextcord.ui.View):
+class SearchDropdownView(disnake.ui.View):
     def __init__(self, author: Member, results: ResultSet):
         super().__init__(timeout=float(os.environ["BOT_SEARCH_TIMEOUT"]))
         self._author = author

@@ -1,20 +1,23 @@
+from __future__ import annotations
+
 import itertools
-import nextcord
 import random
+from typing import TYPE_CHECKING, Union
 
-from typing import Union
-
-from nextcord import Member
+import disnake
+from disnake import Member
 from shazamio.models import YoutubeData
 
-from jukebot.components import Song, Result, SongSet, ResultSet
 from jukebot.utils import converter
+
+if TYPE_CHECKING:
+    from jukebot.components import Result, ResultSet, Song, SongSet
 
 VOID_TOKEN = "\u200B"
 
 
 def _base_embed(author: Member, content="", color=0x38383D):
-    embed: nextcord.Embed = nextcord.Embed(title="", description=content, color=color)
+    embed: disnake.Embed = disnake.Embed(title="", description=content, color=color)
     embed.set_footer(
         text=f"Requested by {author}", icon_url=f"{author.display_avatar.url}"
     )
@@ -22,7 +25,7 @@ def _base_embed(author: Member, content="", color=0x38383D):
 
 
 def error_message(author: Member, title="", content=""):
-    embed: nextcord.Embed = _base_embed(author=author, content=content, color=0xDB3C30)
+    embed: disnake.Embed = _base_embed(author=author, content=content, color=0xDB3C30)
     embed.set_author(
         name="Error" if title == "" else title,
         icon_url="https://icons.iconarchive.com/icons/papirus-team/papirus-status/512/dialog-error-icon.png",
@@ -31,7 +34,7 @@ def error_message(author: Member, title="", content=""):
 
 
 def info_message(author: Member, title="", content=""):
-    embed: nextcord.Embed = _base_embed(author=author, content=content, color=0x30A3DB)
+    embed: disnake.Embed = _base_embed(author=author, content=content, color=0x30A3DB)
 
     embed.set_author(
         name="Information" if title == "" else title,
@@ -41,7 +44,7 @@ def info_message(author: Member, title="", content=""):
 
 
 def basic_message(author: Member, title="", content=""):
-    embed: nextcord.Embed = _base_embed(author=author, content=content, color=0x4F4F4F)
+    embed: disnake.Embed = _base_embed(author=author, content=content, color=0x4F4F4F)
     embed.set_author(
         name="Information" if title == "" else title,
         icon_url="https://cdn.discordapp.com/attachments/573225654452092930/908327963718713404/juke-icon.png",
@@ -52,7 +55,7 @@ def basic_message(author: Member, title="", content=""):
 def activity_message(author: Member, title="", content=""):
     colors = [0xF6C333, 0xF4B400]
     c = colors[random.randint(0, 1)]
-    embed: nextcord.Embed = _base_embed(author=author, content=content, color=c)
+    embed: disnake.Embed = _base_embed(author=author, content=content, color=c)
     embed.set_author(
         name="Information" if title == "" else title,
         icon_url="https://icons.iconarchive.com/icons/papirus-team/papirus-apps/512/dragon-ball-online-global-icon.png",
@@ -64,7 +67,7 @@ def music_message(author: Member, song: Song, current_duration: int = 0):
     colors = [0x736DAB, 0xFFBA58]
     c = colors[random.randint(0, 1)]
 
-    embed: nextcord.Embed = _base_embed(author=author, content="", color=c)
+    embed: disnake.Embed = _base_embed(author=author, content="", color=c)
     embed.set_author(
         name=song.title,
         url=song.web_url,
@@ -89,7 +92,7 @@ def music_message(author: Member, song: Song, current_duration: int = 0):
 
 
 def music_search_message(author: Member, title="", content=""):
-    embed: nextcord.Embed = _base_embed(author=author, content=content, color=0x4F4F4F)
+    embed: disnake.Embed = _base_embed(author=author, content=content, color=0x4F4F4F)
     embed.set_author(
         name="Search" if title == "" else title,
         icon_url="https://icons.iconarchive.com/icons/papirus-team/papirus-apps/512/d-feet-icon.png",
@@ -98,7 +101,7 @@ def music_search_message(author: Member, title="", content=""):
 
 
 def music_not_found_message(author: Member, title="", content=""):
-    embed: nextcord.Embed = _base_embed(author=author, content=content, color=0xEBA229)
+    embed: disnake.Embed = _base_embed(author=author, content=content, color=0xEBA229)
     embed.set_author(
         name="Error" if title == "" else title,
         icon_url="https://icons.iconarchive.com/icons/papirus-team/papirus-apps/512/plasma-search-icon.png",
@@ -107,7 +110,7 @@ def music_not_found_message(author: Member, title="", content=""):
 
 
 def music_found_message(author: Member, music: YoutubeData, title=""):
-    embed: nextcord.Embed = _base_embed(
+    embed: disnake.Embed = _base_embed(
         author=author, content=f"[{music.caption}]({music.uri})", color=0x54B23F
     )
     embed.set_author(
@@ -127,7 +130,7 @@ def search_result_message(
             for i, s in enumerate(playlist, start=1)
         ]
     )
-    embed: nextcord.Embed = music_search_message(
+    embed: disnake.Embed = music_search_message(
         author=author, title=title, content=content
     )
     embed.add_field(
@@ -140,7 +143,7 @@ def search_result_message(
 def basic_queue_message(author: Member, title="", content=""):
     colors = [0x438F96, 0x469961, 0x3F3F3F]
     c = colors[random.randint(0, 2)]
-    embed: nextcord.Embed = _base_embed(author=author, content=content, color=c)
+    embed: disnake.Embed = _base_embed(author=author, content=content, color=c)
     embed.set_author(
         name="Information" if title == "" else title,
         icon_url="https://icons.iconarchive.com/icons/papirus-team/papirus-apps/512/logisim-icon-icon.png",
@@ -156,7 +159,7 @@ def queue_message(author: Member, playlist: Union[ResultSet, SongSet], title="")
             for i, s in enumerate(playlist_slice, start=1)
         ]
     )
-    embed: nextcord.Embed = basic_queue_message(
+    embed: disnake.Embed = basic_queue_message(
         author=author, title=title, content=content
     )
     embed.add_field(name="Total songs", value=f"`{len(playlist)}`")
@@ -174,7 +177,7 @@ def queue_message(author: Member, playlist: Union[ResultSet, SongSet], title="")
 def result_enqueued(author: Member, res: Result):
     colors = [0x438F96, 0x469961, 0x3F3F3F]
     c = colors[random.randint(0, 2)]
-    embed: nextcord.Embed = _base_embed(author=author, content="", color=c)
+    embed: disnake.Embed = _base_embed(author=author, content="", color=c)
     embed.set_author(
         name=f"Enqueued : {res.title}",
         url=res.web_url,
@@ -186,7 +189,7 @@ def result_enqueued(author: Member, res: Result):
 
 
 def grab_message(author: Member, song: Song, current_duration: int = 0):
-    embed: nextcord.Embed = _base_embed(
+    embed: disnake.Embed = _base_embed(
         author=author, content=f"[{song.title}]({song.web_url})", color=0x366ADB
     )
     embed.set_author(
@@ -202,7 +205,7 @@ def grab_message(author: Member, song: Song, current_duration: int = 0):
 
 
 def share_message(author: Member, content, title="", url="", img=""):
-    embed: nextcord.Embed = _base_embed(author=author, content=content, color=0x366ADB)
+    embed: disnake.Embed = _base_embed(author=author, content=content, color=0x366ADB)
     embed.set_author(
         name=title if title else f"Music shared by {author}",
         icon_url="https://icons.iconarchive.com/icons/papirus-team/papirus-apps/512/atunes-icon.png",

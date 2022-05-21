@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import datetime
 import logging
 import os
@@ -5,23 +7,22 @@ import os
 from loguru import logger
 
 from jukebot.listeners import InterceptHandler
-from jukebot.utils import Environment
+
+from .environment import Environment
 
 
 def set_logging(
     jukebot_loglevel: int,
     /,
-    intercept_nextcord_log: bool = True,
-    nextcord_loglevel: int = logging.INFO,
+    intercept_disnake_log: bool = True,
+    disnake_loglevel: int = logging.INFO,
 ):
     logger.info(f"Environment is set to '{os.environ['ENVIRONMENT']}'.")
     logger.info(f"Jukebot log messages with level {jukebot_loglevel}.")
 
-    if intercept_nextcord_log:
-        logger.info(
-            f"Intercepting nextcord log messages with level {nextcord_loglevel}."
-        )
-        logging.basicConfig(handlers=[InterceptHandler()], level=nextcord_loglevel)
+    if intercept_disnake_log:
+        logger.info(f"Intercepting disnake log messages with level {disnake_loglevel}.")
+        logging.basicConfig(handlers=[InterceptHandler()], level=disnake_loglevel)
 
     if os.environ["ENVIRONMENT"] == Environment.DEVELOPMENT:
         pass

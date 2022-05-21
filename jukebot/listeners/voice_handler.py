@@ -1,8 +1,15 @@
-from nextcord import Member, VoiceState, VoiceChannel
-from nextcord.ext import commands
-from nextcord.ext.commands import Bot
+from __future__ import annotations
 
-from jukebot.components import Player
+from typing import TYPE_CHECKING
+
+from disnake import Member, VoiceChannel, VoiceState
+from disnake.ext import commands
+from disnake.ext.commands import Bot
+
+from jukebot.services.music import PauseService, ResumeService
+
+if TYPE_CHECKING:
+    from jukebot.components import Player
 
 
 class VoiceHandler(commands.Cog):
@@ -32,18 +39,16 @@ class VoiceHandler(commands.Cog):
         if self.bot.user in channel.members:
             player: Player = self.bot.players[channel.guild.id]
             if player.is_paused:
-                ctx = player.context
-                music_cog = self.bot.get_cog("Music")
-                await ctx.invoke(music_cog.resume, silent=True)
+                with ResumeService(self.bot) as rs:
+                    await rs(interaction=player.interaction, silent=True)
 
     @commands.Cog.listener()
     async def on_voice_channel_alone(self, member: Member, channel: VoiceChannel):
         if channel.members[0].id == self.bot.user.id:
             player: Player = self.bot.players[channel.guild.id]
             if player.is_playing:
-                ctx = player.context
-                music_cog = self.bot.get_cog("Music")
-                await ctx.invoke(music_cog.pause, silent=True)
+                with PauseService(self.bot) as rs:
+                    await rs(interaction=player.interaction, silent=True)
 
 
 def setup(bot):

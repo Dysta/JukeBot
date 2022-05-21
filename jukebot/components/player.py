@@ -1,18 +1,23 @@
+from __future__ import annotations
+
 import asyncio
 import os
-
 from asyncio import Task
 from enum import IntEnum
 from typing import Optional
 
+from disnake import CommandInteraction, VoiceChannel, VoiceClient
+from disnake.ext.commands import Bot
 from loguru import logger
-from nextcord import VoiceChannel, VoiceClient
-from nextcord.ext.commands import Bot, Context
 
+from jukebot.services.music import LeaveService, PlayService
+from jukebot.utils import coro
+
+from ..services.queue import AddService
+from .audio_stream import AudioStream
 from .query import Query
 from .resultset import ResultSet
 from .song import Song
-from .audio_stream import AudioStream
 
 
 class Player:
@@ -70,7 +75,7 @@ class Player:
 
         self._voice: Optional[VoiceClient] = None
         self._stream: Optional[AudioStream] = None
-        self._context: Optional[Context] = None
+        self._inter: Optional[CommandInteraction] = None
         self._song: Optional[Song] = None
         self._queue: ResultSet = ResultSet.empty()
         self._state: Player.State = Player.State.IDLE
@@ -78,7 +83,7 @@ class Player:
         self._loop: Player.Loop = Player.Loop.DISABLED
 
     async def join(self, channel: VoiceChannel):
-        self._voice = await channel.connect(timeout=3.0)
+        self._voice = await channel.connect(timeout=2.0)
 
     async def play(self, song: Song, replay: bool = False):
         if replay:
@@ -91,9 +96,6 @@ class Player:
             song.requester = author
 
         stream = AudioStream(song.stream_url)
-        logger.opt(lazy=True).info(
-            f"Player create an ffmpeg process ({song.duration}s) for song '{song.title}' at {song.web_url} ({song.stream_url})"
-        )
         stream.read()
 
         if self._voice and self._voice.is_playing():
@@ -129,35 +131,37 @@ class Player:
             self.state = Player.State.PLAYING
             self._voice.resume()
 
-    async def _after(self, error):
+    def _after(self, error):
         if error:
             logger.opt(lazy=True).error(error)
             return
         if self.state.is_leaving:
             return
         if self._loop.is_song_loop and not self.state.is_skipping:
-            await self.play(self.song, replay=True)
+            func = self.play(self.song, replay=True)
+            coro.run_threadsafe(func, loop=self.bot.loop)
             return
         if self._loop.is_queue_loop:
-            queue_cog = self.bot.get_cog("Queue")
-            func = self.context.invoke(
-                queue_cog.add, query=self.song.web_url, silent=True
-            )
-            asyncio.ensure_future(func)
+            with AddService(self.bot) as ad:
+                func = ad(
+                    interaction=self.interaction, query=self.song.web_url, silent=True
+                )
+            asyncio.ensure_future(func, loop=self.bot.loop)
 
         self._stream = None
         self._song = None
 
         if not self._queue.is_empty():
-            music_cog = self.bot.get_cog("Music")
-            await self.context.invoke(music_cog.play, query="")
+            with PlayService(self.bot) as ps:
+                func = ps(interaction=self.interaction, query="")
+            coro.run_threadsafe(func, self.bot.loop)
         else:
             self.state = Player.State.IDLE
 
     def _idle_callback(self) -> None:
         if not self._idle_task.cancelled():
-            music_cog = self.bot.get_cog("Music")
-            func = self.context.invoke(music_cog.leave)
+            with LeaveService(self.bot) as ls:
+                func = ls(interaction=self.interaction)
             asyncio.ensure_future(func, loop=self.bot.loop)
 
     def _set_idle_task(self) -> None:
@@ -207,12 +211,12 @@ class Player:
         self._queue = q
 
     @property
-    def context(self) -> Optional[Context]:
-        return self._context
+    def interaction(self) -> Optional[CommandInteraction]:
+        return self._inter
 
-    @context.setter
-    def context(self, c: Context) -> None:
-        self._context = c
+    @interaction.setter
+    def interaction(self, c: CommandInteraction) -> None:
+        self._inter = c
 
     @property
     def state(self) -> State:

@@ -1,9 +1,10 @@
-import asyncio
-import yt_dlp
+from __future__ import annotations
 
+import asyncio
 from enum import Enum
 from typing import Optional, Union
 
+import yt_dlp
 from loguru import logger
 
 # Silence useless bug reports messages

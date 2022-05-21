@@ -1,7 +1,7 @@
 import os
 
+from disnake.ext import commands
 from loguru import logger
-from nextcord.ext import commands
 
 
 async def _prefix_for(client, message):
