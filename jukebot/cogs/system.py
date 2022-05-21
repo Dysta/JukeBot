@@ -1,13 +1,16 @@
 from __future__ import annotations
 
+import os
 from datetime import datetime
 from typing import Optional
 
+from disnake import CommandInteraction
 from disnake.ext import commands
-from disnake.ext.commands import Context
 from loguru import logger
 
 from jukebot.utils import Extensions, converter, embed
+
+ADMIN_GUILD_IDS = list(map(int, os.environ["BOT_ADMIN_GUILD_IDS"].split(",")))
 
 
 class System(commands.Cog):
@@ -32,54 +35,45 @@ class System(commands.Cog):
         self.bot.reload_extension(name=f"{e['package']}.{e['name']}")
         logger.opt(lazy=True).success(f"Extension {e['package']}.{e['name']} reloaded.")
 
-    @commands.command(
-        aliases=["rld"],
-        brief="Reload a cog or all cogs",
-        help="Reload the given cog. If no cog is given, reload all cogs.",
-        usage="reload [cogs_name]",
-        hidden=True,
+    @commands.slash_command(
+        description="Reload the given cog. If no cog is given, reload all cogs.",
+        guild_ids=ADMIN_GUILD_IDS,
     )
-    @commands.guild_only()
     @commands.is_owner()
-    async def reload(self, ctx, cog_name: Optional[str] = None):
+    async def reload(self, inter: CommandInteraction, cog_name: Optional[str] = None):
         try:
             if not cog_name:
                 self._reload_all_cogs()
             else:
                 self._reload_cog(cog_name)
-        except Exception:
-            await ctx.message.add_reaction("❌")
-            raise
-        await ctx.message.add_reaction("✅")
+        except Exception as e:
+            await inter.send(f"❌ | {e}", ephemeral=True)
+            return
 
-    @commands.command(
-        aliases=["rfsh"],
-        brief="Reset all cached property.",
-        help="Reset all cached property of the bot.",
-        hidden=True,
+        await inter.send("✅ | reloaded", ephemeral=True)
+
+    @commands.slash_command(
+        description="Reset all cached property of the bot.", guild_ids=ADMIN_GUILD_IDS
     )
-    @commands.guild_only()
     @commands.is_owner()
-    async def refresh(self, ctx: Context):
+    async def refresh(self, inter: CommandInteraction):
         try:
             del self.bot.members_count
             logger.opt(lazy=True).success("Members count reset.")
             del self.bot.guilds_count
             logger.opt(lazy=True).success("Guilds count reset.")
-        except Exception:
-            await ctx.message.add_reaction("❌")
-            raise
-        await ctx.message.add_reaction("✅")
+        except Exception as e:
+            await inter.send(f"❌ | {e}", ephemeral=True)
+            return
 
-    @commands.command(
-        brief="Share stats about the bot.",
-        help="Share stats about the bot.",
-        hidden=True,
+        await inter.send("✅ | refresh", ephemeral=True)
+
+    @commands.slash_command(
+        description="Share stats about the bot.", guild_ids=ADMIN_GUILD_IDS
     )
-    @commands.guild_only()
     @commands.is_owner()
-    async def stats(self, ctx: Context):
-        e = embed.info_message(ctx.author, title=f"Stats about {self.bot.user.name}")
+    async def stats(self, inter: CommandInteraction):
+        e = embed.info_message(inter.author, title=f"Stats about {self.bot.user.name}")
         e.add_field(name="📡 Ping", value=f"┕`{self.bot.latency * 1000:.2f}ms`")
         uptime = datetime.now() - self.bot.start_time
         days, hours, minutes, seconds = converter.seconds_to_time(
@@ -106,7 +100,7 @@ class System(commands.Cog):
         )
         e.add_field(name=embed.VOID_TOKEN, value=embed.VOID_TOKEN)
 
-        await ctx.reply(embed=e, mention_author=False)
+        await inter.send(embed=e, ephemeral=True)
 
 
 def setup(bot):
