@@ -105,4 +105,3 @@ class Utility(commands.Cog):
 
 def setup(bot):
     bot.add_cog(Utility(bot))
-    bot.help_command.cog = bot.get_cog("Utility")

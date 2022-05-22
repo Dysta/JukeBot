@@ -15,21 +15,10 @@ services:
       - .env
     environment:
       LOGS_PATH: "/data/logs"
-    depends_on:
-      - mongo
     volumes:
       - jukelogs:/data/logs
 
-  mongo:
-    image: mongo
-    restart: always
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: admin
-    volumes:
-      - jukedbdata:/data/db
 
 volumes:
-  jukedbdata:
   jukelogs:
 

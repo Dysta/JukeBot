@@ -23,33 +23,6 @@ Rename `.env.example` to `.env` and fill in the values.
 Run `poetry run task start`.
 
 ## ⁉ Other
-The bot use a MongoDB database for its custom prefix system, you can have one quickly by registering on [Atlas MongoDB](https://www.mongodb.com/atlas). \
-If you want to disable custom prefix system to do a quick setup, go to `jukebot/__main__.py` and replace
-```py
-bot = JukeBot(
-    command_prefix=prefix.get_prefix,
-    help_command=HelpHandler(),
-    activity=Activity(
-        name=f"{os.environ['BOT_PREFIX']}help", type=ActivityType.listening
-    ),
-    intents=intents.get(),
-    owner_ids=get_ids(),
-)
-```
-with
-```py
-bot = JukeBot(
-    command_prefix=commands.when_mentioned_or(os.environ['BOT_PREFIX']),
-    help_command=HelpHandler(),
-    activity=Activity(
-        name=f"{os.environ['BOT_PREFIX']}help", type=ActivityType.listening
-    ),
-    intents=intents.get(),
-    owner_ids=get_ids(),
-)
-```
-
-
 The bot needs `ffmpeg` to work.
 ### Install on Windows
 Use the package manager [Chocolatey](https://community.chocolatey.org/) and run in an admin shell `choco install ffmpeg`.
@@ -61,9 +34,6 @@ ___
 
 ## 🌐 Deployment
 Rename `.env.example` to `.env` and fill in the values. \
-Edit `MONGO_INITDB_ROOT_USERNAME` and `MONGO_INITDB_ROOT_PASSWORD` in the `docker-compose.yml` file to choose your own mongodb user and pass. \
-Go to your `.env` file and set the `MONGO_DB_URI` key to `mongodb://<user>:<pass>@mongo/` and replace `<user>`/`<pass>` with the same value as the previous key.
-
 Run `docker-compose up -d`.
 
 ___

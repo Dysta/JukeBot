@@ -11,8 +11,7 @@ from dotenv import load_dotenv
 from loguru import logger
 
 from jukebot import JukeBot
-from jukebot.listeners import HelpHandler
-from jukebot.utils import Extensions, intents, logging, prefix
+from jukebot.utils import Extensions, intents, logging
 
 
 def get_ids() -> Set[int]:
@@ -36,11 +35,7 @@ def main():
     )
 
     bot = JukeBot(
-        command_prefix=prefix.get_prefix,
-        help_command=HelpHandler(),
-        activity=Activity(
-            name=f"{os.environ['BOT_PREFIX']}help", type=ActivityType.listening
-        ),
+        activity=Activity(name=f"some good vibes 🎶", type=ActivityType.listening),
         intents=intents.get(),
         owner_ids=get_ids(),
         test_guilds=get_test_guild_ids(),

@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from disnake import CommandInteraction, Embed
+from disnake import CommandInteraction
 from disnake.ext import commands
-from disnake.ext.commands import CommandError, Context
+from disnake.ext.commands import CommandError
 from loguru import logger
 
 from jukebot import exceptions
@@ -14,37 +14,9 @@ class ErrorHandler(commands.Cog):
         self._bot = bot
 
     @commands.Cog.listener()
-    async def on_command_error(self, ctx: Context, error: CommandError):
-        logger.opt(lazy=True).error(error)
-        if isinstance(error, commands.CommandNotFound):
-            e: Embed = embed.info_message(
-                ctx.author,
-                content="`JukeBot` has migrated its commands to slash commands, the new prefix is `/`.\n"
-                "If the commands don't appear, **kick and re-invite** JukeBot in your server using this link: "
-                "https://dsc.gg/jukebot",
-            )
-            await ctx.reply(embed=e)
-            return
-
-        if isinstance(error, exceptions.QueryException):
-            logger.opt(lazy=True).warning(
-                f"Query Exception [{error.__class__.__name__}] '{error.query}' ({error.full_query}) for guild '{ctx.guild.name} (ID: {ctx.guild.id})'."
-            )
-            e = embed.music_not_found_message(
-                ctx.author,
-                title=error,
-            )
-            await ctx.send(embed=e, delete_after=5.0)
-            return
-
-        e = embed.error_message(ctx.author, content=error)
-        await ctx.send(embed=e)
-
-    @commands.Cog.listener()
     async def on_slash_command_error(
         self, inter: CommandInteraction, error: CommandError
     ):
-        logger.opt(lazy=True).error(error)
         if isinstance(error, commands.CommandNotFound):
             return
 
