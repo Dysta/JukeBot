@@ -101,7 +101,7 @@ class PlayService(AbstractService):
             return False
 
         logger.opt(lazy=True).success(
-            f"Server {interaction.guild.name} ({interaction.guild.id}) can play in its player.\n"
+            f"Server {interaction.guild.name} ({interaction.guild.id}) can play in its player."
         )
         e: Embed = embed.music_message(author, song)
         await interaction.edit_original_message(embed=e)

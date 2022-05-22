@@ -35,9 +35,7 @@ def main():
     )
 
     bot = JukeBot(
-        activity=Activity(
-            name=f"{os.environ['BOT_PREFIX']}help", type=ActivityType.listening
-        ),
+        activity=Activity(name=f"some good vibes 🎶", type=ActivityType.listening),
         intents=intents.get(),
         owner_ids=get_ids(),
         test_guilds=get_test_guild_ids(),

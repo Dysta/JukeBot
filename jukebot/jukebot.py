@@ -3,15 +3,13 @@ from __future__ import annotations
 import traceback
 from datetime import datetime
 from functools import cached_property
-from typing import List, TypeVar
+from typing import List
 
 from disnake.ext import commands
 from loguru import logger
 
 from jukebot.abstract_components import AbstractMap
 from jukebot.components import Player
-
-CXT = TypeVar("CXT", bound="Context")
 
 
 class JukeBot(commands.InteractionBot):
