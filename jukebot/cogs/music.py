@@ -7,7 +7,6 @@ from disnake import CommandInteraction, Embed
 from disnake.ext import commands
 from disnake.ext.commands import Bot, BucketType
 
-from jukebot.checks import voice
 from jukebot.components import ShazamQuery
 from jukebot.exceptions import QueryFailed
 from jukebot.services.music import (
@@ -22,7 +21,7 @@ from jukebot.services.music import (
     SkipService,
     StopService,
 )
-from jukebot.utils import aioweb, embed, regex
+from jukebot.utils import aioweb, checks, embed, regex
 
 
 class Music(commands.Cog):
@@ -31,7 +30,7 @@ class Music(commands.Cog):
 
     @commands.slash_command()
     @commands.cooldown(1, 5.0, BucketType.user)
-    @commands.check(voice.user_is_connected)
+    @commands.check(checks.user_is_connected)
     async def play(
         self, inter: CommandInteraction, query: str, top: Optional[bool] = False
     ):
@@ -54,9 +53,9 @@ class Music(commands.Cog):
         description="Disconnect the bot from the current connected voice channel.",
     )
     @commands.cooldown(1, 5.0, BucketType.user)
-    @commands.check(voice.bot_and_user_in_same_channel)
-    @commands.check(voice.bot_is_connected)
-    @commands.check(voice.user_is_connected)
+    @commands.check(checks.bot_and_user_in_same_channel)
+    @commands.check(checks.bot_is_connected)
+    @commands.check(checks.user_is_connected)
     async def leave(self, inter: CommandInteraction):
         with LeaveService(self.bot) as ls:
             await ls(interaction=inter)
@@ -65,10 +64,10 @@ class Music(commands.Cog):
         description="Stop the current music from the bot without disconnect him.",
     )
     @commands.cooldown(1, 5.0, BucketType.user)
-    @commands.check(voice.bot_is_playing)
-    @commands.check(voice.bot_and_user_in_same_channel)
-    @commands.check(voice.bot_is_connected)
-    @commands.check(voice.user_is_connected)
+    @commands.check(checks.bot_is_playing)
+    @commands.check(checks.bot_and_user_in_same_channel)
+    @commands.check(checks.bot_is_connected)
+    @commands.check(checks.user_is_connected)
     async def stop(self, inter: CommandInteraction):
         with StopService(self.bot) as ss:
             await ss(interaction=inter)
@@ -77,10 +76,10 @@ class Music(commands.Cog):
         description="Pause the current music from the bot without stop it.",
     )
     @commands.cooldown(1, 5.0, BucketType.user)
-    @commands.check(voice.bot_is_playing)
-    @commands.check(voice.bot_and_user_in_same_channel)
-    @commands.check(voice.bot_is_connected)
-    @commands.check(voice.user_is_connected)
+    @commands.check(checks.bot_is_playing)
+    @commands.check(checks.bot_and_user_in_same_channel)
+    @commands.check(checks.bot_is_connected)
+    @commands.check(checks.user_is_connected)
     async def pause(self, inter: CommandInteraction):
         with PauseService(self.bot) as ps:
             await ps(interaction=inter)
@@ -89,10 +88,10 @@ class Music(commands.Cog):
         description="Resume the current music",
     )
     @commands.cooldown(1, 5.0, BucketType.user)
-    @commands.check(voice.bot_is_not_playing)
-    @commands.check(voice.bot_and_user_in_same_channel)
-    @commands.check(voice.bot_is_connected)
-    @commands.check(voice.user_is_connected)
+    @commands.check(checks.bot_is_not_playing)
+    @commands.check(checks.bot_and_user_in_same_channel)
+    @commands.check(checks.bot_is_connected)
+    @commands.check(checks.user_is_connected)
     async def resume(self, inter: CommandInteraction):
         with ResumeService(self.bot) as rs:
             await rs(interaction=inter)
@@ -101,9 +100,9 @@ class Music(commands.Cog):
         description="Display the current music and the progression from the bot.",
     )
     @commands.cooldown(1, 5.0, BucketType.user)
-    @commands.check(voice.bot_and_user_in_same_channel)
-    @commands.check(voice.bot_is_connected)
-    @commands.check(voice.user_is_connected)
+    @commands.check(checks.bot_and_user_in_same_channel)
+    @commands.check(checks.bot_is_connected)
+    @commands.check(checks.user_is_connected)
     async def current(self, inter: CommandInteraction):
         with CurrentSongService(self.bot) as css:
             await css(inter)
@@ -112,8 +111,8 @@ class Music(commands.Cog):
         description="Connect the bot to your current voice channel",
     )
     @commands.cooldown(1, 5.0, BucketType.user)
-    @commands.check(voice.user_is_connected)
-    @commands.check(voice.bot_is_not_connected)
+    @commands.check(checks.user_is_connected)
+    @commands.check(checks.bot_is_not_connected)
     async def join(self, inter: CommandInteraction):
         with JoinService(self.bot) as js:
             await js(interaction=inter)
@@ -122,10 +121,10 @@ class Music(commands.Cog):
         description="Skip the current song.",
     )
     @commands.cooldown(3, 10.0, BucketType.user)
-    @commands.check(voice.bot_is_streaming)
-    @commands.check(voice.bot_and_user_in_same_channel)
-    @commands.check(voice.bot_is_connected)
-    @commands.check(voice.user_is_connected)
+    @commands.check(checks.bot_is_streaming)
+    @commands.check(checks.bot_and_user_in_same_channel)
+    @commands.check(checks.bot_is_connected)
+    @commands.check(checks.user_is_connected)
     async def skip(self, inter: CommandInteraction):
         with SkipService(self.bot) as ss:
             await ss(interaction=inter)
@@ -133,10 +132,10 @@ class Music(commands.Cog):
     @commands.slash_command(
         description="Send the current song in your DM to save it.",
     )
-    @commands.check(voice.bot_is_playing)
-    @commands.check(voice.bot_and_user_in_same_channel)
-    @commands.check(voice.bot_is_connected)
-    @commands.check(voice.user_is_connected)
+    @commands.check(checks.bot_is_playing)
+    @commands.check(checks.bot_and_user_in_same_channel)
+    @commands.check(checks.bot_is_connected)
+    @commands.check(checks.user_is_connected)
     @commands.cooldown(1, 10.0, BucketType.user)
     async def grab(self, inter: CommandInteraction):
         with GrabService(self.bot) as gs:
@@ -144,9 +143,9 @@ class Music(commands.Cog):
 
     @commands.slash_command()
     @commands.cooldown(1, 5.0, BucketType.user)
-    @commands.check(voice.user_is_connected)
-    @commands.check(voice.bot_is_connected)
-    @commands.check(voice.bot_and_user_in_same_channel)
+    @commands.check(checks.bot_and_user_in_same_channel)
+    @commands.check(checks.bot_is_connected)
+    @commands.check(checks.user_is_connected)
     async def loop(
         self,
         inter: CommandInteraction,

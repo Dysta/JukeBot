@@ -7,8 +7,8 @@ from disnake.ext import commands
 from disnake.ext.commands import Bot, BucketType
 from loguru import logger
 
-from jukebot.checks import voice
 from jukebot.services.music import PlayService
+from jukebot.utils import checks
 
 
 class Radio(commands.Cog):
@@ -23,7 +23,7 @@ class Radio(commands.Cog):
 
     @commands.slash_command(description="Launch a random radio")
     @commands.cooldown(1, 5.0, BucketType.user)
-    @commands.check(voice.user_is_connected)
+    @commands.check(checks.user_is_connected)
     async def radio(self, inter: CommandInteraction):
         ...
 
