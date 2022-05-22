@@ -17,7 +17,7 @@ from jukebot.components import Player
 CXT = TypeVar("CXT", bound="Context")
 
 
-class JukeBot(commands.Bot):
+class JukeBot(commands.InteractionBot):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._start = datetime.now()

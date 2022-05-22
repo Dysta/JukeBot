@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 from loguru import logger
 
 from jukebot import JukeBot
-from jukebot.listeners import HelpHandler
+from jukebot.utils import Extensions, intents, logging
 from jukebot.utils import Extensions, intents, logging, prefix
 
 
@@ -37,7 +37,6 @@ def main():
 
     bot = JukeBot(
         command_prefix=prefix.get_prefix,
-        help_command=HelpHandler(),
         activity=Activity(
             name=f"{os.environ['BOT_PREFIX']}help", type=ActivityType.listening
         ),

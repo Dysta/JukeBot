@@ -7,5 +7,4 @@ def get() -> Intents:
     intents.guilds = True
     intents.voice_states = True
     intents.members = True
-    intents.message_content = True
     return intents
