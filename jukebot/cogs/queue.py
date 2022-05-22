@@ -6,14 +6,13 @@ from disnake import CommandInteraction, Embed
 from disnake.ext import commands
 from disnake.ext.commands import Bot, BucketType
 
-from jukebot.checks import user, voice
 from jukebot.services.queue import (
     AddService,
     ClearService,
     RemoveService,
     ShuffleService,
 )
-from jukebot.utils import embed
+from jukebot.utils import checks, embed
 
 if TYPE_CHECKING:
     from jukebot.components import ResultSet
@@ -31,8 +30,8 @@ class Queue(commands.Cog):
         description="Show the queue of the server",
     )
     @commands.cooldown(1, 3.0, BucketType.user)
-    @commands.check(voice.bot_is_connected)
-    @commands.check(voice.user_is_connected)
+    @commands.check(checks.bot_is_connected)
+    @commands.check(checks.user_is_connected)
     async def show(self, inter: CommandInteraction):
         queue: ResultSet = self.bot.players[inter.guild.id].queue
         e: Embed = embed.queue_message(
@@ -42,9 +41,9 @@ class Queue(commands.Cog):
 
     @queue.sub_command()
     @commands.cooldown(1, 5.0, BucketType.user)
-    @commands.check(voice.bot_and_user_in_same_channel)
-    @commands.check(voice.bot_is_connected)
-    @commands.check(voice.user_is_connected)
+    @commands.check(checks.bot_and_user_in_same_channel)
+    @commands.check(checks.bot_is_connected)
+    @commands.check(checks.user_is_connected)
     async def add(
         self,
         inter: CommandInteraction,
@@ -68,10 +67,10 @@ class Queue(commands.Cog):
 
     @queue.sub_command()
     @commands.cooldown(1, 5.0, BucketType.user)
-    @commands.check(user.bot_queue_is_not_empty)
-    @commands.check(voice.bot_and_user_in_same_channel)
-    @commands.check(voice.bot_is_connected)
-    @commands.check(voice.user_is_connected)
+    @commands.check(checks.bot_queue_is_not_empty)
+    @commands.check(checks.bot_and_user_in_same_channel)
+    @commands.check(checks.bot_is_connected)
+    @commands.check(checks.user_is_connected)
     async def remove(self, inter: CommandInteraction, song: str):
         """
         Remove a song from the queue
@@ -97,10 +96,10 @@ class Queue(commands.Cog):
         description="Remove all the songs of the queue",
     )
     @commands.cooldown(1, 5.0, BucketType.user)
-    @commands.check(user.bot_queue_is_not_empty)
-    @commands.check(voice.bot_and_user_in_same_channel)
-    @commands.check(voice.bot_is_connected)
-    @commands.check(voice.user_is_connected)
+    @commands.check(checks.bot_queue_is_not_empty)
+    @commands.check(checks.bot_and_user_in_same_channel)
+    @commands.check(checks.bot_is_connected)
+    @commands.check(checks.user_is_connected)
     async def clear(self, inter: CommandInteraction):
         with ClearService(self.bot) as cs:
             await cs(interaction=inter)
@@ -108,10 +107,10 @@ class Queue(commands.Cog):
     @queue.sub_command(
         description="Shuffle the current queue.",
     )
-    @commands.check(user.bot_queue_is_not_empty)
-    @commands.check(voice.bot_and_user_in_same_channel)
-    @commands.check(voice.bot_is_connected)
-    @commands.check(voice.user_is_connected)
+    @commands.check(checks.bot_queue_is_not_empty)
+    @commands.check(checks.bot_and_user_in_same_channel)
+    @commands.check(checks.bot_is_connected)
+    @commands.check(checks.user_is_connected)
     @commands.cooldown(1, 10.0, BucketType.guild)
     async def shuffle(self, inter: CommandInteraction):
         with ShuffleService(self.bot) as ss:

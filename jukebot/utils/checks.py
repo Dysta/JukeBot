@@ -1,12 +1,28 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 from disnake import CommandInteraction, VoiceClient
 from disnake.ext.commands import CheckFailure
 
 if TYPE_CHECKING:
     from jukebot.components import Player
+
+
+def _get_player(inter: CommandInteraction) -> Optional[Player]:
+    """
+    Avoid creating a player if the player does't exist
+    Parameters
+    ----------
+    inter: The interaction
+
+    Returns
+    -------
+    Player if it exist, None otherwise
+    """
+    if not inter.guild.id in inter.bot.players:
+        return None
+    return inter.bot.players[inter.guild.id]
 
 
 def user_is_connected(inter: CommandInteraction):
@@ -41,28 +57,35 @@ def bot_and_user_in_same_channel(inter: CommandInteraction):
 
 
 def bot_is_playing(inter: CommandInteraction):
-    player: Player = inter.bot.players[inter.guild.id]
-    if not player.is_playing:
+    player: Player = _get_player(inter)
+    if not player or not player.is_playing:
         raise CheckFailure("The bot is not currently playing.")
     return True
 
 
 def bot_is_not_playing(inter: CommandInteraction):
-    player: Player = inter.bot.players[inter.guild.id]
-    if player.is_playing:
+    player: Player = _get_player(inter)
+    if not player or player.is_playing:
         raise CheckFailure("The bot is already playing.")
     return True
 
 
 def bot_is_streaming(inter: CommandInteraction):
-    player: Player = inter.bot.players[inter.guild.id]
-    if not player.is_streaming:
+    player: Player = _get_player(inter)
+    if not player or not player.is_streaming:
         raise CheckFailure("The bot is not currently playing.")
     return True
 
 
 def bot_not_playing_live(inter: CommandInteraction):
-    player: Player = inter.bot.players[inter.guild.id]
-    if player.is_playing and player.song.live:
+    player: Player = _get_player(inter)
+    if not player or (player.is_playing and player.song.live):
         raise CheckFailure("The bot is playing a live audio.")
+    return True
+
+
+def bot_queue_is_not_empty(inter: CommandInteraction):
+    player: Player = _get_player(inter)
+    if not player or player.queue.is_empty():
+        raise CheckFailure("The queue is empty.")
     return True

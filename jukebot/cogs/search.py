@@ -9,10 +9,9 @@ from disnake.ext.commands import Bot, BucketType
 from loguru import logger
 
 from jukebot import components
-from jukebot.checks import voice
 from jukebot.exceptions import QueryCanceled, QueryFailed
 from jukebot.services.music import PlayService
-from jukebot.utils import embed
+from jukebot.utils import checks, embed
 from jukebot.views import SearchDropdownView, SearchInteraction
 
 if TYPE_CHECKING:
@@ -26,7 +25,7 @@ class Search(commands.Cog):
     @commands.slash_command()
     @commands.max_concurrency(1, BucketType.user)
     @commands.cooldown(1, 5.0, BucketType.user)
-    @commands.check(voice.user_is_connected)
+    @commands.check(checks.user_is_connected)
     async def search(
         self,
         inter: CommandInteraction,

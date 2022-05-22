@@ -7,9 +7,8 @@ from disnake import CommandInteraction, InviteTarget, Member
 from disnake.ext import commands
 from disnake.ext.commands import Bot, BucketType
 
-from jukebot.checks import voice
 from jukebot.services import ResetService
-from jukebot.utils import applications, converter, embed
+from jukebot.utils import applications, checks, converter, embed
 from jukebot.views import ActivityView, PromoteView
 
 
@@ -55,7 +54,6 @@ class Utility(commands.Cog):
         await inter.send(embed=e, ephemeral=True)
 
     @commands.slash_command(
-        name="avatar",
         description="Display a user avatar in a embed message. If no user, it will show the command invoker avatar.",
     )
     @commands.cooldown(1, 5.0, BucketType.user)
@@ -75,7 +73,7 @@ class Utility(commands.Cog):
     )
     @commands.cooldown(1, 15.0, BucketType.guild)
     @commands.max_concurrency(1, BucketType.guild)
-    @commands.check(voice.user_is_connected)
+    @commands.check(checks.user_is_connected)
     async def watch(self, inter: CommandInteraction):
         max_time = 180
         invite = await inter.author.voice.channel.create_invite(
