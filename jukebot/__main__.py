@@ -31,7 +31,7 @@ def main():
     logging.set_logging(
         plogging.INFO,
         intercept_disnake_log=True,
-        disnake_loglevel=plogging.DEBUG,
+        disnake_loglevel=plogging.WARNING,
     )
 
     bot = JukeBot(
