@@ -12,7 +12,6 @@ from loguru import logger
 
 from jukebot import JukeBot
 from jukebot.utils import Extensions, intents, logging
-from jukebot.utils import Extensions, intents, logging, prefix
 
 
 def get_ids() -> Set[int]:
@@ -36,7 +35,6 @@ def main():
     )
 
     bot = JukeBot(
-        command_prefix=prefix.get_prefix,
         activity=Activity(
             name=f"{os.environ['BOT_PREFIX']}help", type=ActivityType.listening
         ),
