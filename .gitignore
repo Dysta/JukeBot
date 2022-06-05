@@ -6,6 +6,8 @@
 
 **/.idea
 
+**/.vscode
+
 **/logs/*
 
 **/data/*

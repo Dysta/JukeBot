@@ -18,9 +18,7 @@ VOID_TOKEN = "\u200B"
 
 def _base_embed(author: Member, content="", color=0x38383D):
     embed: disnake.Embed = disnake.Embed(title="", description=content, color=color)
-    embed.set_footer(
-        text=f"Requested by {author}", icon_url=f"{author.display_avatar.url}"
-    )
+    embed.set_footer(text=f"Requested by {author}", icon_url=f"{author.display_avatar.url}")
     return embed
 
 
@@ -73,17 +71,11 @@ def music_message(author: Member, song: Song, current_duration: int = 0):
         url=song.web_url,
         icon_url="https://icons.iconarchive.com/icons/papirus-team/papirus-apps/512/musicbrainz-icon.png",
     )
-    embed.add_field(
-        name="Channel", value=song.channel, inline=bool(len(song.title) >= 40)
-    )
+    embed.add_field(name="Channel", value=song.channel, inline=bool(len(song.title) >= 40))
     if current_duration:
-        line = converter.duration_seconds_to_progress_bar(
-            current_duration, song.duration
-        )
+        line = converter.duration_seconds_to_progress_bar(current_duration, song.duration)
         fmt_current: str = converter.seconds_to_youtube_format(current_duration)
-        embed.add_field(
-            name="Progression", value=f"`{fmt_current} {line} {song.fmt_duration}`"
-        )
+        embed.add_field(name="Progression", value=f"`{fmt_current} {line} {song.fmt_duration}`")
     else:
         embed.add_field(name="Duration", value=song.fmt_duration)
     if song.thumbnail:
@@ -109,30 +101,26 @@ def music_not_found_message(author: Member, title="", content=""):
     return embed
 
 
-def music_found_message(author: Member, music: YoutubeData, title=""):
+def music_found_message(author: Member, music: dict, title=""):
     embed: disnake.Embed = _base_embed(
-        author=author, content=f"[{music.caption}]({music.uri})", color=0x54B23F
+        author=author, content=f"[{music['title']}]({music['url']})", color=0x54B23F
     )
     embed.set_author(
         name="Music found!" if title == "" else title,
         icon_url="https://cdn.discordapp.com/attachments/573225654452092930/952197615221612594/d-feet-icon.png",
     )
-    embed.set_thumbnail(url=music.image.url)
+    embed.set_thumbnail(url=music["image_url"])
     return embed
 
 
-def search_result_message(
-    author: Member, playlist: Union[ResultSet, SongSet], title=""
-):
+def search_result_message(author: Member, playlist: Union[ResultSet, SongSet], title=""):
     content = "\n\n".join(
         [
             f"{converter.number_to_emoji(i)} `{s.title} by {s.channel}` **[{s.fmt_duration}]**"
             for i, s in enumerate(playlist, start=1)
         ]
     )
-    embed: disnake.Embed = music_search_message(
-        author=author, title=title, content=content
-    )
+    embed: disnake.Embed = music_search_message(author=author, title=title, content=content)
     embed.add_field(
         name=VOID_TOKEN,
         value="Use the selector below to choose a result.",
@@ -159,9 +147,7 @@ def queue_message(author: Member, playlist: Union[ResultSet, SongSet], title="")
             for i, s in enumerate(playlist_slice, start=1)
         ]
     )
-    embed: disnake.Embed = basic_queue_message(
-        author=author, title=title, content=content
-    )
+    embed: disnake.Embed = basic_queue_message(author=author, title=title, content=content)
     embed.add_field(name="Total songs", value=f"`{len(playlist)}`")
     total_time: int = sum([e.duration for e in playlist if not e.live])
     total_time_fmt: str = converter.seconds_to_youtube_format(total_time)
