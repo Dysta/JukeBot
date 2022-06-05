@@ -57,7 +57,12 @@ class ShazamQuery:
             return
 
         youtube_data = await shazam.get_youtube_data(link=result.track.youtube_link)
-        self._info = Serialize.youtube(youtube_data)
+        data: dict = {
+            "title": youtube_data["caption"],
+            "url": youtube_data["actions"][0]["uri"],
+            "image_url": youtube_data["image"]["url"],
+        }
+        self._info = data
         self._success = True
         logger.opt(lazy=True).debug(f"Query {self._query} saved at {self._path}")
         logger.opt(lazy=True).debug(f"Query data {self._info}")
