@@ -10,7 +10,11 @@ from loguru import logger
 
 from jukebot.utils import Extensions, converter, embed
 
-ADMIN_GUILD_IDS = list(map(int, os.environ["BOT_ADMIN_GUILD_IDS"].split(",")))
+ADMIN_GUILD_IDS = (
+    list(map(int, os.environ["BOT_ADMIN_GUILD_IDS"].split(",")))
+    if "BOT_ADMIN_GUILD_IDS" in os.environ
+    else []
+)
 
 
 class System(commands.Cog):
@@ -21,9 +25,7 @@ class System(commands.Cog):
         logger.opt(lazy=True).info("Reloading all extensions.")
         for e in Extensions.all():
             self.bot.reload_extension(name=f"{e['package']}.{e['name']}")
-            logger.opt(lazy=True).success(
-                f"Extension {e['package']}.{e['name']} reloaded."
-            )
+            logger.opt(lazy=True).success(f"Extension {e['package']}.{e['name']} reloaded.")
         logger.opt(lazy=True).info("All extensions have been successfully reloaded.")
 
     def _reload_cog(self, name):
@@ -68,17 +70,13 @@ class System(commands.Cog):
 
         await inter.send("✅ | refresh", ephemeral=True)
 
-    @commands.slash_command(
-        description="Share stats about the bot.", guild_ids=ADMIN_GUILD_IDS
-    )
+    @commands.slash_command(description="Share stats about the bot.", guild_ids=ADMIN_GUILD_IDS)
     @commands.is_owner()
     async def stats(self, inter: CommandInteraction):
         e = embed.info_message(inter.author, title=f"Stats about {self.bot.user.name}")
         e.add_field(name="📡 Ping", value=f"┕`{self.bot.latency * 1000:.2f}ms`")
         uptime = datetime.now() - self.bot.start_time
-        days, hours, minutes, seconds = converter.seconds_to_time(
-            int(uptime.total_seconds())
-        )
+        days, hours, minutes, seconds = converter.seconds_to_time(int(uptime.total_seconds()))
         e.add_field(
             name="⏱ Uptime",
             value=f"┕`{days}d, {hours}h, {minutes}m, {seconds}s`",
