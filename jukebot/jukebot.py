@@ -23,7 +23,7 @@ class JukeBot(commands.InteractionBot):
 
     async def on_error(self, event, *args, **kwargs):
         logger.error(f"{event=}{args}{kwargs}")
-        traceback.print_exc()
+        logger.error(f"{''.join(traceback.format_stack())}")
 
     @property
     def start_time(self):

@@ -1,9 +1,15 @@
 from __future__ import annotations
 
+import traceback
+
 from disnake import CommandInteraction
 from disnake.ext import commands
 from disnake.ext.commands import CommandError
 from loguru import logger
+
+
+def fancy_traceback(exc: Exception) -> str:
+    return "".join(traceback.format_exception(type(exc), exc, exc.__traceback__))
 
 
 class LoggerHandler(commands.Cog):
@@ -31,10 +37,8 @@ class LoggerHandler(commands.Cog):
         )
 
     @commands.Cog.listener()
-    async def on_slash_command_error(
-        self, inter: CommandInteraction, error: CommandError
-    ):
-        logger.opt(lazy=True).error(
+    async def on_slash_command_error(self, inter: CommandInteraction, error: CommandError):
+        logger.error(
             f"Server: '{inter.guild.name}' (ID: {inter.guild.id}) | "
             f"Channel: '{inter.channel.name}' (ID: {inter.channel.id}) | "
             f"Invoker: '{inter.author}' | "
@@ -42,6 +46,7 @@ class LoggerHandler(commands.Cog):
             f"raw options: '{inter.options}' | "
             f"error: {error}"
         )
+        logger.error(fancy_traceback(error))
 
 
 def setup(bot):
