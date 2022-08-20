@@ -35,9 +35,7 @@ class Query:
             try:
                 info = await loop.run_in_executor(
                     None,
-                    lambda: ytdl.extract_info(
-                        url=self._query, download=False, process=process
-                    ),
+                    lambda: ytdl.extract_info(url=self._query, download=False, process=process),
                 )
             except Exception as e:
                 logger.opt(lazy=True).error(f"Exception in query {self._query}. {e}")
@@ -134,5 +132,5 @@ class _RequestOption:
         "compat_opts": ["no-youtube-unavailable-videos"],
         "noplaylist": True,
         "cachedir": False,
-        "logger": _QueryLogger(),
+        # "logger": _QueryLogger(),
     }

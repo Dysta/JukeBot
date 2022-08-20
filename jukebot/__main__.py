@@ -29,7 +29,7 @@ def get_test_guild_ids() -> Optional[List[int]]:
 def main():
     load_dotenv(".env")
     logging.set_logging(
-        plogging.INFO,
+        plogging.DEBUG,
         intercept_disnake_log=True,
         disnake_loglevel=plogging.WARNING,
     )
