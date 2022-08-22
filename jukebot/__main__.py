@@ -14,12 +14,12 @@ from jukebot import JukeBot
 from jukebot.utils import Extensions, intents, logging
 
 
-def get_ids() -> Set[int]:
+def get_owner_ids() -> Set[int]:
     ids = os.environ["BOT_OWNER_IDS"].split(",")
     return set(map(int, ids))
 
 
-def get_test_guild_ids() -> Optional[List[int]]:
+def get_test_guilds_ids() -> Optional[List[int]]:
     ids = list(filter(lambda x: x, os.environ["BOT_TEST_GUILD_IDS"].split(",")))
     if not ids:
         return None
@@ -37,8 +37,8 @@ def main():
     bot = JukeBot(
         activity=Activity(name=f"some good vibes 🎶", type=ActivityType.listening),
         intents=intents.get(),
-        owner_ids=get_ids(),
-        test_guilds=get_test_guild_ids(),
+        owner_ids=get_owner_ids(),
+        test_guilds=get_test_guilds_ids(),
     )
 
     for e in Extensions.all():
