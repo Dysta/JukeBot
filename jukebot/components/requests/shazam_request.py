@@ -58,6 +58,7 @@ class ShazamRequest(AbstractRequest):
         super().__init__(query=query)
         self._path: str = ""
         self._params: dict = {**ShazamRequest.YTDL_BASE_OPTIONS}
+        self._delete_path: bool = False
 
     async def setup(self):
         rdm_str: str = "".join(
@@ -80,16 +81,16 @@ class ShazamRequest(AbstractRequest):
                     lambda: ytdl.download(self._query),
                 )
             except Exception as e:
-                logger.opt(lazy=True).error(e)
-                self._success = False
+                logger.error(e)
                 return
+
+        self._delete_path = True
 
         shazam = Shazam()
         out = await shazam.recognize_song(data=self._path)
         result = Serialize.full_track(data=out)
         logger.debug(result)
         if not result.track:
-            self._success = False
             return
 
         youtube_data = await shazam.get_youtube_data(link=result.track.youtube_link)
@@ -98,6 +99,7 @@ class ShazamRequest(AbstractRequest):
             "url": youtube_data["actions"][0]["uri"],
             "image_url": youtube_data["image"]["url"],
         }
+
         self._result = data
         self._success = True
 
@@ -105,9 +107,10 @@ class ShazamRequest(AbstractRequest):
         logger.opt(lazy=True).debug(f"Query data {self._result}")
 
     async def terminate(self):
-        loop = asyncio.get_event_loop()
-        try:
-            await loop.run_in_executor(None, lambda: os.remove(self._path))
-            logger.opt(lazy=True).info(f"Query {self._query} deleted at {self._path}")
-        except Exception as e:
-            logger.error(e)
+        if self._delete_path:
+            loop = asyncio.get_event_loop()
+            try:
+                await loop.run_in_executor(None, lambda: os.remove(self._path))
+                logger.opt(lazy=True).info(f"Query {self._query} deleted at {self._path}")
+            except Exception as e:
+                logger.error(e)
