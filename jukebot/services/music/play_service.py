@@ -52,10 +52,10 @@ class PlayService(AbstractService):
 
         rqs: Result = player.queue.get()
         author = rqs.requester
-        qry: Query = components.Query(rqs.web_url)
-        await qry.process()
+        async with MusicRequest(rqs.web_url) as req:
+            await req.execute()
 
-        song: Song = components.Song.from_query(qry)
+        song: Song = components.Song.from_entry(req.result)
         song.requester = author
 
         async def inner(attempt: int) -> bool:

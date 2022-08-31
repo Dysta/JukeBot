@@ -10,6 +10,7 @@ from disnake import CommandInteraction, VoiceChannel, VoiceClient
 from disnake.ext.commands import Bot
 from loguru import logger
 
+from jukebot.components.requests import MusicRequest
 from jukebot.services.music import LeaveService, PlayService
 from jukebot.utils import coro
 
@@ -87,12 +88,13 @@ class Player:
 
     async def play(self, song: Song, replay: bool = False):
         if replay:
-            #  we must requery the song to refresh the stream URL
-            #  some website can invalidate the stream URL after some times
+            # ? we must requery the song to refresh the stream URL
+            # ? some website can invalidate the stream URL after some times
             author = song.requester
-            qry: Query = Query(song.web_url)
-            await qry.process()
-            song: Song = Song.from_query(qry)
+            async with MusicRequest(song.web_url) as req:
+                await req.execute()
+
+            song: Song = Song.from_entry(req.result)
             song.requester = author
 
         stream = AudioStream(song.stream_url)
