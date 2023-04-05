@@ -20,7 +20,7 @@ class TestShazamRequestComponent(unittest.IsolatedAsyncioTestCase):
         )
 
     async def test_shazam_request_failed(self):
-        async with ShazamRequest("https://www.instagram.com/p/Ce67Z4gJPuv/") as req:
+        async with ShazamRequest("https://www.instagram.com/p/Cqk4Vh0MVYo/") as req:
             await req.execute()
 
         self.assertFalse(req.success)

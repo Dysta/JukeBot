@@ -5,16 +5,16 @@ from jukebot.components.requests import MusicRequest
 
 class TestMusicRequestComponent(unittest.IsolatedAsyncioTestCase):
     async def test_music_request_success_youtube(self):
-        async with MusicRequest("https://www.youtube.com/watch?v=YZ2WJ1krQss") as req:
+        async with MusicRequest("https://www.youtube.com/watch?v=8GW6sLrK40k") as req:
             await req.execute()
 
         self.assertTrue(req.success)
         result: dict = req.result
 
-        self.assertEqual(result.get("title"), "Righteous")
-        self.assertEqual(result.get("uploader"), "Mo Beats - Topic")
-        self.assertEqual(result.get("webpage_url"), "https://www.youtube.com/watch?v=YZ2WJ1krQss")
-        self.assertEqual(result.get("duration"), 164)
+        self.assertEqual(result.get("title"), "HOME - Resonance")
+        self.assertEqual(result.get("uploader"), "Electronic Gems")
+        self.assertEqual(result.get("webpage_url"), "https://www.youtube.com/watch?v=8GW6sLrK40k")
+        self.assertEqual(result.get("duration"), 213)
 
         self.assertIsNotNone(result.get("thumbnail", None))
         self.assertIsNotNone(result.get("url", None))
@@ -46,7 +46,7 @@ class TestMusicRequestComponent(unittest.IsolatedAsyncioTestCase):
             "https://www.youtube.com/playlist?list=PLjnOFoOKDEU9rzMtOaKGLABN7QhG19Nl0"
         ) as req:
             await req.execute()
-
+        print(req.result)
         self.assertFalse(req.success)
         self.assertIsNone(req.result)
 
