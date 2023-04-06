@@ -27,9 +27,7 @@ async def _get(url, enquote) -> (int, str):
         async with session.get(url) as rep:
             logger.opt(lazy=True).info(f"Get url {url}")
             logger.opt(lazy=True).info(f"URL {url} status: {rep.status}")
-            logger.opt(lazy=True).debug(
-                f"URL {url} content-type: {rep.headers['content-type']}"
-            )
+            logger.opt(lazy=True).debug(f"URL {url} content-type: {rep.headers['content-type']}")
             if rep.status != 200:
                 return rep.status, ""
 

@@ -10,15 +10,13 @@ from disnake import CommandInteraction, VoiceChannel, VoiceClient
 from disnake.ext.commands import Bot
 from loguru import logger
 
+from jukebot.components.audio_stream import AudioStream
 from jukebot.components.requests import MusicRequest
+from jukebot.components.resultset import ResultSet
+from jukebot.components.song import Song
 from jukebot.services.music import LeaveService, PlayService
+from jukebot.services.queue import AddService
 from jukebot.utils import coro
-
-from ..services.queue import AddService
-from .audio_stream import AudioStream
-from .query import Query
-from .resultset import ResultSet
-from .song import Song
 
 
 class Player:
@@ -145,9 +143,7 @@ class Player:
             return
         if self._loop.is_queue_loop:
             with AddService(self.bot) as ad:
-                func = ad(
-                    interaction=self.interaction, query=self.song.web_url, silent=True
-                )
+                func = ad(interaction=self.interaction, query=self.song.web_url, silent=True)
             asyncio.ensure_future(func, loop=self.bot.loop)
 
         self._stream = None

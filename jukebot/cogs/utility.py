@@ -22,16 +22,10 @@ class Utility(commands.Cog):
     @commands.cooldown(1, 10.0, BucketType.user)
     async def info(self, inter: CommandInteraction):
         e = embed.info_message(inter.author)
-        e.add_field(
-            name="🤖 Name", value=f"┕`{self.bot.user.display_name}`", inline=True
-        )
-        e.add_field(
-            name="📡 Ping", value=f"┕`{self.bot.latency * 1000:.2f}ms`", inline=True
-        )
+        e.add_field(name="🤖 Name", value=f"┕`{self.bot.user.display_name}`", inline=True)
+        e.add_field(name="📡 Ping", value=f"┕`{self.bot.latency * 1000:.2f}ms`", inline=True)
         uptime = datetime.now() - self.bot.start_time
-        days, hours, minutes, seconds = converter.seconds_to_time(
-            int(uptime.total_seconds())
-        )
+        days, hours, minutes, seconds = converter.seconds_to_time(int(uptime.total_seconds()))
         e.add_field(
             name="⏱ Uptime",
             value=f"┕`{days}d, {hours}h, {minutes}m, {seconds}s`",
@@ -88,9 +82,7 @@ class Utility(commands.Cog):
             f"An activity started in `{inter.author.voice.channel.name}`.\n",
         )
 
-        await inter.send(
-            embed=e, view=ActivityView(invite.url), delete_after=float(max_time)
-        )
+        await inter.send(embed=e, view=ActivityView(invite.url), delete_after=float(max_time))
 
     @commands.slash_command(
         description="Reset the current guild player when something is wrong.",

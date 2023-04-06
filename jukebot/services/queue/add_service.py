@@ -29,9 +29,7 @@ class AddService(AbstractService):
         qry: Query = components.Query(query_str)
         await qry.search()
         if not qry.success:
-            raise QueryFailed(
-                f"Nothing found for {query}", query=query, full_query=query_str
-            )
+            raise QueryFailed(f"Nothing found for {query}", query=query, full_query=query_str)
 
         if qry.type == components.Query.Type.PLAYLIST:
             res: ResultSet = components.ResultSet.from_query(qry, interaction.author)

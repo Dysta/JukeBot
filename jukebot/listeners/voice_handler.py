@@ -17,9 +17,7 @@ class VoiceHandler(commands.Cog):
         self.bot: Bot = bot
 
     @commands.Cog.listener()
-    async def on_voice_state_update(
-        self, member: Member, before: VoiceState, after: VoiceState
-    ):
+    async def on_voice_state_update(self, member: Member, before: VoiceState, after: VoiceState):
         if before.channel != after.channel:
             if before.channel is None:
                 self.bot.dispatch("voice_channel_connect", member, after.channel)
@@ -28,9 +26,7 @@ class VoiceHandler(commands.Cog):
                 if len(before.channel.members) == 1:
                     self.bot.dispatch("voice_channel_alone", member, before.channel)
             else:
-                self.bot.dispatch(
-                    "voice_channel_move", member, before.channel, after.channel
-                )
+                self.bot.dispatch("voice_channel_move", member, before.channel, after.channel)
 
     @commands.Cog.listener()
     async def on_voice_channel_connect(self, member: Member, channel: VoiceChannel):

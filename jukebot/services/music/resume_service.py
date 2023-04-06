@@ -14,9 +14,7 @@ if TYPE_CHECKING:
 
 
 class ResumeService(AbstractService):
-    async def __call__(
-        self, /, interaction: CommandInteraction, silent: Optional[bool] = False
-    ):
+    async def __call__(self, /, interaction: CommandInteraction, silent: Optional[bool] = False):
         player: Player = self.bot.players[interaction.guild.id]
         if player.is_paused:
             player.resume()

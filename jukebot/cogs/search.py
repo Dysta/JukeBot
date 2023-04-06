@@ -64,9 +64,7 @@ class Search(commands.Cog):
             )
 
         results: ResultSet = (
-            components.ResultSet.from_query(qry)
-            if not "sc" in source
-            else SongSet.from_query(qry)
+            components.ResultSet.from_query(qry) if not "sc" in source else SongSet.from_query(qry)
         )
         logger.opt(lazy=True).debug(f"Results of the query is {results}")
 
@@ -87,9 +85,7 @@ class Search(commands.Cog):
         await inter.edit_original_message(view=None)
         result: str = v.result
         if result == SearchInteraction.CANCEL_TEXT:
-            raise QueryCanceled(
-                "Search Canceled", query=query, full_query=f"{source}{query}"
-            )
+            raise QueryCanceled("Search Canceled", query=query, full_query=f"{source}{query}")
 
         logger.opt(lazy=True).debug(
             f"Query '{source}{query}' successful for guild '{inter.guild.name} (ID: {inter.guild.id})'."

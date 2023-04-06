@@ -7,14 +7,14 @@ from loguru import logger
 
 from jukebot import components
 from jukebot.abstract_components import AbstractService
+from jukebot.components.requests import MusicRequest
+from jukebot.services import ResetService
+from jukebot.services.music.join_service import JoinService
+from jukebot.services.queue.add_service import AddService
 from jukebot.utils import embed
 
-from .. import ResetService
-from ..queue.add_service import AddService
-from .join_service import JoinService
-
 if TYPE_CHECKING:
-    from jukebot.components import Player, Query, Result, Song
+    from jukebot.components import Player, Result, Song
 
 
 class PlayService(AbstractService):

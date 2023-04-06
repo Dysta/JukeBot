@@ -74,6 +74,4 @@ class SearchDropdownView(disnake.ui.View):
 
     @property
     def result(self):
-        return (
-            self._drop.values[0] if not self._timeout else SearchInteraction.CANCEL_TEXT
-        )
+        return self._drop.values[0] if not self._timeout else SearchInteraction.CANCEL_TEXT

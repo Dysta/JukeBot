@@ -34,9 +34,7 @@ class Queue(commands.Cog):
     @commands.check(checks.user_is_connected)
     async def show(self, inter: CommandInteraction):
         queue: ResultSet = self.bot.players[inter.guild.id].queue
-        e: Embed = embed.queue_message(
-            inter.author, queue, title=f"Queue for {inter.guild.name}"
-        )
+        e: Embed = embed.queue_message(inter.author, queue, title=f"Queue for {inter.guild.name}")
         await inter.send(embed=e)
 
     @queue.sub_command()

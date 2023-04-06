@@ -9,9 +9,7 @@ from jukebot.utils import embed
 
 
 class SkipService(AbstractService):
-    async def __call__(
-        self, /, interaction: CommandInteraction, silent: Optional[bool] = False
-    ):
+    async def __call__(self, /, interaction: CommandInteraction, silent: Optional[bool] = False):
         self.bot.players[interaction.guild.id].skip()
         if not silent:
             e: embed = embed.basic_message(interaction.author, title="Skipped !")

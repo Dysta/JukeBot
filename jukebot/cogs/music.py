@@ -31,9 +31,7 @@ class Music(commands.Cog):
     @commands.slash_command()
     @commands.cooldown(1, 5.0, BucketType.user)
     @commands.check(checks.user_is_connected)
-    async def play(
-        self, inter: CommandInteraction, query: str, top: Optional[bool] = False
-    ):
+    async def play(self, inter: CommandInteraction, query: str, top: Optional[bool] = False):
         """
         Play a music from the provided URL or a query
         Parameters
@@ -230,9 +228,7 @@ class Music(commands.Cog):
         artist: str = data["entitiesByUniqueId"][data["entityUniqueId"]].get(
             "artistName", "Unknown artist"
         )
-        img: str = data["entitiesByUniqueId"][data["entityUniqueId"]].get(
-            "thumbnailUrl", ""
-        )
+        img: str = data["entitiesByUniqueId"][data["entityUniqueId"]].get("thumbnailUrl", "")
         e: Embed = embed.share_message(
             inter.author,
             title=f"{artist} - {title}",
