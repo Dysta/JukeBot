@@ -1,14 +1,16 @@
 import unittest
 
 from jukebot.components.requests import ShazamRequest
+from jukebot.utils.logging import disable_logging
 
 
 class TestShazamRequestComponent(unittest.IsolatedAsyncioTestCase):
     async def test_shazam_request_success(self):
-        async with ShazamRequest(
-            "https://twitter.com/LaCienegaBlvdss/status/1501975048202166283"
-        ) as req:
-            await req.execute()
+        with disable_logging():
+            async with ShazamRequest(
+                "https://twitter.com/LaCienegaBlvdss/status/1501975048202166283"
+            ) as req:
+                await req.execute()
 
         self.assertTrue(req.success)
         result: dict = req.result
@@ -20,8 +22,9 @@ class TestShazamRequestComponent(unittest.IsolatedAsyncioTestCase):
         )
 
     async def test_shazam_request_failed(self):
-        async with ShazamRequest("https://www.instagram.com/p/Cqk4Vh0MVYo/") as req:
-            await req.execute()
+        with disable_logging():
+            async with ShazamRequest("https://www.instagram.com/p/Cqk4Vh0MVYo/") as req:
+                await req.execute()
 
         self.assertFalse(req.success)
         self.assertIsNone(req.result)

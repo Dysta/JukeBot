@@ -1,12 +1,14 @@
 import unittest
 
 from jukebot.components.requests import MusicRequest
+from jukebot.utils.logging import disable_logging
 
 
 class TestMusicRequestComponent(unittest.IsolatedAsyncioTestCase):
     async def test_music_request_success_youtube(self):
-        async with MusicRequest("https://www.youtube.com/watch?v=8GW6sLrK40k") as req:
-            await req.execute()
+        with disable_logging():
+            async with MusicRequest("https://www.youtube.com/watch?v=8GW6sLrK40k") as req:
+                await req.execute()
 
         self.assertTrue(req.success)
         result: dict = req.result
@@ -22,10 +24,11 @@ class TestMusicRequestComponent(unittest.IsolatedAsyncioTestCase):
         self.assertFalse(result.get("is_live"))
 
     async def test_music_request_success_soundcloud(self):
-        async with MusicRequest(
-            "https://soundcloud.com/gee_baller/playboi-carti-cult-classic"
-        ) as req:
-            await req.execute()
+        with disable_logging():
+            async with MusicRequest(
+                "https://soundcloud.com/gee_baller/playboi-carti-cult-classic"
+            ) as req:
+                await req.execute()
 
         self.assertTrue(req.success)
         result: dict = req.result
@@ -42,17 +45,18 @@ class TestMusicRequestComponent(unittest.IsolatedAsyncioTestCase):
         self.assertIsNotNone(result.get("url", None))
 
     async def test_music_request_playlist_youtube(self):
-        async with MusicRequest(
-            "https://www.youtube.com/playlist?list=PLjnOFoOKDEU9rzMtOaKGLABN7QhG19Nl0"
-        ) as req:
-            await req.execute()
-        print(req.result)
+        with disable_logging():
+            async with MusicRequest(
+                "https://www.youtube.com/playlist?list=PLjnOFoOKDEU9rzMtOaKGLABN7QhG19Nl0"
+            ) as req:
+                await req.execute()
         self.assertFalse(req.success)
         self.assertIsNone(req.result)
 
     async def test_music_request_playlist_soundcloud(self):
-        async with MusicRequest("https://soundcloud.com/dysta/sets/breakcore") as req:
-            await req.execute()
+        with disable_logging():
+            async with MusicRequest("https://soundcloud.com/dysta/sets/breakcore") as req:
+                await req.execute()
 
         self.assertFalse(req.success)
         self.assertIsNone(req.result)

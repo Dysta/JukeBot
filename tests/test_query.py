@@ -1,12 +1,14 @@
 import unittest
 
 from jukebot.components import Query, Result, ResultSet, Song
+from jukebot.utils.logging import disable_logging
 
 
 class TestQueryComponents(unittest.IsolatedAsyncioTestCase):
     async def test_query_to_song_from_url(self):
-        qry: Query = Query("https://www.youtube.com/watch?v=hpwnjXrPxtM")
-        await qry.process()
+        with disable_logging():
+            qry: Query = Query("https://www.youtube.com/watch?v=hpwnjXrPxtM")
+            await qry.process()
         self.assertTrue(qry.success)
         self.assertEqual(qry.type, Query.Type.TRACK)
 
@@ -19,8 +21,9 @@ class TestQueryComponents(unittest.IsolatedAsyncioTestCase):
         self.assertFalse(song.live)
 
     async def test_query_to_song_from_url_live(self):
-        qry: Query = Query("https://www.youtube.com/watch?v=rUxyKA_-grg")
-        await qry.process()
+        with disable_logging():
+            qry: Query = Query("https://www.youtube.com/watch?v=rUxyKA_-grg")
+            await qry.process()
         self.assertTrue(qry.success)
         self.assertEqual(qry.type, Query.Type.TRACK)
 
@@ -33,8 +36,9 @@ class TestQueryComponents(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(song.live)
 
     async def test_query_to_song_from_str(self):
-        qry: Query = Query("home resonance")
-        await qry.process()
+        with disable_logging():
+            qry: Query = Query("home resonance")
+            await qry.process()
         self.assertTrue(qry.success)
         self.assertEqual(qry.type, Query.Type.TRACK)
 
@@ -47,8 +51,9 @@ class TestQueryComponents(unittest.IsolatedAsyncioTestCase):
         self.assertFalse(song.live)
 
     async def test_query_to_song_from_str_live(self):
-        qry: Query = Query("lofi hip hop radio - beats to relax/study to")
-        await qry.process()
+        with disable_logging():
+            qry: Query = Query("lofi hip hop radio - beats to relax/study to")
+            await qry.process()
         self.assertTrue(qry.success)
         self.assertEqual(qry.type, Query.Type.TRACK)
 
@@ -61,10 +66,11 @@ class TestQueryComponents(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(song.live)
 
     async def test_query_to_playlist_from_url(self):
-        qry: Query = Query(
-            "https://www.youtube.com/playlist?list=PLjnOFoOKDEU9rzMtOaKGLABN7QhG19Nl0"
-        )
-        await qry.process()
+        with disable_logging():
+            qry: Query = Query(
+                "https://www.youtube.com/playlist?list=PLjnOFoOKDEU9rzMtOaKGLABN7QhG19Nl0"
+            )
+            await qry.process()
         self.assertTrue(qry.success)
         self.assertEqual(qry.type, Query.Type.PLAYLIST)
         self.assertEqual(len(qry.results), 8)
