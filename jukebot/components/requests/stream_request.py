@@ -6,11 +6,11 @@ from loguru import logger
 from jukebot.abstract_components import AbstractRequest
 
 
-class MusicRequest(AbstractRequest):
-    """Class that represent a music request.
-    Music request are done during the play command and only here.
-    Music request retrieve all the data used by the bot to stream the audio in a given voice channel.
-    Music request can retrive only one track, not playlist or sets.
+class StreamRequest(AbstractRequest):
+    """Class that represent a stream request.
+    Stream request are done during the play command and only here.
+    Stream request retrieve all the data used by the bot to stream the audio in a given voice channel.
+    Stream request can retrive only one track, not playlist or sets.
     """
 
     YTDL_OPTIONS: dict = {
@@ -33,7 +33,7 @@ class MusicRequest(AbstractRequest):
 
     def __init__(self, query: str) -> None:
         super().__init__(query)
-        self._params: dict = {**MusicRequest.YTDL_OPTIONS}
+        self._params: dict = {**StreamRequest.YTDL_OPTIONS}
 
     async def setup(self):
         # * nothing to do
@@ -58,8 +58,10 @@ class MusicRequest(AbstractRequest):
             logger.opt(lazy=True).debug(f"No info retrieved for query {self._query}")
             return
 
+        logger.debug(self._result)
+
         if "entries" in self._result:
-            # ? MusicRequest have retrieved a playlist,
+            # ? StreamRequest have retrieved a playlist,
             # ? this shouldn't happen so we delete the result
             logger.warning(f"Query {self._query} retrieve a playlist. Deleleting the result.")
             self._result = None

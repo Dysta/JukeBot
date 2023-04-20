@@ -11,7 +11,7 @@ from disnake.ext.commands import Bot
 from loguru import logger
 
 from jukebot.components.audio_stream import AudioStream
-from jukebot.components.requests import MusicRequest
+from jukebot.components.requests import StreamRequest
 from jukebot.components.resultset import ResultSet
 from jukebot.components.song import Song
 from jukebot.services.music import LeaveService, PlayService
@@ -89,7 +89,7 @@ class Player:
             # ? we must requery the song to refresh the stream URL
             # ? some website can invalidate the stream URL after some times
             author = song.requester
-            async with MusicRequest(song.web_url) as req:
+            async with StreamRequest(song.web_url) as req:
                 await req.execute()
 
             song: Song = Song.from_entry(req.result)

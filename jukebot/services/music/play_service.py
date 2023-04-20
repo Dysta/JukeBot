@@ -7,7 +7,7 @@ from loguru import logger
 
 from jukebot import components
 from jukebot.abstract_components import AbstractService
-from jukebot.components.requests import MusicRequest
+from jukebot.components.requests import StreamRequest
 from jukebot.services import ResetService
 from jukebot.services.music.join_service import JoinService
 from jukebot.services.queue.add_service import AddService
@@ -52,7 +52,7 @@ class PlayService(AbstractService):
 
         rqs: Result = player.queue.get()
         author = rqs.requester
-        async with MusicRequest(rqs.web_url) as req:
+        async with StreamRequest(rqs.web_url) as req:
             await req.execute()
 
         song: Song = components.Song.from_entry(req.result)
