@@ -28,7 +28,7 @@ class TestQueryComponents(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(qry.type, Query.Type.TRACK)
 
         song: Song = Song.from_query(qry)
-        self.assertIn("lofi hip hop radio - beats to sleep/chill to", song.title)
+        self.assertIn("lofi hip hop radio 💤 - beats to sleep/chill", song.title)
         self.assertEqual(song.duration, 0)
         self.assertEqual(song.fmt_duration, "ထ")
         self.assertEqual(song.web_url, "https://www.youtube.com/watch?v=rUxyKA_-grg")
@@ -58,7 +58,7 @@ class TestQueryComponents(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(qry.type, Query.Type.TRACK)
 
         song: Song = Song.from_query(qry)
-        self.assertIn("lofi hip hop radio - beats to relax/study to", song.title)
+        self.assertIn("lofi hip hop radio 📚 - beats to relax/study to", song.title)
         self.assertEqual(song.duration, 0)
         self.assertEqual(song.fmt_duration, "ထ")
         self.assertEqual(song.web_url, "https://www.youtube.com/watch?v=jfKfPfyJRdk")
