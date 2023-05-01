@@ -6,7 +6,6 @@ from typing import TYPE_CHECKING, Union
 
 import disnake
 from disnake import Member
-from shazamio.models import YoutubeData
 
 from jukebot.utils import converter
 

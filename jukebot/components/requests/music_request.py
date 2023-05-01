@@ -86,7 +86,6 @@ class MusicRequest(AbstractRequest):
             # ? MusicRequest returned an only track
             self._type = MusicRequest.ResultType.TRACK
             self._success = True
-            logger.debug(pprint.pformat(self._result))
             return
 
         # ? assume that MusicRequest return a playlist
