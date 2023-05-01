@@ -187,3 +187,43 @@ class TestMusicRequestComponent(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(result.get("channel"), "Electronic Gems")
         self.assertEqual(result.get("url"), "https://www.youtube.com/watch?v=8GW6sLrK40k")
         self.assertEqual(result.get("duration"), 213)
+
+    async def test_music_request_failed_youtube_query(self):
+        with disable_logging():
+            async with MusicRequest(
+                "khfdkjshdfglmdsjfgtlkdjsfgkjshdfkgljhdskfjghkdljfhgkldsjfhg"
+            ) as req:
+                await req.execute()
+
+        self.assertFalse(req.success)
+        self.assertIsNone(req.result)
+        self.assertEqual(req.type, MusicRequest.ResultType.UNKNOWN)
+
+    async def test_music_request_failed_youtube_empty_query(self):
+        with disable_logging():
+            async with MusicRequest("") as req:
+                await req.execute()
+
+        self.assertFalse(req.success)
+        self.assertIsNone(req.result)
+        self.assertEqual(req.type, MusicRequest.ResultType.UNKNOWN)
+
+    async def test_music_request_failed_youtube_invalid_url(self):
+        with disable_logging():
+            async with MusicRequest("https://www.youtube.com/watch?v=8GW7sLrK40k") as req:
+                await req.execute()
+
+        self.assertFalse(req.success)
+        self.assertIsNone(req.result)
+        self.assertEqual(req.type, MusicRequest.ResultType.UNKNOWN)
+
+    async def test_music_request_failed_soundcloud_invalid_url(self):
+        with disable_logging():
+            async with MusicRequest(
+                "https://soundcloud.com/dysta/loopshit-plz-dont-plz-dont"
+            ) as req:
+                await req.execute()
+
+        self.assertFalse(req.success)
+        self.assertIsNone(req.result)
+        self.assertEqual(req.type, MusicRequest.ResultType.UNKNOWN)

@@ -80,8 +80,6 @@ class MusicRequest(AbstractRequest):
             logger.opt(lazy=True).debug(f"No info retrieved for query {self._query}")
             return
 
-        self._clean_data()
-
         if not "entries" in self._result:
             # ? MusicRequest returned an only track
             self._type = MusicRequest.ResultType.TRACK
@@ -90,7 +88,11 @@ class MusicRequest(AbstractRequest):
 
         # ? assume that MusicRequest return a playlist
         self._result = list(self._result.pop("entries"))
-        self._clean_data()
+        # ? check if result isn't an empty iterator
+        if not len(self._result):
+            self._result = None
+            logger.opt(lazy=True).debug(f"No info retrieved for query {self._query}")
+            return
 
         if self._single_search:
             self._result = self._result[0]
