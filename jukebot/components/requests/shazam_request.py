@@ -85,11 +85,11 @@ class ShazamRequest(AbstractRequest):
                 return
 
         self._delete_path = True
-
+        logger.opt(lazy=True).debug(f"Query {self._query} saved at {self._path}")
         shazam = Shazam()
         out = await shazam.recognize_song(data=self._path)
         result = Serialize.full_track(data=out)
-        logger.debug(result)
+        logger.debug(result.track)
         if not result.track:
             return
 
@@ -103,7 +103,6 @@ class ShazamRequest(AbstractRequest):
         self._result = data
         self._success = True
 
-        logger.opt(lazy=True).debug(f"Query {self._query} saved at {self._path}")
         logger.opt(lazy=True).debug(f"Query data {self._result}")
 
     async def terminate(self):

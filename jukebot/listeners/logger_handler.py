@@ -44,9 +44,9 @@ class LoggerHandler(commands.Cog):
             f"Invoker: '{inter.author}' | "
             f"Command: '{inter.application_command.cog.qualified_name}:{inter.application_command.name}' | "
             f"raw options: '{inter.options}' | "
-            f"error: {error}"
+            f"error: {error} | \n"
+            f"traceback : {fancy_traceback(error)}"
         )
-        logger.error(fancy_traceback(error))
 
 
 def setup(bot):

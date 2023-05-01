@@ -58,8 +58,6 @@ class StreamRequest(AbstractRequest):
             logger.opt(lazy=True).debug(f"No info retrieved for query {self._query}")
             return
 
-        logger.debug(self._result)
-
         if "entries" in self._result:
             # ? StreamRequest have retrieved a playlist,
             # ? this shouldn't happen so we delete the result
