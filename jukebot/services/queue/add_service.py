@@ -6,6 +6,7 @@ from disnake import CommandInteraction, Embed
 
 from jukebot import components
 from jukebot.abstract_components import AbstractService
+from jukebot.components.requests.music_request import MusicRequest
 from jukebot.exceptions import QueryFailed
 from jukebot.utils import embed, regex
 
@@ -22,17 +23,16 @@ class AddService(AbstractService):
         top: Optional[bool] = False,
         silent: Optional[bool] = False,
     ):
-        query_str = query if regex.is_url(query) else f"ytsearch1:{query}"
         if not interaction.response.is_done():
             await interaction.response.defer()
 
-        qry: Query = components.Query(query_str)
-        await qry.search()
-        if not qry.success:
-            raise QueryFailed(f"Nothing found for {query}", query=query, full_query=query_str)
+        async with MusicRequest(query) as req:
+            await req.execute()
+        if not req.success:
+            raise QueryFailed(f"Nothing found for {query}", query=query, full_query=query)
 
-        if qry.type == components.Query.Type.PLAYLIST:
-            res: ResultSet = components.ResultSet.from_query(qry, interaction.author)
+        if req.type == MusicRequest.ResultType.PLAYLIST:
+            res: ResultSet = components.ResultSet.from_result(req.result, interaction.author)
             player: Player = self.bot.players[interaction.guild.id]
             if top:
                 player.queue = res + player.queue
@@ -44,7 +44,7 @@ class AddService(AbstractService):
             )
             await interaction.edit_original_message(embed=e)
         else:
-            res: Result = components.Result.from_query(qry)
+            res: Result = components.Result.from_entry(req.result)
             res.requester = interaction.author
             player: Player = self.bot.players[interaction.guild.id]
             if top:
