@@ -6,9 +6,9 @@ from jukebot.utils.logging import disable_logging
 
 class TestMusicRequestComponent(unittest.IsolatedAsyncioTestCase):
     async def test_music_request_success_youtube_url(self):
-        # with disable_logging():
-        async with MusicRequest("https://www.youtube.com/watch?v=8GW6sLrK40k") as req:
-            await req.execute()
+        with disable_logging():
+            async with MusicRequest("https://www.youtube.com/watch?v=8GW6sLrK40k") as req:
+                await req.execute()
 
         self.assertTrue(req.success)
         self.assertIsNotNone(req.result)
@@ -173,8 +173,9 @@ class TestMusicRequestComponent(unittest.IsolatedAsyncioTestCase):
         self.assertIsNotNone(result.get("url"))
 
     async def test_music_request_success_youtube_query(self):
-        async with MusicRequest("Home - Resonance") as req:
-            await req.execute()
+        with disable_logging():
+            async with MusicRequest("Home - Resonance") as req:
+                await req.execute()
 
         self.assertTrue(req.success)
         self.assertIsNotNone(req.result)
