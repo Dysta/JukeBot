@@ -9,6 +9,7 @@ from disnake.ext.commands import Bot, BucketType
 from loguru import logger
 
 from jukebot import components
+from jukebot.components.requests import SearchRequest
 from jukebot.exceptions import QueryCanceled, QueryFailed
 from jukebot.services.music import PlayService
 from jukebot.utils import checks, embed
@@ -30,9 +31,7 @@ class Search(commands.Cog):
         self,
         inter: CommandInteraction,
         query: str,
-        source: commands.option_enum(
-            {"YouTube": "ytsearch10:", "SoundCloud": "scsearch10:"}
-        ) = "ytsearch10:",
+        source: SearchRequest.Engine = SearchRequest.Engine.Youtube.value,
     ):
         """
         Search for your query and display the 10 first results
@@ -48,24 +47,20 @@ class Search(commands.Cog):
         """
         await inter.response.defer()
         logger.opt(lazy=True).debug(
-            f"Search query '{source}{query}' for guild '{inter.guild.name} (ID: {inter.guild.id})'."
+            f"Search query '{query}' with source '{source}' for guild '{inter.guild.name} (ID: {inter.guild.id})'."
         )
 
-        qry: Query = components.Query(f"{source}{query}")
-        if "sc" in source:
-            await qry.process()
-        else:
-            await qry.search()
-        if not qry.success:
+        async with SearchRequest(query, source) as req:
+            await req.execute()
+
+        if not req.success:
             raise QueryFailed(
                 f"Nothing found for {query}",
                 query=query,
                 full_query=f"{source}{query}",
             )
 
-        results: ResultSet = (
-            components.ResultSet.from_query(qry) if not "sc" in source else SongSet.from_query(qry)
-        )
+        results: ResultSet = components.ResultSet.from_result(req.result)
         logger.opt(lazy=True).debug(f"Results of the query is {results}")
 
         if not results:
