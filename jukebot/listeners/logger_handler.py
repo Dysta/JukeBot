@@ -7,6 +7,8 @@ from disnake.ext import commands
 from disnake.ext.commands import CommandError
 from loguru import logger
 
+from jukebot import exceptions
+
 
 def fancy_traceback(exc: Exception) -> str:
     return "".join(traceback.format_exception(type(exc), exc, exc.__traceback__))
@@ -38,13 +40,17 @@ class LoggerHandler(commands.Cog):
 
     @commands.Cog.listener()
     async def on_slash_command_error(self, inter: CommandInteraction, error: CommandError):
+        if isinstance(error, exceptions.QueryException):
+            # handled in error_handler.py
+            return
+
         logger.error(
             f"Server: '{inter.guild.name}' (ID: {inter.guild.id}) | "
             f"Channel: '{inter.channel.name}' (ID: {inter.channel.id}) | "
             f"Invoker: '{inter.author}' | "
             f"Command: '{inter.application_command.cog.qualified_name}:{inter.application_command.name}' | "
             f"raw options: '{inter.options}' | "
-            f"error: {error} | \n"
+            f"error: {error}\n"
             f"traceback : {fancy_traceback(error)}"
         )
 
