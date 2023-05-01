@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 import asyncio
+from enum import Enum
 
 import yt_dlp
 from loguru import logger
@@ -12,8 +15,27 @@ class SearchRequest(AbstractRequest):
     Search request are done during the search command and only here.
     Search request retrieve the 10 first track from a query on youtube or soundcloud website.
     Search request can retrive only 10 tracks, not playlist or sets.
-    Search request canno't be created with url, only a query of words.
+    Search request can't be created with url, only a query of words.
     """
+
+    class Engine(str, Enum):
+        Youtube = "ytsearch10:"
+        SoundCloud = "scsearch10:"
+
+        @property
+        def is_youtube(self) -> bool:
+            return self == SearchRequest.Engine.Youtube
+
+        @property
+        def is_soundcloud(self) -> bool:
+            return self == SearchRequest.Engine.SoundCloud
+
+        @classmethod
+        def value_of(cls, value) -> SearchRequest.Engine:
+            for k, v in cls.__members__.items():
+                if v == value:
+                    return v
+            raise ValueError(f"'{cls.__name__}' enum not found for '{value}'")
 
     YTDL_OPTIONS: dict = {
         "format": "bestaudio/best",
@@ -37,14 +59,14 @@ class SearchRequest(AbstractRequest):
         if regex.is_url(query):
             raise ValueError(f"query must be words, not direct url")
 
-        super().__init__(f"{engine}{query}")
-        self._engine: str = engine
+        self._engine: SearchRequest.Engine = SearchRequest.Engine.value_of(engine)
         self._params: dict = {**SearchRequest.YTDL_OPTIONS}
-
         self._process: bool = False
 
+        super().__init__(f"{self._engine.value}{query}")
+
     async def setup(self):
-        self._process = "sc" in self._engine
+        self._process = self._engine.is_soundcloud
         logger.opt(lazy=True).debug(f"Query {self._query} have process state at {self._process}.")
 
     async def execute(self):
