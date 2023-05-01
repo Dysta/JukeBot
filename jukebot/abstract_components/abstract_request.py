@@ -12,7 +12,7 @@ class AbstractRequest(ABC):
 
     @abstractmethod
     async def setup(self):
-        """Setup the Request. Called before the do method."""
+        """Setup the Request. Called before the execute method."""
 
     @abstractmethod
     async def execute(self):
@@ -20,7 +20,7 @@ class AbstractRequest(ABC):
 
     @abstractmethod
     async def terminate(self):
-        """Cleanup the Request. Called after the do method."""
+        """Cleanup the Request. Called after the execute method."""
 
     async def __aenter__(self):
         await self.setup()
