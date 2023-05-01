@@ -33,7 +33,7 @@ class SearchRequest(AbstractRequest):
         @classmethod
         def value_of(cls, value) -> SearchRequest.Engine:
             for k, v in cls.__members__.items():
-                if v == value:
+                if value in [k, v]:
                     return v
             raise ValueError(f"'{cls.__name__}' enum not found for '{value}'")
 
