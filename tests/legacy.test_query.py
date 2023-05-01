@@ -12,7 +12,7 @@ class TestQueryComponents(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(qry.success)
         self.assertEqual(qry.type, Query.Type.TRACK)
 
-        song: Song = Song.from_query(qry)
+        song: Song = Song.(qry)
         self.assertEqual(song.title, "tech house mix | vascoprod")
         self.assertEqual(song.duration, 1824)
         self.assertEqual(song.fmt_duration, "30:24")
@@ -27,7 +27,7 @@ class TestQueryComponents(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(qry.success)
         self.assertEqual(qry.type, Query.Type.TRACK)
 
-        song: Song = Song.from_query(qry)
+        song: Song = Song.(qry)
         self.assertIn("lofi hip hop radio 💤 - beats to sleep/chill", song.title)
         self.assertEqual(song.duration, 0)
         self.assertEqual(song.fmt_duration, "ထ")
@@ -42,7 +42,7 @@ class TestQueryComponents(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(qry.success)
         self.assertEqual(qry.type, Query.Type.TRACK)
 
-        song: Song = Song.from_query(qry)
+        song: Song = Song.(qry)
         self.assertEqual(song.title, "HOME - Resonance")
         self.assertEqual(song.duration, 213)
         self.assertEqual(song.fmt_duration, "3:33")
@@ -57,7 +57,7 @@ class TestQueryComponents(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(qry.success)
         self.assertEqual(qry.type, Query.Type.TRACK)
 
-        song: Song = Song.from_query(qry)
+        song: Song = Song.(qry)
         self.assertIn("lofi hip hop radio 📚 - beats to relax/study to", song.title)
         self.assertEqual(song.duration, 0)
         self.assertEqual(song.fmt_duration, "ထ")
@@ -75,7 +75,7 @@ class TestQueryComponents(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(qry.type, Query.Type.PLAYLIST)
         self.assertEqual(len(qry.results), 8)
 
-        results: ResultSet = ResultSet.from_query(qry)
+        results: ResultSet = ResultSet.(qry)
         result: Result = None
 
         # test each result

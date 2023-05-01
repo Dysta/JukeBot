@@ -1,23 +1,23 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import List
+from typing import List, Optional
+
+from disnake import Member
 
 from jukebot.abstract_components import AbstractCollection
 
-from .query import Query
 from .song import Song
 
 
 @dataclass
 class SongSet(AbstractCollection[Song]):
     @classmethod
-    def from_query(cls, query: Query) -> "SongSet":
-        song_set: List[Song] = []
-        results = query.results
-        if not query.type == Query.Type.PLAYLIST:
-            results = [query.results]
+    def from_result(cls, results: list, requester: Optional[Member] = None) -> SongSet:
+        result_set: List[Song] = []
         for r in results:
-            song_set.append(Song.from_entry(r))
+            tmp: Song = Song.from_entry(r)
+            tmp.requester = requester
+            result_set.append(tmp)
 
-        return cls(set=song_set)
+        return cls(set=result_set)

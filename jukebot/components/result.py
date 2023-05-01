@@ -7,8 +7,6 @@ from disnake import Member
 
 from jukebot.utils import converter
 
-from .query import Query
-
 
 @dataclass
 class Result:
@@ -29,21 +27,6 @@ class Result:
         self.fmt_duration = (
             "ထ" if self.live else converter.seconds_to_youtube_format(self.duration)
         )
-
-    @classmethod
-    def from_query(cls, query: Query, entry: int = 0):
-        results = query.results
-        if query.type == Query.Type.PLAYLIST:
-            try:
-                info = results[entry]
-            except KeyError:
-                raise
-        elif query.type == Query.Type.TRACK:
-            info = results
-        else:
-            raise Exception(f"Query result unknown format for {results=}")
-
-        return cls(info=info)
 
     @classmethod
     def from_entry(cls, entry: dict):
