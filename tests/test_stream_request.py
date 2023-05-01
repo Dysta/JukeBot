@@ -60,3 +60,10 @@ class TestStreamRequestComponent(unittest.IsolatedAsyncioTestCase):
 
         self.assertFalse(req.success)
         self.assertIsNone(req.result)
+
+    async def test_stream_request_success_youtube_query(self):
+        with disable_logging():
+            async with StreamRequest("home resonance") as req:
+                await req.execute()
+
+        self.assertFalse(req.success)
