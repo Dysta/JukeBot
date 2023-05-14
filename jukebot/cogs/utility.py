@@ -21,6 +21,13 @@ class Utility(commands.Cog):
     )
     @commands.cooldown(1, 10.0, BucketType.user)
     async def info(self, inter: CommandInteraction):
+        """Displays information about the bot like its ping, uptime, prefix and more
+
+        Parameters
+        ----------
+        inter : CommandInteraction
+            The interaction
+        """
         e = embed.info_message(inter.author)
         e.add_field(name="🤖 Name", value=f"┕`{self.bot.user.display_name}`", inline=True)
         e.add_field(name="📡 Ping", value=f"┕`{self.bot.latency * 1000:.2f}ms`", inline=True)
@@ -47,28 +54,30 @@ class Utility(commands.Cog):
         )
         await inter.send(embed=e, ephemeral=True)
 
-    @commands.slash_command(
-        description="Display a user avatar in a embed message. If no user, it will show the command invoker avatar.",
-    )
-    @commands.cooldown(1, 5.0, BucketType.user)
-    async def avatar(self, inter: CommandInteraction, user: Optional[Member] = None):
-        user: Member = inter.author if user is None else user
-        e = embed.basic_message(inter.author, title=f"{user.name}'s avatar")
-        e.set_image(url=user.display_avatar.url)
-        await inter.send(embed=e)
-
-    @commands.slash_command(description="Send all links to support the bot")
+    @commands.slash_command()
     @commands.cooldown(1, 8.0, BucketType.user)
     async def links(self, inter: CommandInteraction):
+        """Send all links to support the bot
+
+        Parameters
+        ----------
+        inter : CommandInteraction
+            The interaction
+        """
         await inter.send(view=PromoteView())
 
-    @commands.slash_command(
-        description="Launch a Youtube Together session in the current voice channel the invoker is.",
-    )
+    @commands.slash_command()
     @commands.cooldown(1, 15.0, BucketType.guild)
     @commands.max_concurrency(1, BucketType.guild)
     @commands.check(checks.user_is_connected)
     async def watch(self, inter: CommandInteraction):
+        """Launch a Youtube Together session in the voice channel where you are currently.
+
+        Parameters
+        ----------
+        inter : CommandInteraction
+            The interaction
+        """
         max_time = 180
         invite = await inter.author.voice.channel.create_invite(
             max_age=max_time,
@@ -84,11 +93,16 @@ class Utility(commands.Cog):
 
         await inter.send(embed=e, view=ActivityView(invite.url), delete_after=float(max_time))
 
-    @commands.slash_command(
-        description="Reset the current guild player when something is wrong.",
-    )
+    @commands.slash_command()
     @commands.cooldown(1, 15.0, BucketType.guild)
     async def reset(self, inter: CommandInteraction):
+        """Disconnects the bot and resets its internal state if something isn't working.
+
+        Parameters
+        ----------
+        inter : CommandInteraction
+            The interaction
+        """
         with ResetService(self.bot) as rs:
             await rs(interaction=inter)
 

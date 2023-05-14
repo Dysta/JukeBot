@@ -34,16 +34,13 @@ class Search(commands.Cog):
         source: SearchRequest.Engine = SearchRequest.Engine.Youtube.value,
     ):
         """
-        Search for your query and display the 10 first results
+        Allows you to search the first 10 results for the desired music.
+
         Parameters
         ----------
         inter: The interaction
         query: The query to search
         source: The website to use to search for the query
-
-        Returns
-        -------
-
         """
         await inter.response.defer()
         logger.opt(lazy=True).debug(

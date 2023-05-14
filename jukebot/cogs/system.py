@@ -1,10 +1,11 @@
 from __future__ import annotations
 
+import io
 import os
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Set
 
-from disnake import CommandInteraction
+from disnake import APISlashCommand, CommandInteraction, File
 from disnake.ext import commands
 from loguru import logger
 
@@ -38,11 +39,19 @@ class System(commands.Cog):
         logger.opt(lazy=True).success(f"Extension {e['package']}.{e['name']} reloaded.")
 
     @commands.slash_command(
-        description="Reload the given cog. If no cog is given, reload all cogs.",
         guild_ids=ADMIN_GUILD_IDS,
     )
     @commands.is_owner()
     async def reload(self, inter: CommandInteraction, cog_name: Optional[str] = None):
+        """Reload the given cog. If no cog is given, reload all cogs.
+
+        Parameters
+        ----------
+        inter : CommandInteraction
+            The interaction
+        cog_name : Optional[str], optional
+            The cog name to reload, by default None
+        """
         try:
             if not cog_name:
                 self._reload_all_cogs()
@@ -54,11 +63,16 @@ class System(commands.Cog):
 
         await inter.send("✅ | reloaded", ephemeral=True)
 
-    @commands.slash_command(
-        description="Reset all cached property of the bot.", guild_ids=ADMIN_GUILD_IDS
-    )
+    @commands.slash_command(guild_ids=ADMIN_GUILD_IDS)
     @commands.is_owner()
     async def refresh(self, inter: CommandInteraction):
+        """Updates all cached properties of the bot
+
+        Parameters
+        ----------
+        inter : CommandInteraction
+            The interaction
+        """
         try:
             del self.bot.members_count
             logger.opt(lazy=True).success("Members count reset.")
@@ -70,9 +84,16 @@ class System(commands.Cog):
 
         await inter.send("✅ | refresh", ephemeral=True)
 
-    @commands.slash_command(description="Share stats about the bot.", guild_ids=ADMIN_GUILD_IDS)
+    @commands.slash_command(guild_ids=ADMIN_GUILD_IDS)
     @commands.is_owner()
     async def stats(self, inter: CommandInteraction):
+        """Displays bot statistics such as number of servers, users or players created
+
+        Parameters
+        ----------
+        inter : CommandInteraction
+            The interaction
+        """
         e = embed.info_message(inter.author, title=f"Stats about {self.bot.user.name}")
         e.add_field(name="📡 Ping", value=f"┕`{self.bot.latency * 1000:.2f}ms`")
         uptime = datetime.now() - self.bot.start_time
@@ -99,6 +120,31 @@ class System(commands.Cog):
         e.add_field(name=embed.VOID_TOKEN, value=embed.VOID_TOKEN)
 
         await inter.send(embed=e, ephemeral=True)
+
+    @commands.slash_command(guild_ids=ADMIN_GUILD_IDS)
+    @commands.is_owner()
+    async def commands(self, inter: CommandInteraction):
+        """Generates a .yaml file containing all bot commands
+
+        Parameters
+        ----------
+        inter : CommandInteraction
+            The interaction
+        """
+        cmds = sorted(self.bot.slash_commands, key=lambda x: x.name)
+        msg: str = "---\n"
+        for c in cmds:
+            opts: str = ""
+            if c.body.options:
+                opts = " ".join([e.name for e in c.body.options])
+            msg += f"""
+- title: {c.name}
+  icon: none
+  usage: /{c.name} {opts}
+  desc: {c.body.description}
+"""
+        data = io.BytesIO(msg.encode())
+        await inter.send(file=File(data, "cmds.yaml"), ephemeral=True)
 
 
 def setup(bot):
