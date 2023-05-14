@@ -1,10 +1,11 @@
 from __future__ import annotations
 
+import io
 import os
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Set
 
-from disnake import CommandInteraction
+from disnake import APISlashCommand, CommandInteraction, File
 from disnake.ext import commands
 from loguru import logger
 
@@ -99,6 +100,24 @@ class System(commands.Cog):
         e.add_field(name=embed.VOID_TOKEN, value=embed.VOID_TOKEN)
 
         await inter.send(embed=e, ephemeral=True)
+
+    @commands.slash_command(description="Show all the bot commands", guild_ids=ADMIN_GUILD_IDS)
+    @commands.is_owner()
+    async def commands(self, inter: CommandInteraction):
+        cmds = sorted(self.bot.slash_commands, key=lambda x: x.name)
+        msg: str = "---\n"
+        for c in cmds:
+            opts: str = ""
+            if c.body.options:
+                opts = " ".join([e.name for e in c.body.options])
+            msg += f"""
+- title: {c.name}
+  icon: none
+  usage: /{c.name} {opts}
+  desc: {c.body.description}
+"""
+        data = io.BytesIO(msg.encode())
+        await inter.send(file=File(data, "cmds.yaml"), ephemeral=True)
 
 
 def setup(bot):
