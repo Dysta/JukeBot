@@ -16,7 +16,7 @@ class ResultSet(AbstractCollection[Result]):
     def from_result(cls, results: list, requester: Optional[Member] = None) -> ResultSet:
         result_set: List[Result] = []
         for r in results:
-            tmp: Result = Result.from_entry(r)
+            tmp: Result = Result(r)
             tmp.requester = requester
             result_set.append(tmp)
 

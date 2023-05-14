@@ -92,7 +92,7 @@ class Player:
             async with StreamRequest(song.web_url) as req:
                 await req.execute()
 
-            song: Song = Song.from_entry(req.result)
+            song: Song = Song(req.result)
             song.requester = author
 
         stream = AudioStream(song.stream_url)

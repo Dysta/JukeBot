@@ -16,7 +16,7 @@ from jukebot.utils import checks, embed
 from jukebot.views import SearchDropdownView, SearchInteraction
 
 if TYPE_CHECKING:
-    from jukebot.components import Query, ResultSet, SongSet
+    from jukebot.components import ResultSet
 
 
 class Search(commands.Cog):

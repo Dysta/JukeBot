@@ -10,7 +10,7 @@ from disnake import Member
 from jukebot.utils import converter
 
 if TYPE_CHECKING:
-    from jukebot.components import Result, ResultSet, Song, SongSet
+    from jukebot.components import Result, ResultSet, Song
 
 VOID_TOKEN = "\u200B"
 
@@ -112,7 +112,7 @@ def music_found_message(author: Member, music: dict, title=""):
     return embed
 
 
-def search_result_message(author: Member, playlist: Union[ResultSet, SongSet], title=""):
+def search_result_message(author: Member, playlist: ResultSet, title=""):
     content = "\n\n".join(
         [
             f"{converter.number_to_emoji(i)} `{s.title} by {s.channel}` **[{s.fmt_duration}]**"
@@ -138,7 +138,7 @@ def basic_queue_message(author: Member, title="", content=""):
     return embed
 
 
-def queue_message(author: Member, playlist: Union[ResultSet, SongSet], title=""):
+def queue_message(author: Member, playlist: ResultSet, title=""):
     playlist_slice = itertools.islice(playlist, 10)
     content = "\n\n".join(
         [

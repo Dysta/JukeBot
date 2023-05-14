@@ -44,7 +44,7 @@ class AddService(AbstractService):
             )
             await interaction.edit_original_message(embed=e)
         else:
-            res: Result = components.Result.from_entry(req.result)
+            res: Result = components.Result(req.result)
             res.requester = interaction.author
             player: Player = self.bot.players[interaction.guild.id]
             if top:

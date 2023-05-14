@@ -19,15 +19,25 @@ class Result:
     requester: Optional[Member] = None
 
     def __init__(self, info: dict):
-        self.web_url = info.get("url", info.get("original_url"))
+        self.web_url = info.get("url") or info.get("original_url")
         self.title = info.get("title", "Unknown")
-        self.channel = info.get("channel", info.get("uploader", "Unknown"))
-        self.duration = int(info.get("duration", 0) or 0)
+        self.channel = info.get("channel") or info.get("uploader") or "Unknown"
+        self.duration = round(info.get("duration") or 0)
         self.live = info.get("duration") is None
         self.fmt_duration = (
             "ထ" if self.live else converter.seconds_to_youtube_format(self.duration)
         )
 
-    @classmethod
-    def from_entry(cls, entry: dict):
-        return cls(info=entry)
+        if self.title == "Unknown" or self.channel == "Unknwon":
+            self._define_complementary_info_from_url()
+
+    def _define_complementary_info_from_url(self):
+        """This method try to define title and channel from url"""
+        if "soundcloud" in self.web_url:
+            # ? SoundCloud API return only the url
+            # ? we try to define title and channel from it
+            *_, tmp_channel, tmp_title = self.web_url.split("/")
+            if self.channel == "Unknown":
+                self.channel = tmp_channel.replace("-", " ").title()
+            if self.title == "Unknown":
+                self.title = tmp_title.replace("-", " ").title()

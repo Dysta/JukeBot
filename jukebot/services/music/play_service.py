@@ -55,7 +55,7 @@ class PlayService(AbstractService):
         async with StreamRequest(rqs.web_url) as req:
             await req.execute()
 
-        song: Song = components.Song.from_entry(req.result)
+        song: Song = components.Song(req.result)
         song.requester = author
 
         async def inner(attempt: int) -> bool:
