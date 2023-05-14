@@ -32,110 +32,149 @@ class Music(commands.Cog):
     @commands.cooldown(1, 5.0, BucketType.user)
     @commands.check(checks.user_is_connected)
     async def play(self, inter: CommandInteraction, query: str, top: Optional[bool] = False):
-        """
-        Play a music from the provided URL or a query
+        """Play music from URL or search
+
         Parameters
         ----------
-        inter: The interaction
-        query: The URL or query to play
-        top: Put the requested song at the top of the queue
-
-        Returns
-        -------
-
+        inter : CommandInteraction
+            The interaction
+        query : str
+            The URL or search to play
+        top : Optional[bool], optional
+            Put the requested song at the top of the queue, by default False
         """
         with PlayService(self.bot) as ps:
             await ps(interaction=inter, query=query, top=top)
 
-    @commands.slash_command(
-        description="Disconnect the bot from the current connected voice channel.",
-    )
+    @commands.slash_command()
     @commands.cooldown(1, 5.0, BucketType.user)
     @commands.check(checks.bot_and_user_in_same_channel)
     @commands.check(checks.bot_is_connected)
     @commands.check(checks.user_is_connected)
     async def leave(self, inter: CommandInteraction):
+        """Disconnect the bot from the current connected voice channel.
+
+        Parameters
+        ----------
+        inter : CommandInteraction
+            The interaction
+        """
         with LeaveService(self.bot) as ls:
             await ls(interaction=inter)
 
-    @commands.slash_command(
-        description="Stop the current music from the bot without disconnect him.",
-    )
+    @commands.slash_command()
     @commands.cooldown(1, 5.0, BucketType.user)
     @commands.check(checks.bot_is_playing)
     @commands.check(checks.bot_and_user_in_same_channel)
     @commands.check(checks.bot_is_connected)
     @commands.check(checks.user_is_connected)
     async def stop(self, inter: CommandInteraction):
+        """Stop and skip current music without disconnecting bot from voice channel
+
+        Parameters
+        ----------
+        inter : CommandInteraction
+            The interaction
+        """
         with StopService(self.bot) as ss:
             await ss(interaction=inter)
 
-    @commands.slash_command(
-        description="Pause the current music from the bot without stop it.",
-    )
+    @commands.slash_command()
     @commands.cooldown(1, 5.0, BucketType.user)
     @commands.check(checks.bot_is_playing)
     @commands.check(checks.bot_and_user_in_same_channel)
     @commands.check(checks.bot_is_connected)
     @commands.check(checks.user_is_connected)
     async def pause(self, inter: CommandInteraction):
+        """Pause the current music without skipping it
+
+        Parameters
+        ----------
+        inter : CommandInteraction
+            The interaction
+        """
         with PauseService(self.bot) as ps:
             await ps(interaction=inter)
 
-    @commands.slash_command(
-        description="Resume the current music",
-    )
+    @commands.slash_command()
     @commands.cooldown(1, 5.0, BucketType.user)
     @commands.check(checks.bot_is_not_playing)
     @commands.check(checks.bot_and_user_in_same_channel)
     @commands.check(checks.bot_is_connected)
     @commands.check(checks.user_is_connected)
     async def resume(self, inter: CommandInteraction):
+        """Resumes the current or the next music
+
+        Parameters
+        ----------
+        inter : CommandInteraction
+            The interaction
+        """
         with ResumeService(self.bot) as rs:
             await rs(interaction=inter)
 
-    @commands.slash_command(
-        description="Display the current music and the progression from the bot.",
-    )
+    @commands.slash_command()
     @commands.cooldown(1, 5.0, BucketType.user)
     @commands.check(checks.bot_and_user_in_same_channel)
     @commands.check(checks.bot_is_connected)
     @commands.check(checks.user_is_connected)
     async def current(self, inter: CommandInteraction):
+        """Shows the music currently playing and its progress
+
+        Parameters
+        ----------
+        inter : CommandInteraction
+            The interaction
+        """
         with CurrentSongService(self.bot) as css:
             await css(inter)
 
-    @commands.slash_command(
-        description="Connect the bot to your current voice channel",
-    )
+    @commands.slash_command()
     @commands.cooldown(1, 5.0, BucketType.user)
     @commands.check(checks.user_is_connected)
     @commands.check(checks.bot_is_not_connected)
     async def join(self, inter: CommandInteraction):
+        """Connect the bot to the voice channel you are in
+
+        Parameters
+        ----------
+        inter : CommandInteraction
+            The interaction
+        """
         with JoinService(self.bot) as js:
             await js(interaction=inter)
 
-    @commands.slash_command(
-        description="Skip the current song.",
-    )
+    @commands.slash_command()
     @commands.cooldown(3, 10.0, BucketType.user)
     @commands.check(checks.bot_is_streaming)
     @commands.check(checks.bot_and_user_in_same_channel)
     @commands.check(checks.bot_is_connected)
     @commands.check(checks.user_is_connected)
     async def skip(self, inter: CommandInteraction):
+        """Skips to the next music in the queue. Stop the music if the queue is empty
+
+        Parameters
+        ----------
+        inter : CommandInteraction
+            The interaction
+        """
         with SkipService(self.bot) as ss:
             await ss(interaction=inter)
 
-    @commands.slash_command(
-        description="Send the current song in your DM to save it.",
-    )
+    @commands.slash_command()
     @commands.check(checks.bot_is_playing)
     @commands.check(checks.bot_and_user_in_same_channel)
     @commands.check(checks.bot_is_connected)
     @commands.check(checks.user_is_connected)
     @commands.cooldown(1, 10.0, BucketType.user)
     async def grab(self, inter: CommandInteraction):
+        """Similar to the current command but sends the message in DM
+
+        Parameters
+        ----------
+        inter : CommandInteraction
+            The interaction
+        """
         with GrabService(self.bot) as gs:
             await gs(interaction=inter)
 
@@ -151,14 +190,14 @@ class Music(commands.Cog):
     ):
         """
         Allow user to enable or disable the looping of a song or queue.
+
         Parameters
         ----------
         inter: The interaction
         mode: The loop mode
-
-        Returns
-        -------
-
+                - song (loop the current song)
+                - queue (loop the current queue)
+                - none (disable looping)
         """
         with LoopService(self.bot) as lp:
             await lp(interaction=inter, mode=mode)
@@ -168,15 +207,12 @@ class Music(commands.Cog):
     @commands.max_concurrency(1, BucketType.guild)
     async def find(self, inter: CommandInteraction, url: str):
         """
-        Shazam the song at the given url. It take the 20 first seconds of the media then Shazam it.
+        Parses the media at the given URL and returns the music used in it
+
         Parameters
         ----------
         inter: The interaction
         url: The url of the media to analyze
-
-        Returns
-        -------
-
         """
         if not regex.is_url(url):
             raise commands.UserInputError("Query must be an url to a media")
@@ -197,15 +233,12 @@ class Music(commands.Cog):
     @commands.max_concurrency(1, BucketType.guild)
     async def share(self, inter: CommandInteraction, url: str):
         """
-        Share the song at the given url. It return all the available streaming platform for the track.
+        Returns all streaming platforms available for the given media
+
         Parameters
         ----------
         inter: The inter
         url: The url of the music/album to share
-
-        Returns
-        -------
-
         """
         if not regex.is_url(url):
             raise commands.UserInputError("You must provide an URL.")

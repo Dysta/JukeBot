@@ -22,17 +22,29 @@ class Queue(commands.Cog):
     def __init__(self, bot):
         self.bot: Bot = bot
 
-    @commands.slash_command(description="Manipulate the queue of the player.")
+    @commands.slash_command()
     async def queue(self, inter: CommandInteraction):
+        """Base command to perform manipulations on the bot queue
+
+        Parameters
+        ----------
+        inter : CommandInteraction
+            The interaction
+        """
         pass
 
-    @queue.sub_command(
-        description="Show the queue of the server",
-    )
+    @queue.sub_command()
     @commands.cooldown(1, 3.0, BucketType.user)
     @commands.check(checks.bot_is_connected)
     @commands.check(checks.user_is_connected)
     async def show(self, inter: CommandInteraction):
+        """Shows queue, music count and total duration
+
+        Parameters
+        ----------
+        inter : CommandInteraction
+            The interaction
+        """
         queue: ResultSet = self.bot.players[inter.guild.id].queue
         e: Embed = embed.queue_message(inter.author, queue, title=f"Queue for {inter.guild.name}")
         await inter.send(embed=e)
@@ -48,17 +60,13 @@ class Queue(commands.Cog):
         query: str,
         top: Optional[bool] = False,
     ):
-        """
-        Add a song to the current queue
+        """Add a song to the current queue
+
         Parameters
         ----------
         inter: The interaction
         query: the URL or query to play
-        top: Put the requested song at the top of the queue
-
-        Returns
-        -------
-
+        top: Whether or not to put music at the top of the queue
         """
         with AddService(self.bot) as asr:
             await asr(interaction=inter, query=query, top=top)
@@ -70,16 +78,12 @@ class Queue(commands.Cog):
     @commands.check(checks.bot_is_connected)
     @commands.check(checks.user_is_connected)
     async def remove(self, inter: CommandInteraction, song: str):
-        """
-        Remove a song from the queue
+        """Remove a song from the queue
+
         Parameters
         ----------
         inter: The interaction
-        song: The song to remove
-
-        Returns
-        -------
-
+        song: The name of the music to remove. The bot auto completes the answer
         """
         with RemoveService(self.bot) as rs:
             await rs(interaction=inter, song=song)  # type:ignore
@@ -90,27 +94,37 @@ class Queue(commands.Cog):
         queue: ResultSet = self.bot.players[inter.guild.id].queue
         return [e.title for e in queue if data in e.title.lower()][:25]
 
-    @queue.sub_command(
-        description="Remove all the songs of the queue",
-    )
+    @queue.sub_command()
     @commands.cooldown(1, 5.0, BucketType.user)
     @commands.check(checks.bot_queue_is_not_empty)
     @commands.check(checks.bot_and_user_in_same_channel)
     @commands.check(checks.bot_is_connected)
     @commands.check(checks.user_is_connected)
     async def clear(self, inter: CommandInteraction):
+        """Remove all music from the current queue
+
+        Parameters
+        ----------
+        inter : CommandInteraction
+            The interaction
+        """
         with ClearService(self.bot) as cs:
             await cs(interaction=inter)
 
-    @queue.sub_command(
-        description="Shuffle the current queue.",
-    )
+    @queue.sub_command()
     @commands.check(checks.bot_queue_is_not_empty)
     @commands.check(checks.bot_and_user_in_same_channel)
     @commands.check(checks.bot_is_connected)
     @commands.check(checks.user_is_connected)
     @commands.cooldown(1, 10.0, BucketType.guild)
     async def shuffle(self, inter: CommandInteraction):
+        """Shuffles the current queue
+
+        Parameters
+        ----------
+        inter : CommandInteraction
+            The interaction
+        """
         with ShuffleService(self.bot) as ss:
             await ss(interaction=inter)
 
