@@ -17,9 +17,7 @@ class CurrentSongService(AbstractService):
         stream: AudioStream = player.stream
         song: Song = player.song
         if stream and song:
-            e = embed.music_message(
-                song.requester, song=song, current_duration=stream.progress
-            )
+            e = embed.music_message(song.requester, song=song, current_duration=stream.progress)
         else:
             e = embed.basic_message(
                 interaction.author,

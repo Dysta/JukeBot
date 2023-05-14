@@ -14,9 +14,7 @@ class ErrorHandler(commands.Cog):
         self._bot = bot
 
     @commands.Cog.listener()
-    async def on_slash_command_error(
-        self, inter: CommandInteraction, error: CommandError
-    ):
+    async def on_slash_command_error(self, inter: CommandInteraction, error: CommandError):
         if isinstance(error, commands.CommandNotFound):
             return
 

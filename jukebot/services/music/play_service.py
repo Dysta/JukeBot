@@ -7,14 +7,14 @@ from loguru import logger
 
 from jukebot import components
 from jukebot.abstract_components import AbstractService
+from jukebot.components.requests import StreamRequest
+from jukebot.services import ResetService
+from jukebot.services.music.join_service import JoinService
+from jukebot.services.queue.add_service import AddService
 from jukebot.utils import embed
 
-from .. import ResetService
-from ..queue.add_service import AddService
-from .join_service import JoinService
-
 if TYPE_CHECKING:
-    from jukebot.components import Player, Query, Result, Song
+    from jukebot.components import Player, Result, Song
 
 
 class PlayService(AbstractService):
@@ -52,10 +52,10 @@ class PlayService(AbstractService):
 
         rqs: Result = player.queue.get()
         author = rqs.requester
-        qry: Query = components.Query(rqs.web_url)
-        await qry.process()
+        async with StreamRequest(rqs.web_url) as req:
+            await req.execute()
 
-        song: Song = components.Song.from_query(qry)
+        song: Song = components.Song(req.result)
         song.requester = author
 
         async def inner(attempt: int) -> bool:

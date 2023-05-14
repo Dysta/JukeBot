@@ -10,14 +10,13 @@ from disnake import CommandInteraction, VoiceChannel, VoiceClient
 from disnake.ext.commands import Bot
 from loguru import logger
 
+from jukebot.components.audio_stream import AudioStream
+from jukebot.components.requests import StreamRequest
+from jukebot.components.resultset import ResultSet
+from jukebot.components.song import Song
 from jukebot.services.music import LeaveService, PlayService
+from jukebot.services.queue import AddService
 from jukebot.utils import coro
-
-from ..services.queue import AddService
-from .audio_stream import AudioStream
-from .query import Query
-from .resultset import ResultSet
-from .song import Song
 
 
 class Player:
@@ -87,12 +86,13 @@ class Player:
 
     async def play(self, song: Song, replay: bool = False):
         if replay:
-            #  we must requery the song to refresh the stream URL
-            #  some website can invalidate the stream URL after some times
+            # ? we must requery the song to refresh the stream URL
+            # ? some website can invalidate the stream URL after some times
             author = song.requester
-            qry: Query = Query(song.web_url)
-            await qry.process()
-            song: Song = Song.from_query(qry)
+            async with StreamRequest(song.web_url) as req:
+                await req.execute()
+
+            song: Song = Song(req.result)
             song.requester = author
 
         stream = AudioStream(song.stream_url)
@@ -143,9 +143,7 @@ class Player:
             return
         if self._loop.is_queue_loop:
             with AddService(self.bot) as ad:
-                func = ad(
-                    interaction=self.interaction, query=self.song.web_url, silent=True
-                )
+                func = ad(interaction=self.interaction, query=self.song.web_url, silent=True)
             asyncio.ensure_future(func, loop=self.bot.loop)
 
         self._stream = None

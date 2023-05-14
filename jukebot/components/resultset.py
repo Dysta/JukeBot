@@ -7,25 +7,18 @@ from typing import List, Optional
 from disnake import Member
 
 from jukebot.abstract_components import AbstractCollection
-
-from .query import Query
-from .result import Result
+from jukebot.components.result import Result
 
 
 @dataclass
 class ResultSet(AbstractCollection[Result]):
     @classmethod
-    def from_query(
-        cls, query: Query, requester: Optional[Member] = None
-    ) -> "ResultSet":
+    def from_result(cls, results: list, requester: Optional[Member] = None) -> ResultSet:
         result_set: List[Result] = []
-        results = query.results
-        if not query.type == Query.Type.PLAYLIST:
-            results = [query.results]
         for r in results:
-            rslt: Result = Result.from_entry(r)
-            rslt.requester = requester
-            result_set.append(rslt)
+            tmp: Result = Result(r)
+            tmp.requester = requester
+            result_set.append(tmp)
 
         return cls(set=result_set)
 

@@ -3,6 +3,7 @@ from __future__ import annotations
 import datetime
 import logging
 import os
+from contextlib import contextmanager
 
 from loguru import logger
 
@@ -43,3 +44,29 @@ def set_logging(
     else:
         logger.error(f"Unknown environment {os.environ['ENVIRONMENT']}.")
         exit(1)
+
+
+@contextmanager
+def disable_logging(name: str | None = None) -> None:
+    """Temporary disable logging for a given module
+
+    Parameters
+    ----------
+    name : str | None
+        The module name where you want to disable logging
+    Example
+    _______
+    ```
+    class MyTest(unittest.TestCase):
+
+        def test_do_something(self):
+            with disable_logger('mypackage.mymodule'):
+                mymodule.do_something()
+    ```
+    """
+    name = "jukebot" if not name else name
+    logger.disable(name)
+    try:
+        yield
+    finally:
+        logger.enable(name)

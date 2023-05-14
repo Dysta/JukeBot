@@ -1,0 +1,477 @@
+import unittest
+
+from jukebot.components import Result, ResultSet
+from jukebot.components.requests import MusicRequest
+from jukebot.utils.logging import disable_logging
+
+
+class TestMusicRequestComponent(unittest.IsolatedAsyncioTestCase):
+    async def test_music_request_success_youtube_url(self):
+        with disable_logging():
+            async with MusicRequest("https://www.youtube.com/watch?v=8GW6sLrK40k") as req:
+                await req.execute()
+
+        self.assertTrue(req.success)
+        self.assertIsNotNone(req.result)
+        self.assertEqual(req.type, MusicRequest.ResultType.TRACK)
+
+        result: dict = req.result
+
+        self.assertEqual(result.get("title"), "HOME - Resonance")
+        self.assertEqual(result.get("uploader"), "Electronic Gems")
+        self.assertEqual(result.get("webpage_url"), "https://www.youtube.com/watch?v=8GW6sLrK40k")
+        self.assertEqual(result.get("duration"), 213)
+        self.assertEqual(result.get("live_status"), "not_live")
+        self.assertIsNotNone(result.get("thumbnail"))
+
+    async def test_music_request_success_youtube_live_url(self):
+        with disable_logging():
+            async with MusicRequest("https://www.youtube.com/watch?v=MVPTGNGiI-4") as req:
+                await req.execute()
+
+        self.assertTrue(req.success)
+        self.assertIsNotNone(req.result)
+        self.assertEqual(req.type, MusicRequest.ResultType.TRACK)
+
+        result: dict = req.result
+
+        self.assertIn("synthwave radio 🌌 - beats to chill/game to", result.get("title"))
+        self.assertEqual(result.get("uploader"), "Lofi Girl")
+        self.assertEqual(result.get("webpage_url"), "https://www.youtube.com/watch?v=MVPTGNGiI-4")
+        self.assertIsNone(result.get("duration"))
+        self.assertEqual(result.get("live_status"), "is_live")
+        self.assertIsNotNone(result.get("thumbnail"))
+
+    async def test_music_request_success_soundcloud_url(self):
+        with disable_logging():
+            async with MusicRequest(
+                "https://soundcloud.com/gee_baller/playboi-carti-cult-classic"
+            ) as req:
+                await req.execute()
+
+        self.assertTrue(req.success)
+        self.assertIsNotNone(req.result)
+        self.assertEqual(req.type, MusicRequest.ResultType.TRACK)
+
+        result: dict = req.result
+
+        self.assertEqual(result.get("title"), "Playboi Carti – Cult Classic")
+        self.assertEqual(result.get("uploader"), "Gee Baller")
+        self.assertEqual(
+            result.get("webpage_url"),
+            "https://soundcloud.com/gee_baller/playboi-carti-cult-classic",
+        )
+        self.assertEqual(round(result.get("duration")), 118)
+        self.assertIsNone(result.get("thumbnail"))
+
+    async def test_music_request_playlist_youtube_url(self):
+        with disable_logging():
+            async with MusicRequest(
+                "https://www.youtube.com/playlist?list=PLjnOFoOKDEU9rzMtOaKGLABN7QhG19Nl0"
+            ) as req:
+                await req.execute()
+
+        self.assertTrue(req.success)
+        self.assertIsNotNone(req.result)
+        self.assertEqual(req.type, MusicRequest.ResultType.PLAYLIST)
+
+        results: list = req.result
+
+        self.assertTrue(isinstance(results, list))
+        self.assertEqual(len(results), 8)
+
+        # test each result
+        result = results.pop(0)
+        self.assertEqual(len(results), 7)
+        self.assertEqual(result.get("title"), "Clams Casino - Water Theme")
+        self.assertEqual(result.get("duration"), 110)
+        self.assertIsNotNone(result.get("url"))
+        self.assertEqual(result.get("channel"), "Clams Casino")
+
+        result = results.pop(0)
+        self.assertEqual(len(results), 6)
+        self.assertEqual(result.get("title"), "Clams Casino - Water Theme 2")
+        self.assertEqual(result.get("duration"), 122)
+        self.assertIsNotNone(result.get("url"))
+        self.assertEqual(result.get("channel"), "Clams Casino")
+
+        result = results.pop(0)
+        self.assertEqual(len(results), 5)
+        self.assertEqual(result.get("title"), "Clams Casino - Misty")
+        self.assertEqual(result.get("duration"), 145)
+        self.assertIsNotNone(result.get("url"))
+        self.assertEqual(result.get("channel"), "Clams Casino")
+
+        result = results.pop(0)
+        self.assertEqual(len(results), 4)
+        self.assertEqual(result.get("title"), "Clams Casino - Tunnel Speed")
+        self.assertEqual(result.get("duration"), 138)
+        self.assertIsNotNone(result.get("url"))
+        self.assertEqual(result.get("channel"), "Clams Casino")
+
+        result = results.pop(0)
+        self.assertEqual(len(results), 3)
+        self.assertEqual(result.get("title"), "Clams Casino - Pine")
+        self.assertEqual(result.get("duration"), 127)
+        self.assertIsNotNone(result.get("url"))
+        self.assertEqual(result.get("channel"), "Clams Casino")
+
+        result = results.pop(0)
+        self.assertEqual(len(results), 2)
+        self.assertEqual(result.get("title"), "Clams Casino - Emblem")
+        self.assertEqual(result.get("duration"), 110)
+        self.assertIsNotNone(result.get("url"))
+        self.assertEqual(result.get("channel"), "Clams Casino")
+
+        result = results.pop(0)
+        self.assertEqual(len(results), 1)
+        self.assertEqual(result.get("title"), "Clams Casino - Unknown")
+        self.assertEqual(result.get("duration"), 81)
+        self.assertIsNotNone(result.get("url"))
+        self.assertEqual(result.get("channel"), "Clams Casino")
+
+        result = results.pop(0)
+        self.assertEqual(len(results), 0)
+        self.assertEqual(result.get("title"), "Clams Casino - Winter Flower")
+        self.assertEqual(result.get("duration"), 174)
+        self.assertIsNotNone(result.get("url"))
+        self.assertEqual(result.get("channel"), "Clams Casino")
+
+    async def test_music_request_playlist_soundcloud_url(self):
+        with disable_logging():
+            async with MusicRequest("https://soundcloud.com/dysta/sets/breakcore") as req:
+                await req.execute()
+
+        self.assertTrue(req.success)
+        self.assertIsNotNone(req.result)
+        self.assertEqual(req.type, MusicRequest.ResultType.PLAYLIST)
+
+        results: list = req.result
+
+        self.assertTrue(isinstance(results, list))
+        self.assertEqual(len(results), 4)
+
+        # ? SoundCloud API doesn't return any title/channel or duration
+        # ? only a stream link that will be used in StreamRequest
+        # test each result
+        result = results.pop(0)
+        self.assertEqual(len(results), 3)
+        self.assertIsNotNone(result.get("url"))
+
+        # test each result
+        result = results.pop(0)
+        self.assertEqual(len(results), 2)
+        self.assertIsNotNone(result.get("url"))
+
+        # test each result
+        result = results.pop(0)
+        self.assertEqual(len(results), 1)
+        self.assertIsNotNone(result.get("url"))
+
+        # test each result
+        result = results.pop(0)
+        self.assertEqual(len(results), 0)
+        self.assertIsNotNone(result.get("url"))
+
+    async def test_music_request_success_youtube_query(self):
+        with disable_logging():
+            async with MusicRequest("Home - Resonance") as req:
+                await req.execute()
+
+        self.assertTrue(req.success)
+        self.assertIsNotNone(req.result)
+        self.assertEqual(req.type, MusicRequest.ResultType.TRACK)
+
+        result: dict = req.result
+
+        self.assertEqual(result.get("title"), "HOME - Resonance")
+        self.assertEqual(result.get("channel"), "Electronic Gems")
+        self.assertEqual(result.get("url"), "https://www.youtube.com/watch?v=8GW6sLrK40k")
+        self.assertEqual(result.get("duration"), 213)
+
+    async def test_music_request_failed_youtube_query(self):
+        with disable_logging():
+            async with MusicRequest(
+                "khfdkjshdfglmdsjfgtlkdjsfgkjshdfkgljhdskfjghkdljfhgkldsjfhg"
+            ) as req:
+                await req.execute()
+
+        self.assertFalse(req.success)
+        self.assertIsNone(req.result)
+        self.assertEqual(req.type, MusicRequest.ResultType.UNKNOWN)
+
+    async def test_music_request_failed_youtube_empty_query(self):
+        with disable_logging():
+            async with MusicRequest("") as req:
+                await req.execute()
+
+        self.assertFalse(req.success)
+        self.assertIsNone(req.result)
+        self.assertEqual(req.type, MusicRequest.ResultType.UNKNOWN)
+
+    async def test_music_request_failed_youtube_invalid_url(self):
+        with disable_logging():
+            async with MusicRequest("https://www.youtube.com/watch?v=8GW7sLrK40k") as req:
+                await req.execute()
+
+        self.assertFalse(req.success)
+        self.assertIsNone(req.result)
+        self.assertEqual(req.type, MusicRequest.ResultType.UNKNOWN)
+
+    async def test_music_request_failed_soundcloud_invalid_url(self):
+        with disable_logging():
+            async with MusicRequest(
+                "https://soundcloud.com/dysta/loopshit-plz-dont-plz-dont"
+            ) as req:
+                await req.execute()
+
+        self.assertFalse(req.success)
+        self.assertIsNone(req.result)
+        self.assertEqual(req.type, MusicRequest.ResultType.UNKNOWN)
+
+    async def test_music_request_youtube_url_convert_to_result(self):
+        with disable_logging():
+            async with MusicRequest("https://www.youtube.com/watch?v=8GW6sLrK40k") as req:
+                await req.execute()
+
+        self.assertTrue(req.success)
+        self.assertIsNotNone(req.result)
+        self.assertEqual(req.type, MusicRequest.ResultType.TRACK)
+
+        result: Result = Result(req.result)
+
+        self.assertEqual(result.title, "HOME - Resonance")
+        self.assertEqual(result.channel, "Electronic Gems")
+        self.assertEqual(result.web_url, "https://www.youtube.com/watch?v=8GW6sLrK40k")
+        self.assertEqual(result.duration, 213)
+        self.assertEqual(result.fmt_duration, "3:33")
+        self.assertFalse(result.live)
+        self.assertIsNone(result.requester)
+
+    async def test_music_request_youtube_query_convert_to_result(self):
+        with disable_logging():
+            async with MusicRequest("Home - Resonance") as req:
+                await req.execute()
+
+        self.assertTrue(req.success)
+        self.assertIsNotNone(req.result)
+        self.assertEqual(req.type, MusicRequest.ResultType.TRACK)
+
+        result: Result = Result(req.result)
+
+        self.assertEqual(result.title, "HOME - Resonance")
+        self.assertEqual(result.channel, "Electronic Gems")
+        self.assertEqual(result.web_url, "https://www.youtube.com/watch?v=8GW6sLrK40k")
+        self.assertEqual(result.duration, 213)
+        self.assertEqual(result.fmt_duration, "3:33")
+        self.assertFalse(result.live)
+        self.assertIsNone(result.requester)
+
+    async def test_music_request_success_soundcloud_url_convert_to_result(self):
+        with disable_logging():
+            async with MusicRequest(
+                "https://soundcloud.com/gee_baller/playboi-carti-cult-classic"
+            ) as req:
+                await req.execute()
+
+        self.assertTrue(req.success)
+        self.assertIsNotNone(req.result)
+        self.assertEqual(req.type, MusicRequest.ResultType.TRACK)
+
+        result: Result = Result(req.result)
+
+        self.assertEqual(result.title, "Playboi Carti – Cult Classic")
+        self.assertEqual(result.channel, "Gee Baller")
+        self.assertEqual(
+            result.web_url,
+            "https://soundcloud.com/gee_baller/playboi-carti-cult-classic",
+        )
+        self.assertEqual(result.duration, 118)
+        self.assertEqual(result.fmt_duration, "1:58")
+        self.assertFalse(result.live)
+        self.assertIsNone(result.requester)
+
+    async def test_music_request_success_soundcloud_shorted_url_convert_to_result(self):
+        with disable_logging():
+            async with MusicRequest("https://on.soundcloud.com/Gsdzc") as req:
+                await req.execute()
+
+        self.assertTrue(req.success)
+        self.assertIsNotNone(req.result)
+        self.assertEqual(req.type, MusicRequest.ResultType.TRACK)
+
+        result: Result = Result(req.result)
+
+        self.assertEqual(result.title, "Headband Andy Vito Bad Boy")
+        self.assertEqual(result.channel, "Minecraft Pukaj 009 Sk")
+        self.assertEqual(
+            result.web_url,
+            "https://soundcloud.com/minecraft-pukaj-009-sk/headband-andy-vito-bad-boy",
+        )
+        self.assertEqual(result.duration, 0)
+        self.assertEqual(result.fmt_duration, "ထ")
+        self.assertTrue(result.live)
+        self.assertIsNone(result.requester)
+
+    async def test_music_request_youtube_live_url_convert_to_result(self):
+        with disable_logging():
+            async with MusicRequest("https://www.youtube.com/watch?v=MVPTGNGiI-4") as req:
+                await req.execute()
+
+        self.assertTrue(req.success)
+        self.assertIsNotNone(req.result)
+        self.assertEqual(req.type, MusicRequest.ResultType.TRACK)
+
+        result: Result = Result(req.result)
+
+        self.assertIn("synthwave radio 🌌 - beats to chill/game to", result.title)
+        self.assertEqual(result.channel, "Lofi Girl")
+        self.assertEqual(result.web_url, "https://www.youtube.com/watch?v=MVPTGNGiI-4")
+        self.assertEqual(result.duration, 0)
+        self.assertEqual(result.fmt_duration, "ထ")
+        self.assertTrue(result.live)
+
+    async def test_music_request_playlist_youtube_url_convert_to_resultset(self):
+        with disable_logging():
+            async with MusicRequest(
+                "https://www.youtube.com/playlist?list=PLjnOFoOKDEU9rzMtOaKGLABN7QhG19Nl0"
+            ) as req:
+                await req.execute()
+
+        self.assertTrue(req.success)
+        self.assertIsNotNone(req.result)
+        self.assertEqual(req.type, MusicRequest.ResultType.PLAYLIST)
+        self.assertTrue(isinstance(req.result, list))
+        self.assertEqual(len(req.result), 8)
+
+        results: ResultSet = ResultSet.from_result(req.result)
+        self.assertEqual(len(results), 8)
+
+        # test each result
+        result: Result = results.get()
+        self.assertEqual(len(results), 7)
+        self.assertEqual(result.title, "Clams Casino - Water Theme")
+        self.assertEqual(result.channel, "Clams Casino")
+        self.assertEqual(result.duration, 110)
+        self.assertEqual(result.fmt_duration, "1:50")
+        self.assertEqual(result.web_url, "https://www.youtube.com/watch?v=CCXHU3AjVPs")
+        self.assertFalse(result.live)
+
+        result = results.get()
+        self.assertEqual(len(results), 6)
+        self.assertEqual(result.title, "Clams Casino - Water Theme 2")
+        self.assertEqual(result.channel, "Clams Casino")
+        self.assertEqual(result.duration, 122)
+        self.assertEqual(result.fmt_duration, "2:02")
+        self.assertEqual(result.web_url, "https://www.youtube.com/watch?v=F-NH1cxEVz8")
+        self.assertFalse(result.live)
+
+        result = results.get()
+        self.assertEqual(len(results), 5)
+        self.assertEqual(result.title, "Clams Casino - Misty")
+        self.assertEqual(result.channel, "Clams Casino")
+        self.assertEqual(result.duration, 145)
+        self.assertEqual(result.fmt_duration, "2:25")
+        self.assertEqual(result.web_url, "https://www.youtube.com/watch?v=e2ho4sQm_sU")
+        self.assertFalse(result.live)
+
+        result = results.get()
+        self.assertEqual(len(results), 4)
+        self.assertEqual(result.title, "Clams Casino - Tunnel Speed")
+        self.assertEqual(result.channel, "Clams Casino")
+        self.assertEqual(result.duration, 138)
+        self.assertEqual(result.fmt_duration, "2:18")
+        self.assertEqual(result.web_url, "https://www.youtube.com/watch?v=x2-LawcTIVk")
+        self.assertFalse(result.live)
+
+        result = results.get()
+        self.assertEqual(len(results), 3)
+        self.assertEqual(result.title, "Clams Casino - Pine")
+        self.assertEqual(result.channel, "Clams Casino")
+        self.assertEqual(result.duration, 127)
+        self.assertEqual(result.fmt_duration, "2:07")
+        self.assertEqual(result.web_url, "https://www.youtube.com/watch?v=X1WLnqN4oPI")
+        self.assertFalse(result.live)
+
+        result = results.get()
+        self.assertEqual(len(results), 2)
+        self.assertEqual(result.title, "Clams Casino - Emblem")
+        self.assertEqual(result.channel, "Clams Casino")
+        self.assertEqual(result.duration, 110)
+        self.assertEqual(result.fmt_duration, "1:50")
+        self.assertEqual(result.web_url, "https://www.youtube.com/watch?v=41qlOmiRrLM")
+        self.assertFalse(result.live)
+
+        result = results.get()
+        self.assertEqual(len(results), 1)
+        self.assertEqual(result.title, "Clams Casino - Unknown")
+        self.assertEqual(result.channel, "Clams Casino")
+        self.assertEqual(result.duration, 81)
+        self.assertEqual(result.fmt_duration, "1:21")
+        self.assertEqual(result.web_url, "https://www.youtube.com/watch?v=4SEcDxD9QGg")
+        self.assertFalse(result.live)
+
+        result = results.get()
+        self.assertEqual(len(results), 0)
+        self.assertEqual(result.title, "Clams Casino - Winter Flower")
+        self.assertEqual(result.channel, "Clams Casino")
+        self.assertEqual(result.duration, 174)
+        self.assertEqual(result.fmt_duration, "2:54")
+        self.assertEqual(result.web_url, "https://www.youtube.com/watch?v=P45rOK-SlDY")
+        self.assertFalse(result.live)
+
+    async def test_music_request_playlist_soundcloud_url_convert_to_resultset(self):
+        with disable_logging():
+            async with MusicRequest("https://soundcloud.com/dysta/sets/breakcore") as req:
+                await req.execute()
+
+        self.assertTrue(req.success)
+        self.assertIsNotNone(req.result)
+        self.assertEqual(req.type, MusicRequest.ResultType.PLAYLIST)
+        self.assertTrue(isinstance(req.result, list))
+        self.assertEqual(len(req.result), 4)
+
+        results: ResultSet = ResultSet.from_result(req.result)
+        self.assertEqual(len(results), 4)
+
+        # ? SoundCloud API doesn't return any title/channel or duration
+        # ? only a stream link that will be used in StreamRequest
+        # test each result
+        result = results.get()
+        self.assertEqual(len(results), 3)
+        self.assertEqual(result.web_url, "https://soundcloud.com/rmdh-it/goreshit-fine-night")
+        self.assertEqual(result.title, "Goreshit Fine Night")
+        self.assertEqual(result.channel, "Rmdh It")
+        self.assertEqual(result.duration, 0)
+        self.assertEqual(result.fmt_duration, "ထ")
+        self.assertTrue(result.live)
+
+        # test each result
+        result = results.get()
+        self.assertEqual(len(results), 2)
+        self.assertEqual(result.web_url, "https://soundcloud.com/harmful-logic/self-worth-1")
+        self.assertEqual(result.title, "Self Worth 1")
+        self.assertEqual(result.channel, "Harmful Logic")
+        self.assertEqual(result.duration, 0)
+        self.assertEqual(result.fmt_duration, "ထ")
+        self.assertTrue(result.live)
+
+        # test each result
+        result = results.get()
+        self.assertEqual(len(results), 1)
+        self.assertEqual(result.web_url, "https://soundcloud.com/imhiraeth/spyglass-w-mystik")
+        self.assertEqual(result.title, "Spyglass W Mystik")
+        self.assertEqual(result.channel, "Imhiraeth")
+        self.assertEqual(result.duration, 0)
+        self.assertEqual(result.fmt_duration, "ထ")
+        self.assertTrue(result.live)
+
+        # test each result
+        result = results.get()
+        self.assertEqual(len(results), 0)
+        self.assertEqual(result.web_url, "https://soundcloud.com/ilyquintuple/woke-up-in-a-dream")
+        self.assertEqual(result.title, "Woke Up In A Dream")
+        self.assertEqual(result.channel, "Ilyquintuple")
+        self.assertEqual(result.duration, 0)
+        self.assertEqual(result.fmt_duration, "ထ")
+        self.assertTrue(result.live)

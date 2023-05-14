@@ -11,9 +11,7 @@ if TYPE_CHECKING:
 
 
 class ResetService(AbstractService):
-    async def __call__(
-        self, /, interaction: CommandInteraction, silent: Optional[bool] = False
-    ):
+    async def __call__(self, /, interaction: CommandInteraction, silent: Optional[bool] = False):
         if not interaction.guild.id in self.bot.players:
             logger.opt(lazy=True).debug(
                 f"Server {interaction.guild.name} ({interaction.guild.id}) try to kill a player that don't exist."
@@ -38,7 +36,5 @@ class ResetService(AbstractService):
             f"Server {interaction.guild.name} ({interaction.guild.id}) has successfully reset his player."
         )
         if not silent:
-            e: Embed = embed.info_message(
-                interaction.author, content="The player has been reset."
-            )
+            e: Embed = embed.info_message(interaction.author, content="The player has been reset.")
             await interaction.send(embed=e)

@@ -16,9 +16,7 @@ class GrabService(AbstractService):
         player: Player = self.bot.players[interaction.guild.id]
         stream: AudioStream = player.stream
         song: Song = player.song
-        e = embed.grab_message(
-            song.requester, song=song, current_duration=stream.progress
-        )
+        e = embed.grab_message(song.requester, song=song, current_duration=stream.progress)
         e.add_field(
             name="Voice channel",
             value=f"`{interaction.guild.name} — {interaction.author.voice.channel.name}`",
