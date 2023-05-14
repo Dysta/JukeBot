@@ -36,6 +36,10 @@ class Result:
         if "soundcloud" in self.web_url:
             # ? SoundCloud API return only the url
             # ? we try to define title and channel from it
+            if "?" in self.web_url:
+                # ? Remove metadata from url
+                self.web_url = self.web_url.split("?")[0]
+
             *_, tmp_channel, tmp_title = self.web_url.split("/")
             if self.channel == "Unknown":
                 self.channel = tmp_channel.replace("-", " ").title()

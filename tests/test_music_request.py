@@ -291,6 +291,28 @@ class TestMusicRequestComponent(unittest.IsolatedAsyncioTestCase):
         self.assertFalse(result.live)
         self.assertIsNone(result.requester)
 
+    async def test_music_request_success_soundcloud_shorted_url_convert_to_result(self):
+        with disable_logging():
+            async with MusicRequest("https://on.soundcloud.com/Gsdzc") as req:
+                await req.execute()
+
+        self.assertTrue(req.success)
+        self.assertIsNotNone(req.result)
+        self.assertEqual(req.type, MusicRequest.ResultType.TRACK)
+
+        result: Result = Result(req.result)
+
+        self.assertEqual(result.title, "Headband Andy Vito Bad Boy")
+        self.assertEqual(result.channel, "Minecraft Pukaj 009 Sk")
+        self.assertEqual(
+            result.web_url,
+            "https://soundcloud.com/minecraft-pukaj-009-sk/headband-andy-vito-bad-boy",
+        )
+        self.assertEqual(result.duration, 0)
+        self.assertEqual(result.fmt_duration, "ထ")
+        self.assertTrue(result.live)
+        self.assertIsNone(result.requester)
+
     async def test_music_request_youtube_live_url_convert_to_result(self):
         with disable_logging():
             async with MusicRequest("https://www.youtube.com/watch?v=MVPTGNGiI-4") as req:
