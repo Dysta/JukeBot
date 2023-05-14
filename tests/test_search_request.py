@@ -46,8 +46,6 @@ class TestSearchRequestComponent(unittest.IsolatedAsyncioTestCase):
             async with SearchRequest("Slowdive - sleep", SearchRequest.Engine.Youtube) as req:
                 await req.execute()
 
-        self.assertFalse(req._process)
-
         self.assertTrue(req.result)
         self.assertIsNotNone(req.result)
         self.assertIsInstance(req.result, list)
@@ -60,8 +58,6 @@ class TestSearchRequestComponent(unittest.IsolatedAsyncioTestCase):
         with disable_logging():
             async with SearchRequest("Slowdive - sleep", SearchRequest.Engine.Youtube) as req:
                 await req.execute()
-
-        self.assertFalse(req._process)
 
         self.assertTrue(req.result)
         self.assertIsNotNone(req.result)
@@ -80,8 +76,6 @@ class TestSearchRequestComponent(unittest.IsolatedAsyncioTestCase):
             async with SearchRequest("Slowdive - sleep", SearchRequest.Engine.SoundCloud) as req:
                 await req.execute()
 
-        self.assertTrue(req._process)
-
         self.assertTrue(req.result)
         self.assertIsNotNone(req.result)
         self.assertIsInstance(req.result, list)
@@ -94,8 +88,6 @@ class TestSearchRequestComponent(unittest.IsolatedAsyncioTestCase):
         with disable_logging():
             async with SearchRequest("Slowdive - sleep", SearchRequest.Engine.SoundCloud) as req:
                 await req.execute()
-
-        self.assertTrue(req._process)
 
         self.assertTrue(req.result)
         self.assertIsNotNone(req.result)
@@ -114,8 +106,6 @@ class TestSearchRequestComponent(unittest.IsolatedAsyncioTestCase):
             async with SearchRequest("Slowdive - sleep", "ytsearch10:") as req:
                 await req.execute()
 
-        self.assertFalse(req._process)
-
         self.assertTrue(req.result)
         self.assertIsNotNone(req.result)
         self.assertIsInstance(req.result, list)
@@ -128,8 +118,6 @@ class TestSearchRequestComponent(unittest.IsolatedAsyncioTestCase):
         with disable_logging():
             async with SearchRequest("Slowdive - sleep", "ytsearch10:") as req:
                 await req.execute()
-
-        self.assertFalse(req._process)
 
         self.assertTrue(req.result)
         self.assertIsNotNone(req.result)
@@ -148,8 +136,6 @@ class TestSearchRequestComponent(unittest.IsolatedAsyncioTestCase):
             async with SearchRequest("Slowdive - sleep", "scsearch10:") as req:
                 await req.execute()
 
-        self.assertTrue(req._process)
-
         self.assertTrue(req.result)
         self.assertIsNotNone(req.result)
         self.assertIsInstance(req.result, list)
@@ -162,8 +148,6 @@ class TestSearchRequestComponent(unittest.IsolatedAsyncioTestCase):
         with disable_logging():
             async with SearchRequest("Slowdive - sleep", "scsearch10:") as req:
                 await req.execute()
-
-        self.assertTrue(req._process)
 
         self.assertTrue(req.result)
         self.assertIsNotNone(req.result)

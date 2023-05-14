@@ -22,14 +22,6 @@ class SearchRequest(AbstractRequest):
         Youtube = "ytsearch10:"
         SoundCloud = "scsearch10:"
 
-        @property
-        def is_youtube(self) -> bool:
-            return self == SearchRequest.Engine.Youtube
-
-        @property
-        def is_soundcloud(self) -> bool:
-            return self == SearchRequest.Engine.SoundCloud
-
         @classmethod
         def value_of(cls, value) -> SearchRequest.Engine:
             for k, v in cls.__members__.items():
@@ -61,13 +53,12 @@ class SearchRequest(AbstractRequest):
 
         self._engine: SearchRequest.Engine = SearchRequest.Engine.value_of(engine)
         self._params: dict = {**SearchRequest.YTDL_OPTIONS}
-        self._process: bool = False
 
         super().__init__(f"{self._engine.value}{query}")
 
     async def setup(self):
-        self._process = self._engine.is_soundcloud
-        logger.opt(lazy=True).debug(f"Query {self._query} have process state at {self._process}.")
+        # * nothing to do
+        pass
 
     async def execute(self):
         with yt_dlp.YoutubeDL(params=self._params) as ytdl:
@@ -75,9 +66,7 @@ class SearchRequest(AbstractRequest):
             try:
                 data = await loop.run_in_executor(
                     None,
-                    lambda: ytdl.extract_info(
-                        url=self._query, download=False, process=self._process
-                    ),
+                    lambda: ytdl.extract_info(url=self._query, download=False, process=False),
                 )
             except Exception as e:
                 logger.error(f"Exception in query {self._query}. {e}")
