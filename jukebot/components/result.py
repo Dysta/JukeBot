@@ -40,7 +40,11 @@ class Result:
                 # ? Remove metadata from url
                 self.web_url = self.web_url.split("?")[0]
 
-            *_, tmp_channel, tmp_title = self.web_url.split("/")
+            # ? should give [https, "" (because of double slash), soundlouc, channel, title, secret (if exist)]
+            data = self.web_url.split("/")
+            data = data[3:]  # ? we remove the 3 first element (https, "", soundcloud.com)
+            tmp_channel: str = data[0]  # ? we keep channel
+            tmp_title: str = data[1]  # ? and title
             if self.channel == "Unknown":
                 self.channel = tmp_channel.replace("-", " ").title()
             if self.title == "Unknown":
