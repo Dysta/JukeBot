@@ -18,8 +18,5 @@ class RemoveService(AbstractService):
         if not (elem := queue.remove(song)):
             raise commands.UserInputError(f"Can't delete item `{song}`")
 
-        e: Embed = embed.basic_message(
-            interaction.author,
-            content=f"`{elem.title}` have been removed from the queue",
-        )
+        e: Embed = embed.basic_message(content=f"`{elem.title}` have been removed from the queue")
         await interaction.send(embed=e)

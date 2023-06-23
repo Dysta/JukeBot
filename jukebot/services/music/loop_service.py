@@ -25,5 +25,5 @@ class LoopService(AbstractService):
             player.loop = components.Player.Loop.DISABLED
             new_status = "Loop is disabled"
 
-        e: embed = embed.basic_message(interaction.author, title=new_status)
+        e: embed = embed.basic_message(title=new_status)
         await interaction.send(embed=e)

@@ -39,9 +39,7 @@ class AddService(AbstractService):
             else:
                 player.queue += res
 
-            e: Embed = embed.basic_queue_message(
-                interaction.author, title=f"Enqueued : {len(res)} songs"
-            )
+            e: Embed = embed.basic_queue_message(title=f"Enqueued : {len(res)} songs")
             await interaction.edit_original_message(embed=e)
         else:
             res: Result = components.Result(req.result)
@@ -52,6 +50,6 @@ class AddService(AbstractService):
             else:
                 player.queue.put(res)
             if not silent:
-                e: Embed = embed.result_enqueued(interaction.author, res)
+                e: Embed = embed.result_enqueued(res)
                 await interaction.edit_original_message(embed=e)
         return True

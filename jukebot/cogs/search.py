@@ -65,11 +65,7 @@ class Search(commands.Cog):
                 f"Nothing found for {query}", query=query, full_query=f"{source}{query}"
             )
 
-        e = embed.search_result_message(
-            inter.author,
-            playlist=results,
-            title=f"Result for {query}",
-        )
+        e = embed.search_result_message(playlist=results, title=f"Result for {query}")
 
         v = SearchDropdownView(inter.author, results)
         await inter.edit_original_message(embed=e, view=v)

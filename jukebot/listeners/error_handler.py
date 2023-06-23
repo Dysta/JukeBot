@@ -32,7 +32,7 @@ class ErrorHandler(commands.Cog):
                 await inter.send(embed=e, ephemeral=True)
             return
 
-        e = embed.error_message(inter.author, content=error)
+        e = embed.error_message(content=error)
         if inter.response.is_done():
             await inter.edit_original_message(embed=e)
         else:

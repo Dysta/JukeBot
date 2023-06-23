@@ -12,5 +12,5 @@ class SkipService(AbstractService):
     async def __call__(self, /, interaction: CommandInteraction, silent: Optional[bool] = False):
         self.bot.players[interaction.guild.id].skip()
         if not silent:
-            e: embed = embed.basic_message(interaction.author, title="Skipped !")
+            e: embed = embed.basic_message(title="Skipped !")
             await interaction.send(embed=e)

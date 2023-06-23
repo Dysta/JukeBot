@@ -12,5 +12,5 @@ class PauseService(AbstractService):
     async def __call__(self, /, interaction: CommandInteraction, silent: Optional[bool] = False):
         self.bot.players[interaction.guild.id].pause()
         if not silent:
-            e = embed.basic_message(interaction.author, title="Player paused")
+            e = embed.basic_message(title="Player paused")
             await interaction.send(embed=e)

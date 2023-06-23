@@ -28,7 +28,7 @@ class Utility(commands.Cog):
         inter : CommandInteraction
             The interaction
         """
-        e = embed.info_message(inter.author)
+        e = embed.info_message()
         e.add_field(name="🤖 Name", value=f"┕`{self.bot.user.display_name}`", inline=True)
         e.add_field(name="📡 Ping", value=f"┕`{self.bot.latency * 1000:.2f}ms`", inline=True)
         uptime = datetime.now() - self.bot.start_time
@@ -86,7 +86,6 @@ class Utility(commands.Cog):
             target_application=applications.default["youtube"],
         )
         e = embed.activity_message(
-            inter.author,
             "Watch Together started!",
             f"An activity started in `{inter.author.voice.channel.name}`.\n",
         )

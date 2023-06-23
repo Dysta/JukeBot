@@ -19,15 +19,13 @@ class ResumeService(AbstractService):
         if player.is_paused:
             player.resume()
             if not silent:
-                e = embed.basic_message(interaction.author, title="Player resumed")
+                e = embed.basic_message(title="Player resumed")
                 await interaction.send(embed=e)
         elif player.state.is_stopped and not player.queue.is_empty():
             with PlayService(self.bot) as ps:
                 await ps(interaction=interaction, query="")
         else:
             e = embed.basic_message(
-                interaction.author,
-                title="Nothing to play",
-                content=f"Try `/play` to add a music !",
+                title="Nothing to play", content=f"Try `/play` to add a music !"
             )
             await interaction.send(embed=e)

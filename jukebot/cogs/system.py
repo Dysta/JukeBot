@@ -94,7 +94,7 @@ class System(commands.Cog):
         inter : CommandInteraction
             The interaction
         """
-        e = embed.info_message(inter.author, title=f"Stats about {self.bot.user.name}")
+        e = embed.info_message(title=f"Stats about {self.bot.user.name}")
         e.add_field(name="📡 Ping", value=f"┕`{self.bot.latency * 1000:.2f}ms`")
         uptime = datetime.now() - self.bot.start_time
         days, hours, minutes, seconds = converter.seconds_to_time(int(uptime.total_seconds()))

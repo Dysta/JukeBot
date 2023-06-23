@@ -225,7 +225,7 @@ class Music(commands.Cog):
         if not req.success:
             raise QueryFailed(f"No music found for this media..", query="", full_query=url)
 
-        e: Embed = embed.music_found_message(inter.author, req.result)
+        e: Embed = embed.music_found_message(req.result)
         await inter.edit_original_message(embed=e)
 
     @commands.slash_command()

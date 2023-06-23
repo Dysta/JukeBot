@@ -21,5 +21,5 @@ class ClearService(AbstractService):
 
         player.queue = components.ResultSet.empty()
 
-        e: Embed = embed.basic_message(interaction.author, title="The queue have been cleared.")
+        e: Embed = embed.basic_message(title="The queue have been cleared.")
         await interaction.send(embed=e)

@@ -33,7 +33,6 @@ class JoinService(AbstractService):
 
         if not silent:
             e = embed.basic_message(
-                interaction.author,
                 content=f"Connected to <#{interaction.author.voice.channel.id}>\n"
                 f"Bound to <#{interaction.channel.id}>\n",
             )

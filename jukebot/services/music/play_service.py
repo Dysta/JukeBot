@@ -92,7 +92,6 @@ class PlayService(AbstractService):
                 f"Shouldn't happen."
             )
             e: Embed = embed.error_message(
-                author,
                 content="The player cannot play on the voice channel. This is because he's not connected to a voice channel or he's already playing something.\n"
                 "This situation can happen when the player has been abruptly disconnected by Discord or a user. "
                 "Use the `reset` command to reset the player in this case.",
@@ -103,6 +102,6 @@ class PlayService(AbstractService):
         logger.opt(lazy=True).success(
             f"Server {interaction.guild.name} ({interaction.guild.id}) can play in its player."
         )
-        e: Embed = embed.music_message(author, song)
+        e: Embed = embed.music_message(song)
         await interaction.edit_original_message(embed=e)
         return True

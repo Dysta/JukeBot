@@ -17,9 +17,7 @@ class ResetService(AbstractService):
                 f"Server {interaction.guild.name} ({interaction.guild.id}) try to kill a player that don't exist."
             )
             if not silent:
-                e: Embed = embed.error_message(
-                    interaction.author, content="No player detected in this server."
-                )
+                e: Embed = embed.error_message(content="No player detected in this server.")
                 await interaction.send(embed=e, ephemeral=True)
             return
 
@@ -36,5 +34,5 @@ class ResetService(AbstractService):
             f"Server {interaction.guild.name} ({interaction.guild.id}) has successfully reset his player."
         )
         if not silent:
-            e: Embed = embed.info_message(interaction.author, content="The player has been reset.")
+            e: Embed = embed.info_message(content="The player has been reset.")
             await interaction.send(embed=e)

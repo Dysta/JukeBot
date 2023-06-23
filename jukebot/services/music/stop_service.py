@@ -9,5 +9,5 @@ from jukebot.utils import embed
 class StopService(AbstractService):
     async def __call__(self, /, interaction: CommandInteraction):
         self.bot.players[interaction.guild.id].stop()
-        e = embed.basic_message(interaction.author, title="Player stopped")
+        e = embed.basic_message(title="Player stopped")
         await interaction.send(embed=e)
