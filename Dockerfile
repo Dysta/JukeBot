@@ -1,6 +1,6 @@
-FROM python:3.9-slim-buster
+FROM python:3.10-slim-buster
 
-WORKDIR /app/jukebot
+WORKDIR /app
 
 RUN apt-get update && \
     apt-get install --no-install-recommends -y ffmpeg && \
@@ -10,7 +10,8 @@ RUN pip install --no-cache-dir -U poetry
 
 COPY poetry.lock pyproject.toml ./
 
-RUN poetry install --no-dev -E speed
+RUN poetry config virtualenvs.create false \
+    && poetry install --no-dev --no-interaction --no-ansi -E speed
 
 COPY . ./
 

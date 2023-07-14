@@ -3,22 +3,14 @@ version: "3"
 services:
 
   jukebot:
+    image: dysta/jukebot
     build: .
-    container_name: jukebot-app
-    tty: true
     deploy:
       restart_policy:
         condition: on-failure
         max_attempts: 3
-        window: 20s
+        window: 15s
     env_file:
       - .env
-    environment:
-      LOGS_PATH: "/data/logs"
     volumes:
-      - jukelogs:/data/logs
-
-
-volumes:
-  jukelogs:
-
+      - .:/app:cached
