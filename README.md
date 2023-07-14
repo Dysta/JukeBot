@@ -36,8 +36,14 @@ Use **brew**, run `brew install ffmpeg`.
 ___
 
 ## 🌐 Deployment
+Clone the repos. \
 Rename `.env.example` to `.env` and fill in the values. \
 Run `docker-compose up -d`.
+
+**OR**
+
+C/C the file `.env.example` in local, fill in the values. \
+Run `docker run --env-file <YOUR_LOCAL_ENV_FILE> dysta/jukebot`.
 
 ___
 
