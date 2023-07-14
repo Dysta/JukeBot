@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import datetime
 import logging
+import logging as plogging
 import os
 from contextlib import contextmanager
 
@@ -19,20 +20,23 @@ def set_logging(
     disnake_loglevel: int = logging.INFO,
 ):
     logger.info(f"Environment is set to '{os.environ['ENVIRONMENT']}'.")
-    logger.info(f"Jukebot log messages with level {jukebot_loglevel}.")
+    logger.info(f"Jukebot log messages with level {plogging.getLevelName(jukebot_loglevel)}.")
 
     if intercept_disnake_log:
-        logger.info(f"Intercepting disnake log messages with level {disnake_loglevel}.")
+        logger.info(
+            f"Intercepting disnake log messages with level {plogging.getLevelName(disnake_loglevel)}."
+        )
         logging.basicConfig(handlers=[InterceptHandler()], level=disnake_loglevel)
 
-    if os.environ["ENVIRONMENT"] == Environment.DEVELOPMENT:
-        pass
-    elif os.environ["ENVIRONMENT"] == Environment.PRODUCTION:
+    if not os.environ["ENVIRONMENT"] in list(Environment):
+        logger.critical(f"Unknown environment {os.environ['ENVIRONMENT']}.")
+        exit(1)
+
+    if os.environ["ENVIRONMENT"] == Environment.PRODUCTION:
         logger.remove()
-        path: str = os.environ["LOGS_PATH"] if "LOGS_PATH" in os.environ else "./logs"
-        fmt = "{time:YYYY-MM-DD at HH:mm:ss} || {level} || {name} ||  {message}"
+        fmt = "{time:YYYY-MM-DD at HH:mm:ss} || {level} || {name} || {message}"
         logger.add(
-            f"{path}/log-{datetime.datetime.now():%Y-%m-%d}.log",
+            f"./logs/log-{datetime.datetime.now():%Y-%m-%d}.log",
             level=jukebot_loglevel,
             format=fmt,
             rotation="01:00",
@@ -41,9 +45,6 @@ def set_logging(
             mode="w",
             encoding="utf-8",
         )
-    else:
-        logger.error(f"Unknown environment {os.environ['ENVIRONMENT']}.")
-        exit(1)
 
 
 @contextmanager

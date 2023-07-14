@@ -29,9 +29,9 @@ def get_test_guilds_ids() -> Optional[List[int]]:
 def main():
     load_dotenv(".env")
     logging.set_logging(
-        plogging.DEBUG,
+        plogging.getLevelName(os.environ["LOG_LEVEL"]),
         intercept_disnake_log=True,
-        disnake_loglevel=plogging.WARNING,
+        disnake_loglevel=plogging.getLevelName(os.environ["DISCORD_LOG_LEVEL"]),
     )
 
     bot = JukeBot(
