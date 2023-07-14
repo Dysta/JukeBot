@@ -23,18 +23,27 @@ Rename `.env.example` to `.env` and fill in the values.
 Run `poetry run task start`.
 
 ## ⁉ Other
-The bot needs `ffmpeg` to work.
+The bot needs [ffmpeg](https://ffmpeg.org/) to work.
 ### Install on Windows
-Use the package manager [Chocolatey](https://community.chocolatey.org/) and run in an admin shell `choco install ffmpeg`.
+Use the package manager [Chocolatey](https://community.chocolatey.org/) and run in an **admin shell** `choco install ffmpeg`.
 
 ### Install on Linux
-Use apt, run `sudo apt install ffmpeg`.
+Use **apt**, run `sudo apt install ffmpeg`.
+
+### Install on MacOS
+Use **brew**, run `brew install ffmpeg`.
 
 ___
 
 ## 🌐 Deployment
 Rename `.env.example` to `.env` and fill in the values. \
 Run `docker-compose up -d`.
+
+___
+
+## 🔮 Devcontainer
+Clone the project then open it in `vscode`. If you have the `devcontainer` extension, it will ask you to reopen the project in a devcontainer. If not, open the commands prompt then search for **reopen in container**. \
+All the needs will be automatically installed.
 
 ___
 
@@ -75,7 +84,6 @@ ___
   - [ ] **`nightcore`**
   - [ ] **`slowed`**
   ### Others
-  - [X] **`avatar`**
   - [X] **`info`**
   - [X] **`invite`**
   - [X] **`donate`**
