@@ -23,7 +23,6 @@ class ErrorHandler(commands.Cog):
                 f"Query Exception [{error.__class__.__name__}] '{error.query}' ({error.full_query}) for guild '{inter.guild.name} (ID: {inter.guild.id})'."
             )
             e = embed.music_not_found_message(
-                inter.author,
                 title=error,
             )
             if inter.response.is_done():
