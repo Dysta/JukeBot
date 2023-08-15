@@ -10,7 +10,7 @@ from disnake.ext.commands import BucketType
 from loguru import logger
 
 from jukebot.services.music import PlayService
-from jukebot.utils import checks, embed
+from jukebot.utils import checks, converter, embed
 
 if TYPE_CHECKING:
     from disnake import Embed
@@ -23,12 +23,7 @@ class Radio(commands.Cog):
         self._radios: dict = {}
 
     async def cog_load(self) -> None:
-        # ? we transform a list of dict into a single dict
-        with open("./data/radios.yaml", "r") as f:
-            data = yaml.safe_load(f)
-            for e in data:
-                self._radios.update(e)
-        logger.debug(self._radios)
+        self._radios = converter.radios_yaml_to_dict()
 
     async def _radio_process(self, inter: CommandInteraction, choices: list):
         query: str = random.choice(choices)
@@ -40,7 +35,6 @@ class Radio(commands.Cog):
     @commands.cooldown(1, 5.0, BucketType.user)
     @commands.check(checks.user_is_connected)
     async def radio(self, inter: CommandInteraction, radio: str):
-        # TODO: check why there's no response when nothing is found
         choices: list = self._radios.get(radio, [])
         if not choices:
             e: Embed = embed.error_message(content=f"No radio found with the name `{radio}`")
@@ -48,6 +42,10 @@ class Radio(commands.Cog):
             return
 
         await self._radio_process(inter, choices)
+
+    @radio.autocomplete("radio")
+    async def radio_autocomplete(self, inter: CommandInteraction, query: str):
+        return [e for e in self._radios.keys() if query in e.lower()][:25]
 
 
 def setup(bot):

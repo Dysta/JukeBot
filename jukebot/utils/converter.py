@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import re
 
+import yaml
+
 
 def seconds_to_time(seconds: int) -> (int, int, int, int):
     h, r = divmod(seconds, 3600)
@@ -38,3 +40,12 @@ def duration_seconds_to_progress_bar(time: int, total: int, ticks: int = 30) -> 
     x = int(ticks * (time / total)) if total else 0
     line = "".join(["▬" if t != x else "🔘" for t in range(ticks)])
     return line
+
+
+def radios_yaml_to_dict() -> dict:
+    radios: dict = {}
+    with open("./data/radios.yaml", "r") as f:
+        data = yaml.safe_load(f)
+        for e in data:
+            radios.update(e)
+    return radios
