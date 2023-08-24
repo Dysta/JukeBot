@@ -100,7 +100,7 @@ class TestStreamRequestComponent(unittest.IsolatedAsyncioTestCase):
 
     async def test_stream_request_success_youtube_live_convert_to_song(self):
         with disable_logging():
-            async with StreamRequest("https://www.youtube.com/watch?v=MVPTGNGiI-4") as req:
+            async with StreamRequest("https://www.youtube.com/watch?v=4xDzrJKXOOY") as req:
                 await req.execute()
 
         self.assertTrue(req.success)
@@ -111,7 +111,7 @@ class TestStreamRequestComponent(unittest.IsolatedAsyncioTestCase):
 
         self.assertIn("synthwave radio 🌌 - beats to chill/game to", result.title)
         self.assertEqual(result.channel, "Lofi Girl")
-        self.assertEqual(result.web_url, "https://www.youtube.com/watch?v=MVPTGNGiI-4")
+        self.assertEqual(result.web_url, "https://www.youtube.com/watch?v=4xDzrJKXOOY")
         self.assertEqual(result.duration, 0)
         self.assertEqual(result.fmt_duration, "ထ")
 
