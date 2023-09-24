@@ -15,7 +15,7 @@ class TestShazamRequestComponent(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(req.success)
         result: dict = req.result
 
-        self.assertEqual(result.get("title"), "Enya - The Humming (Lyric Video)")
+        self.assertEqual(result.get("title"), "Enya - The Humming (Official Lyric Video)")
         self.assertEqual(result.get("url"), "https://youtu.be/FOP_PPavoLA?autoplay=1")
         self.assertEqual(
             result.get("image_url"), "https://i.ytimg.com/vi/FOP_PPavoLA/maxresdefault.jpg"
