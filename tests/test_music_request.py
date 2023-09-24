@@ -26,7 +26,7 @@ class TestMusicRequestComponent(unittest.IsolatedAsyncioTestCase):
 
     async def test_music_request_success_youtube_live_url(self):
         with disable_logging():
-            async with MusicRequest("https://www.youtube.com/watch?v=MVPTGNGiI-4") as req:
+            async with MusicRequest("https://www.youtube.com/watch?v=4xDzrJKXOOY") as req:
                 await req.execute()
 
         self.assertTrue(req.success)
@@ -37,7 +37,7 @@ class TestMusicRequestComponent(unittest.IsolatedAsyncioTestCase):
 
         self.assertIn("synthwave radio 🌌 - beats to chill/game to", result.get("title"))
         self.assertEqual(result.get("uploader"), "Lofi Girl")
-        self.assertEqual(result.get("webpage_url"), "https://www.youtube.com/watch?v=MVPTGNGiI-4")
+        self.assertEqual(result.get("webpage_url"), "https://www.youtube.com/watch?v=4xDzrJKXOOY")
         self.assertIsNone(result.get("duration"))
         self.assertEqual(result.get("live_status"), "is_live")
         self.assertIsNotNone(result.get("thumbnail"))
@@ -139,7 +139,9 @@ class TestMusicRequestComponent(unittest.IsolatedAsyncioTestCase):
 
     async def test_music_request_playlist_soundcloud_url(self):
         with disable_logging():
-            async with MusicRequest("https://soundcloud.com/dysta/sets/breakcore") as req:
+            async with MusicRequest(
+                "https://soundcloud.com/dysta/sets/vanished-ep-by-evryn/s-HkTM3QuDGiW"
+            ) as req:
                 await req.execute()
 
         self.assertTrue(req.success)
@@ -149,10 +151,35 @@ class TestMusicRequestComponent(unittest.IsolatedAsyncioTestCase):
         results: list = req.result
 
         self.assertTrue(isinstance(results, list))
-        self.assertEqual(len(results), 4)
+        self.assertEqual(len(results), 9)
 
         # ? SoundCloud API doesn't return any title/channel or duration
         # ? only a stream link that will be used in StreamRequest
+        # test each result
+        result = results.pop(0)
+        self.assertEqual(len(results), 8)
+        self.assertIsNotNone(result.get("url"))
+
+        # test each result
+        result = results.pop(0)
+        self.assertEqual(len(results), 7)
+        self.assertIsNotNone(result.get("url"))
+
+        # test each result
+        result = results.pop(0)
+        self.assertEqual(len(results), 6)
+        self.assertIsNotNone(result.get("url"))
+
+        # test each result
+        result = results.pop(0)
+        self.assertEqual(len(results), 5)
+        self.assertIsNotNone(result.get("url"))
+
+        # test each result
+        result = results.pop(0)
+        self.assertEqual(len(results), 4)
+        self.assertIsNotNone(result.get("url"))
+
         # test each result
         result = results.pop(0)
         self.assertEqual(len(results), 3)
@@ -293,7 +320,7 @@ class TestMusicRequestComponent(unittest.IsolatedAsyncioTestCase):
 
     async def test_music_request_youtube_live_url_convert_to_result(self):
         with disable_logging():
-            async with MusicRequest("https://www.youtube.com/watch?v=MVPTGNGiI-4") as req:
+            async with MusicRequest("https://www.youtube.com/watch?v=4xDzrJKXOOY") as req:
                 await req.execute()
 
         self.assertTrue(req.success)
@@ -304,7 +331,7 @@ class TestMusicRequestComponent(unittest.IsolatedAsyncioTestCase):
 
         self.assertIn("synthwave radio 🌌 - beats to chill/game to", result.title)
         self.assertEqual(result.channel, "Lofi Girl")
-        self.assertEqual(result.web_url, "https://www.youtube.com/watch?v=MVPTGNGiI-4")
+        self.assertEqual(result.web_url, "https://www.youtube.com/watch?v=4xDzrJKXOOY")
         self.assertEqual(result.duration, 0)
         self.assertEqual(result.fmt_duration, "ထ")
         self.assertTrue(result.live)
@@ -400,26 +427,89 @@ class TestMusicRequestComponent(unittest.IsolatedAsyncioTestCase):
 
     async def test_music_request_playlist_soundcloud_url_convert_to_resultset(self):
         with disable_logging():
-            async with MusicRequest("https://soundcloud.com/dysta/sets/breakcore") as req:
+            async with MusicRequest(
+                "https://soundcloud.com/dysta/sets/vanished-ep-by-evryn/s-HkTM3QuDGiW"
+            ) as req:
                 await req.execute()
 
         self.assertTrue(req.success)
         self.assertIsNotNone(req.result)
         self.assertEqual(req.type, MusicRequest.ResultType.PLAYLIST)
         self.assertTrue(isinstance(req.result, list))
-        self.assertEqual(len(req.result), 4)
+        self.assertEqual(len(req.result), 9)
 
         results: ResultSet = ResultSet.from_result(req.result)
-        self.assertEqual(len(results), 4)
+        self.assertEqual(len(results), 9)
 
         # ? SoundCloud API doesn't return any title/channel or duration
         # ? only a stream link that will be used in StreamRequest
         # test each result
         result = results.get()
+        self.assertEqual(len(results), 8)
+        self.assertEqual(
+            result.web_url,
+            "https://soundcloud.com/dysta/evryn-no-more-bad-days/s-vTqs4UGlKkS",
+        )
+        self.assertEqual(result.title, "Evryn No More Bad Days")
+        self.assertEqual(result.channel, "Dysta")
+        self.assertEqual(result.duration, 0)
+        self.assertEqual(result.fmt_duration, "ထ")
+        self.assertTrue(result.live)
+
+        # test each result
+        result = results.get()
+        self.assertEqual(len(results), 7)
+        self.assertEqual(
+            result.web_url, "https://soundcloud.com/dysta/evryn-can-you-see-me/s-HDLAfyVjqfb"
+        )
+        self.assertEqual(result.title, "Evryn Can You See Me")
+        self.assertEqual(result.channel, "Dysta")
+        self.assertEqual(result.duration, 0)
+        self.assertEqual(result.fmt_duration, "ထ")
+        self.assertTrue(result.live)
+
+        # test each result
+        result = results.get()
+        self.assertEqual(len(results), 6)
+        self.assertEqual(
+            result.web_url, "https://soundcloud.com/dysta/evryn-tears-in-the-rain/s-0b7fcsuBibx"
+        )
+        self.assertEqual(result.title, "Evryn Tears In The Rain")
+        self.assertEqual(result.channel, "Dysta")
+        self.assertEqual(result.duration, 0)
+        self.assertEqual(result.fmt_duration, "ထ")
+        self.assertTrue(result.live)
+
+        # test each result
+        result = results.get()
+        self.assertEqual(len(results), 5)
+        self.assertEqual(result.web_url, "https://soundcloud.com/dysta/evryn-reset/s-hsygXrF0aId")
+        self.assertEqual(result.title, "Evryn Reset")
+        self.assertEqual(result.channel, "Dysta")
+        self.assertEqual(result.duration, 0)
+        self.assertEqual(result.fmt_duration, "ထ")
+        self.assertTrue(result.live)
+
+        # test each result
+        result = results.get()
+        self.assertEqual(len(results), 4)
+        self.assertEqual(
+            result.web_url, "https://soundcloud.com/dysta/evryn-colored-elements/s-9QNPeHetkTz"
+        )
+        self.assertEqual(result.title, "Evryn Colored Elements")
+        self.assertEqual(result.channel, "Dysta")
+        self.assertEqual(result.duration, 0)
+        self.assertEqual(result.fmt_duration, "ထ")
+        self.assertTrue(result.live)
+
+        # test each result
+        result = results.get()
         self.assertEqual(len(results), 3)
-        self.assertEqual(result.web_url, "https://soundcloud.com/rmdh-it/goreshit-fine-night")
-        self.assertEqual(result.title, "Goreshit Fine Night")
-        self.assertEqual(result.channel, "Rmdh It")
+        self.assertEqual(
+            result.web_url, "https://soundcloud.com/dysta/evryn-everything-cyclic/s-A0HhrlySRy1"
+        )
+        self.assertEqual(result.title, "Evryn Everything Cyclic")
+        self.assertEqual(result.channel, "Dysta")
         self.assertEqual(result.duration, 0)
         self.assertEqual(result.fmt_duration, "ထ")
         self.assertTrue(result.live)
@@ -427,9 +517,11 @@ class TestMusicRequestComponent(unittest.IsolatedAsyncioTestCase):
         # test each result
         result = results.get()
         self.assertEqual(len(results), 2)
-        self.assertEqual(result.web_url, "https://soundcloud.com/harmful-logic/self-worth-1")
-        self.assertEqual(result.title, "Self Worth 1")
-        self.assertEqual(result.channel, "Harmful Logic")
+        self.assertEqual(
+            result.web_url, "https://soundcloud.com/dysta/evryn-love-you-forever/s-KL22UIGotke"
+        )
+        self.assertEqual(result.title, "Evryn Love You Forever")
+        self.assertEqual(result.channel, "Dysta")
         self.assertEqual(result.duration, 0)
         self.assertEqual(result.fmt_duration, "ထ")
         self.assertTrue(result.live)
@@ -437,9 +529,11 @@ class TestMusicRequestComponent(unittest.IsolatedAsyncioTestCase):
         # test each result
         result = results.get()
         self.assertEqual(len(results), 1)
-        self.assertEqual(result.web_url, "https://soundcloud.com/imhiraeth/spyglass-w-mystik")
-        self.assertEqual(result.title, "Spyglass W Mystik")
-        self.assertEqual(result.channel, "Imhiraeth")
+        self.assertEqual(
+            result.web_url, "https://soundcloud.com/dysta/evryn-promising-future/s-DDl6TFrf919"
+        )
+        self.assertEqual(result.title, "Evryn Promising Future")
+        self.assertEqual(result.channel, "Dysta")
         self.assertEqual(result.duration, 0)
         self.assertEqual(result.fmt_duration, "ထ")
         self.assertTrue(result.live)
@@ -447,9 +541,11 @@ class TestMusicRequestComponent(unittest.IsolatedAsyncioTestCase):
         # test each result
         result = results.get()
         self.assertEqual(len(results), 0)
-        self.assertEqual(result.web_url, "https://soundcloud.com/ilyquintuple/woke-up-in-a-dream")
-        self.assertEqual(result.title, "Woke Up In A Dream")
-        self.assertEqual(result.channel, "Ilyquintuple")
+        self.assertEqual(
+            result.web_url, "https://soundcloud.com/dysta/evryn-ups-and-downs/s-rcgMdEnFnBz"
+        )
+        self.assertEqual(result.title, "Evryn Ups And Downs")
+        self.assertEqual(result.channel, "Dysta")
         self.assertEqual(result.duration, 0)
         self.assertEqual(result.fmt_duration, "ထ")
         self.assertTrue(result.live)
