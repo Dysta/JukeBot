@@ -3,18 +3,16 @@ from __future__ import annotations
 import io
 import os
 from datetime import datetime
-from typing import Optional, Set
+from typing import Optional
 
-from disnake import APISlashCommand, CommandInteraction, File
+from disnake import CommandInteraction, File
 from disnake.ext import commands
 from loguru import logger
 
 from jukebot.utils import Extensions, converter, embed
 
 ADMIN_GUILD_IDS = (
-    list(map(int, os.environ["BOT_ADMIN_GUILD_IDS"].split(",")))
-    if "BOT_ADMIN_GUILD_IDS" in os.environ
-    else []
+    list(map(int, os.environ["BOT_ADMIN_GUILD_IDS"].split(","))) if "BOT_ADMIN_GUILD_IDS" in os.environ else []
 )
 
 
@@ -95,7 +93,9 @@ class System(commands.Cog):
             The interaction
         """
         e = embed.info_message(title=f"Stats about {self.bot.user.name}")
+
         e.add_field(name="📡 Ping", value=f"┕`{self.bot.latency * 1000:.2f}ms`")
+
         uptime = datetime.now() - self.bot.start_time
         days, hours, minutes, seconds = converter.seconds_to_time(int(uptime.total_seconds()))
         e.add_field(
@@ -103,20 +103,26 @@ class System(commands.Cog):
             value=f"┕`{days}d, {hours}h, {minutes}m, {seconds}s`",
         )
         e.add_field(name=embed.VOID_TOKEN, value=embed.VOID_TOKEN)
+
         e.add_field(name="🏛️ Servers", value=f"┕`{len(self.bot.guilds)}`", inline=True)
+
         e.add_field(
             name="👥 Members",
             value=f"┕`{len(set(self.bot.get_all_members()))}`",
         )
+
         e.add_field(name=embed.VOID_TOKEN, value=embed.VOID_TOKEN)
+
         e.add_field(
             name="📻 Players created",
             value=f"┕`{len(self.bot.players)}`",
         )
+
         e.add_field(
             name="🎶 Players playing",
             value=f"┕`{len(self.bot.players.playing())}`",
         )
+
         e.add_field(name=embed.VOID_TOKEN, value=embed.VOID_TOKEN)
 
         await inter.send(embed=e, ephemeral=True)

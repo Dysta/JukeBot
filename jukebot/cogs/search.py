@@ -48,7 +48,7 @@ class Search(commands.Cog):
         )
 
         async with SearchRequest(query, source) as req:
-            await req.execute()
+            await req()
 
         if not req.success:
             raise QueryFailed(
@@ -61,9 +61,7 @@ class Search(commands.Cog):
         logger.opt(lazy=True).debug(f"Results of the query is {results}")
 
         if not results:
-            raise QueryFailed(
-                f"Nothing found for {query}", query=query, full_query=f"{source}{query}"
-            )
+            raise QueryFailed(f"Nothing found for {query}", query=query, full_query=f"{source}{query}")
 
         e = embed.search_result_message(playlist=results, title=f"Result for {query}")
 
@@ -79,8 +77,8 @@ class Search(commands.Cog):
             f"Query '{source}{query}' successful for guild '{inter.guild.name} (ID: {inter.guild.id})'."
         )
 
-        with PlayService(self.bot) as ps:
-            func = ps(interaction=inter, query=result)
+        with PlayService(self.bot, inter) as play:
+            func = play(query=result)
         asyncio.ensure_future(func, loop=self.bot.loop)
 
 

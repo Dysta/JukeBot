@@ -56,11 +56,7 @@ class SearchRequest(AbstractRequest):
 
         super().__init__(f"{self._engine.value}{query}")
 
-    async def setup(self):
-        # * nothing to do
-        pass
-
-    async def execute(self):
+    async def __call__(self):
         with yt_dlp.YoutubeDL(params=self._params) as ytdl:
             loop = asyncio.get_event_loop()
             try:
@@ -74,7 +70,7 @@ class SearchRequest(AbstractRequest):
 
             self._result = data
 
-    async def terminate(self):
+    async def __aexit__(self, exc_type, exc_value, traceback):
         if not self._result:
             logger.opt(lazy=True).debug(f"No info retrieved for query {self._query}")
             return
@@ -82,17 +78,13 @@ class SearchRequest(AbstractRequest):
         if not "entries" in self._result:
             # ? SearchRequest have to retrieved a playlist,
             # ? this shouldn't happen so we delete the result
-            logger.warning(
-                f"Query {self._query} don't retrieve a playlist. Deleleting the result."
-            )
+            logger.warning(f"Query {self._query} don't retrieve a playlist. Deleleting the result.")
             self._result = None
             return
 
         self._result = list(self._result.pop("entries"))
         if not len(self._result):
-            logger.warning(
-                f"Query {self._query} don't retrieve any results. Deleleting the result."
-            )
+            logger.warning(f"Query {self._query} don't retrieve any results. Deleleting the result.")
             self._result = None
             return
 

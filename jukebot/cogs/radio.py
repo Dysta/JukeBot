@@ -3,7 +3,6 @@ from __future__ import annotations
 import random
 from typing import TYPE_CHECKING
 
-import yaml
 from disnake import CommandInteraction
 from disnake.ext import commands
 from disnake.ext.commands import BucketType
@@ -28,8 +27,8 @@ class Radio(commands.Cog):
     async def _radio_process(self, inter: CommandInteraction, choices: list):
         query: str = random.choice(choices)
         logger.opt(lazy=True).debug(f"Choice is {query}")
-        with PlayService(self.bot) as ps:
-            await ps(interaction=inter, query=query, top=True)
+        async with PlayService(self.bot, inter) as play:
+            await play(query=query, top=True)
 
     @commands.slash_command(description="Launch a random radio")
     @commands.cooldown(1, 5.0, BucketType.user)

@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from disnake import CommandInteraction
 
 from jukebot import components
 from jukebot.abstract_components import AbstractService
@@ -13,8 +12,8 @@ if TYPE_CHECKING:
 
 
 class LoopService(AbstractService):
-    async def __call__(self, /, interaction: CommandInteraction, mode: str):
-        player: Player = self.bot.players[interaction.guild.id]
+    async def __call__(self, /, mode: str):
+        player: Player = self.bot.players[self.interaction.guild.id]
         if mode == "song":
             player.loop = components.Player.Loop.SONG
             new_status = "Loop is set to song"
@@ -26,4 +25,4 @@ class LoopService(AbstractService):
             new_status = "Loop is disabled"
 
         e: embed = embed.basic_message(title=new_status)
-        await interaction.send(embed=e)
+        await self.interaction.send(embed=e)

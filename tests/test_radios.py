@@ -1,6 +1,4 @@
-import asyncio
 import unittest
-from typing import Tuple
 
 from jukebot.components.requests import MusicRequest
 from jukebot.utils import converter
@@ -19,5 +17,5 @@ class TestRadios(unittest.IsolatedAsyncioTestCase):
                 for link in v:
                     with self.subTest(f"Test link {link} for radio {k}"):
                         async with MusicRequest(link) as req:
-                            await req.execute()
+                            await req()
                             self.assertTrue(req.success)

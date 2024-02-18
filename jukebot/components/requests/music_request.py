@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import asyncio
-import pprint
 from enum import Enum, auto
 
 import yt_dlp
@@ -56,12 +55,14 @@ class MusicRequest(AbstractRequest):
         self._type: MusicRequest.ResultType = MusicRequest.ResultType.UNKNOWN
         self._single_search: bool = False
 
-    async def setup(self):
+    async def __aenter__(self):
         if not regex.is_url(self._query):
             self._query = f"ytsearch1:{self._query}"
             self._single_search = True
 
-    async def execute(self):
+        return self
+
+    async def __call__(self):
         with yt_dlp.YoutubeDL(params=self._params) as ytdl:
             loop = asyncio.get_event_loop()
             try:
@@ -75,7 +76,7 @@ class MusicRequest(AbstractRequest):
 
             self._result = data
 
-    async def terminate(self):
+    async def __aexit__(self, exc_type, exc_value, traceback):
         if not self._result:
             logger.opt(lazy=True).debug(f"No info retrieved for query {self._query}")
             return

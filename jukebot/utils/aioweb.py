@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from typing import Tuple
 from urllib import parse
 
 import aiohttp
@@ -10,17 +11,17 @@ _MOZ_HEADER = {"User-Agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64)"}
 
 
 @alib.lru_cache(maxsize=1024)
-async def cached_query(url, enquote_url: bool = False) -> (int, str):
+async def cached_query(url, enquote_url: bool = False) -> Tuple[int, str]:
     logger.opt(lazy=True).info(f"Cached query for url {url}")
     return await _get(url, enquote_url)
 
 
-async def uncached_query(url, enquote_url: bool = False) -> (int, str):
+async def uncached_query(url, enquote_url: bool = False) -> Tuple[int, str]:
     logger.opt(lazy=True).info(f"Uncached query for url {url}")
     return await _get(url, enquote_url)
 
 
-async def _get(url, enquote) -> (int, str):
+async def _get(url, enquote) -> Tuple[int, str]:
     url = url if not enquote else parse.quote(url)
 
     async with aiohttp.ClientSession(headers=_MOZ_HEADER) as session:

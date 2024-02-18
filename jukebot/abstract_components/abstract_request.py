@@ -1,8 +1,8 @@
-from abc import ABC, abstractmethod
+import contextlib
 from typing import Any
 
 
-class AbstractRequest(ABC):
+class AbstractRequest(contextlib.AbstractAsyncContextManager):
     """Class that represent a request made by the user during a command."""
 
     def __init__(self, query: str) -> None:
@@ -10,24 +10,8 @@ class AbstractRequest(ABC):
         self._result: Any = None
         self._success: bool = False
 
-    @abstractmethod
-    async def setup(self):
-        """Setup the Request. Called before the execute method."""
-
-    @abstractmethod
-    async def execute(self):
-        """Execute the Request and handle the result type"""
-
-    @abstractmethod
-    async def terminate(self):
-        """Cleanup the Request. Called after the execute method."""
-
-    async def __aenter__(self):
-        await self.setup()
-        return self
-
-    async def __aexit__(self, exc_type, exc_val, exc_tb):
-        await self.terminate()
+    async def __call__(self, *args, **kwargs):
+        raise NotImplementedError
 
     @property
     def query(self) -> str:

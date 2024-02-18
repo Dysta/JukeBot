@@ -43,8 +43,8 @@ class Music(commands.Cog):
         top : Optional[bool], optional
             Put the requested song at the top of the queue, by default False
         """
-        with PlayService(self.bot) as ps:
-            await ps(interaction=inter, query=query, top=top)
+        async with PlayService(self.bot, inter) as play:
+            await play(query=query, top=top)
 
     @commands.slash_command()
     @commands.cooldown(1, 5.0, BucketType.user)
@@ -59,8 +59,8 @@ class Music(commands.Cog):
         inter : CommandInteraction
             The interaction
         """
-        with LeaveService(self.bot) as ls:
-            await ls(interaction=inter)
+        async with LeaveService(self.bot, inter) as leave:
+            await leave()
 
     @commands.slash_command()
     @commands.cooldown(1, 5.0, BucketType.user)
@@ -76,8 +76,8 @@ class Music(commands.Cog):
         inter : CommandInteraction
             The interaction
         """
-        with StopService(self.bot) as ss:
-            await ss(interaction=inter)
+        async with StopService(self.bot, inter) as stop:
+            await stop()
 
     @commands.slash_command()
     @commands.cooldown(1, 5.0, BucketType.user)
@@ -93,8 +93,8 @@ class Music(commands.Cog):
         inter : CommandInteraction
             The interaction
         """
-        with PauseService(self.bot) as ps:
-            await ps(interaction=inter)
+        async with PauseService(self.bot, inter) as pause:
+            await pause()
 
     @commands.slash_command()
     @commands.cooldown(1, 5.0, BucketType.user)
@@ -110,8 +110,8 @@ class Music(commands.Cog):
         inter : CommandInteraction
             The interaction
         """
-        with ResumeService(self.bot) as rs:
-            await rs(interaction=inter)
+        async with ResumeService(self.bot, inter) as resume:
+            await resume()
 
     @commands.slash_command()
     @commands.cooldown(1, 5.0, BucketType.user)
@@ -126,8 +126,8 @@ class Music(commands.Cog):
         inter : CommandInteraction
             The interaction
         """
-        with CurrentSongService(self.bot) as css:
-            await css(inter)
+        async with CurrentSongService(self.bot, inter) as current_song:
+            await current_song()
 
     @commands.slash_command()
     @commands.cooldown(1, 5.0, BucketType.user)
@@ -141,8 +141,8 @@ class Music(commands.Cog):
         inter : CommandInteraction
             The interaction
         """
-        with JoinService(self.bot) as js:
-            await js(interaction=inter)
+        async with JoinService(self.bot, inter) as join:
+            await join()
 
     @commands.slash_command()
     @commands.cooldown(3, 10.0, BucketType.user)
@@ -158,8 +158,8 @@ class Music(commands.Cog):
         inter : CommandInteraction
             The interaction
         """
-        with SkipService(self.bot) as ss:
-            await ss(interaction=inter)
+        async with SkipService(self.bot, inter) as skip:
+            await skip()
 
     @commands.slash_command()
     @commands.check(checks.bot_is_playing)
@@ -175,8 +175,8 @@ class Music(commands.Cog):
         inter : CommandInteraction
             The interaction
         """
-        with GrabService(self.bot) as gs:
-            await gs(interaction=inter)
+        async with GrabService(self.bot, inter) as grab:
+            await grab()
 
     @commands.slash_command()
     @commands.cooldown(1, 5.0, BucketType.user)
@@ -199,8 +199,8 @@ class Music(commands.Cog):
                 - queue (loop the current queue)
                 - none (disable looping)
         """
-        with LoopService(self.bot) as lp:
-            await lp(interaction=inter, mode=mode)
+        async with LoopService(self.bot, inter) as loop:
+            await loop(mode=mode)
 
     @commands.slash_command()
     @commands.cooldown(1, 15.0, BucketType.guild)
@@ -220,7 +220,7 @@ class Music(commands.Cog):
         await inter.response.defer()
 
         async with ShazamRequest(url) as req:
-            await req.execute()
+            await req()
 
         if not req.success:
             raise QueryFailed(f"No music found for this media..", query="", full_query=url)
@@ -252,15 +252,10 @@ class Music(commands.Cog):
             raise commands.UserInputError("The URL didn't return anything")
 
         content = " | ".join(
-            f"[{k.capitalize()}]({v['url']})"
-            for k, v in sorted(data["linksByPlatform"].items(), key=lambda x: x)
+            f"[{k.capitalize()}]({v['url']})" for k, v in sorted(data["linksByPlatform"].items(), key=lambda x: x)
         )
-        title: str = data["entitiesByUniqueId"][data["entityUniqueId"]].get(
-            "title", "Unknown title"
-        )
-        artist: str = data["entitiesByUniqueId"][data["entityUniqueId"]].get(
-            "artistName", "Unknown artist"
-        )
+        title: str = data["entitiesByUniqueId"][data["entityUniqueId"]].get("title", "Unknown title")
+        artist: str = data["entitiesByUniqueId"][data["entityUniqueId"]].get("artistName", "Unknown artist")
         img: str = data["entitiesByUniqueId"][data["entityUniqueId"]].get("thumbnailUrl", "")
         e: Embed = embed.share_message(
             inter.author,

@@ -21,26 +21,24 @@ class PlayService(AbstractService):
     async def __call__(
         self,
         /,
-        interaction: CommandInteraction,
         query: str,
         top: Optional[bool] = False,
         silent: Optional[bool] = False,
     ):
-        if not interaction.response.is_done():
-            await interaction.response.defer()
+        if not self.interaction.response.is_done():
+            await self.interaction.response.defer()
 
         # PlayerContainer create bot if needed
-        player: Player = self.bot.players[interaction.guild.id]
+        player: Player = self.bot.players[self.interaction.guild.id]
 
         if not player.is_connected:
-            with JoinService(self.bot) as js:
-                if not await js(interaction=interaction, silent=True):
+            async with JoinService(self.bot, self.interaction) as join:
+                if not await join(silent=True):
                     return False
 
         if query:
-            with AddService(self.bot) as asr:
-                ok = await asr(
-                    interaction=interaction,
+            async with AddService(self.bot, self.interaction) as add:
+                ok = await add(
                     query=query,
                     silent=silent or not player.is_playing,
                 )
@@ -53,30 +51,32 @@ class PlayService(AbstractService):
         rqs: Result = player.queue.get()
         author = rqs.requester
         async with StreamRequest(rqs.web_url) as req:
-            await req.execute()
+            await req()
 
         song: Song = components.Song(req.result)
         song.requester = author
 
         for i in range(2):
-            if await self._try_to_play(interaction, player, song, i):
+            if await self._try_to_play(self.interaction, player, song, i):
                 break
 
-            with ResetService(self.bot) as rs, JoinService(self.bot) as js:
-                await rs(interaction=interaction, silent=True)
+            async with ResetService(self.bot, self.interaction) as reset, JoinService(
+                self.bot, self.interaction
+            ) as join:
+                await reset(silent=True)
                 logger.opt(lazy=True).info(
-                    f"Server {interaction.guild.name} ({interaction.guild.id}) player reset."
+                    f"Server {self.interaction.guild.name} ({self.interaction.guild.id}) player reset."
                 )
-                await js(interaction=interaction, silent=True)
+                await join(silent=True)
                 logger.opt(lazy=True).info(
-                    f"Server {interaction.guild.name} ({interaction.guild.id}) player connected."
+                    f"Server {self.interaction.guild.name} ({self.interaction.guild.id}) player connected."
                 )
 
         else:
-            with ResetService(self.bot) as rs:
-                await rs(interaction=interaction, silent=True)
+            async with ResetService(self.bot, self.interaction) as reset:
+                await reset(silent=True)
             logger.opt(lazy=True).error(
-                f"Server {interaction.guild.name} ({interaction.guild.id}) can't play in its player after 2 attempts. "
+                f"Server {self.interaction.guild.name} ({self.interaction.guild.id}) can't play in its player after 2 attempts. "
                 f"Shouldn't happen."
             )
             e: Embed = embed.error_message(
@@ -84,19 +84,17 @@ class PlayService(AbstractService):
                 "This situation can happen when the player has been abruptly disconnected by Discord or a user. "
                 "Use the `reset` command to reset the player in this case.",
             )
-            await interaction.edit_original_message(embed=e)
+            await self.interaction.edit_original_message(embed=e)
             return False
 
         logger.opt(lazy=True).success(
-            f"Server {interaction.guild.name} ({interaction.guild.id}) can play in its player."
+            f"Server {self.interaction.guild.name} ({self.interaction.guild.id}) can play in its player."
         )
         e: Embed = embed.music_message(song)
-        await interaction.edit_original_message(embed=e)
+        await self.interaction.edit_original_message(embed=e)
         return True
 
-    async def _try_to_play(
-        self, interaction: CommandInteraction, player: Player, song: Song, attempt: int
-    ) -> bool:
+    async def _try_to_play(self, interaction: CommandInteraction, player: Player, song: Song, attempt: int) -> bool:
         """
         An asynchronous function to attempt to play a song in a Discord guild.
 

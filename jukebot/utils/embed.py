@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import itertools
 import random
-from typing import TYPE_CHECKING, Union
+from typing import TYPE_CHECKING
 
 import disnake
 from disnake import Member
@@ -99,9 +99,7 @@ def music_not_found_message(title="", content=""):
 
 
 def music_found_message(music: dict, title=""):
-    embed: disnake.Embed = _base_embed(
-        content=f"[{music['title']}]({music['url']})", color=0x54B23F
-    )
+    embed: disnake.Embed = _base_embed(content=f"[{music['title']}]({music['url']})", color=0x54B23F)
     embed.set_author(
         name="Music found!" if title == "" else title,
         icon_url="https://cdn.discordapp.com/attachments/573225654452092930/952197615221612594/d-feet-icon.png",

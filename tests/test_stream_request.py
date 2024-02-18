@@ -9,7 +9,7 @@ class TestStreamRequestComponent(unittest.IsolatedAsyncioTestCase):
     async def test_stream_request_success_youtube(self):
         with disable_logging():
             async with StreamRequest("https://www.youtube.com/watch?v=8GW6sLrK40k") as req:
-                await req.execute()
+                await req()
 
         self.assertTrue(req.success)
         self.assertIsNotNone(req.result)
@@ -29,10 +29,8 @@ class TestStreamRequestComponent(unittest.IsolatedAsyncioTestCase):
 
     async def test_stream_request_success_soundcloud(self):
         with disable_logging():
-            async with StreamRequest(
-                "https://soundcloud.com/gee_baller/playboi-carti-cult-classic"
-            ) as req:
-                await req.execute()
+            async with StreamRequest("https://soundcloud.com/gee_baller/playboi-carti-cult-classic") as req:
+                await req()
 
         self.assertTrue(req.success)
         self.assertIsNotNone(req.result)
@@ -53,17 +51,15 @@ class TestStreamRequestComponent(unittest.IsolatedAsyncioTestCase):
 
     async def test_stream_request_playlist_youtube(self):
         with disable_logging():
-            async with StreamRequest(
-                "https://www.youtube.com/playlist?list=PLjnOFoOKDEU9rzMtOaKGLABN7QhG19Nl0"
-            ) as req:
-                await req.execute()
+            async with StreamRequest("https://www.youtube.com/playlist?list=PLjnOFoOKDEU9rzMtOaKGLABN7QhG19Nl0") as req:
+                await req()
         self.assertFalse(req.success)
         self.assertIsNone(req.result)
 
     async def test_stream_request_playlist_soundcloud(self):
         with disable_logging():
             async with StreamRequest("https://soundcloud.com/dysta/sets/breakcore") as req:
-                await req.execute()
+                await req()
 
         self.assertFalse(req.success)
         self.assertIsNone(req.result)
@@ -71,7 +67,7 @@ class TestStreamRequestComponent(unittest.IsolatedAsyncioTestCase):
     async def test_stream_request_success_youtube_query(self):
         with disable_logging():
             async with StreamRequest("home resonance") as req:
-                await req.execute()
+                await req()
 
         self.assertFalse(req.success)
         self.assertIsNone(req.result)
@@ -79,7 +75,7 @@ class TestStreamRequestComponent(unittest.IsolatedAsyncioTestCase):
     async def test_stream_request_success_youtube_convert_to_song(self):
         with disable_logging():
             async with StreamRequest("https://www.youtube.com/watch?v=8GW6sLrK40k") as req:
-                await req.execute()
+                await req()
 
         self.assertTrue(req.success)
         self.assertIsNotNone(req.result)
@@ -101,7 +97,7 @@ class TestStreamRequestComponent(unittest.IsolatedAsyncioTestCase):
     async def test_stream_request_success_youtube_live_convert_to_song(self):
         with disable_logging():
             async with StreamRequest("https://www.youtube.com/watch?v=4xDzrJKXOOY") as req:
-                await req.execute()
+                await req()
 
         self.assertTrue(req.success)
         self.assertIsNotNone(req.result)
@@ -122,10 +118,8 @@ class TestStreamRequestComponent(unittest.IsolatedAsyncioTestCase):
 
     async def test_stream_request_success_soundcloud_convert_to_song(self):
         with disable_logging():
-            async with StreamRequest(
-                "https://soundcloud.com/gee_baller/playboi-carti-cult-classic"
-            ) as req:
-                await req.execute()
+            async with StreamRequest("https://soundcloud.com/gee_baller/playboi-carti-cult-classic") as req:
+                await req()
 
         self.assertTrue(req.success)
         self.assertIsNotNone(req.result)

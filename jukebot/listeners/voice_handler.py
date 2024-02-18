@@ -35,16 +35,16 @@ class VoiceHandler(commands.Cog):
         if self.bot.user in channel.members:
             player: Player = self.bot.players[channel.guild.id]
             if player.is_paused:
-                with ResumeService(self.bot) as rs:
-                    await rs(interaction=player.interaction, silent=True)
+                with ResumeService(self.bot, player.interaction) as resume:
+                    await resume(silent=True)
 
     @commands.Cog.listener()
     async def on_voice_channel_alone(self, member: Member, channel: VoiceChannel):
         if channel.members[0].id == self.bot.user.id:
             player: Player = self.bot.players[channel.guild.id]
             if player.is_playing:
-                with PauseService(self.bot) as rs:
-                    await rs(interaction=player.interaction, silent=True)
+                with PauseService(self.bot, player.interaction) as pause:
+                    await pause(silent=True)
 
 
 def setup(bot):

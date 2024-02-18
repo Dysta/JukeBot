@@ -35,11 +35,7 @@ class StreamRequest(AbstractRequest):
         super().__init__(query)
         self._params: dict = {**StreamRequest.YTDL_OPTIONS}
 
-    async def setup(self):
-        # * nothing to do
-        pass
-
-    async def execute(self):
+    async def __call__(self):
         with yt_dlp.YoutubeDL(params=self._params) as ytdl:
             loop = asyncio.get_event_loop()
             try:
@@ -53,7 +49,7 @@ class StreamRequest(AbstractRequest):
 
             self._result = data
 
-    async def terminate(self):
+    async def __aexit__(self, exc_type, exc_value, traceback):
         if not self._result:
             logger.opt(lazy=True).debug(f"No info retrieved for query {self._query}")
             return

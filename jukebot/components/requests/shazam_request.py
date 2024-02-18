@@ -60,19 +60,18 @@ class ShazamRequest(AbstractRequest):
         self._params: dict = {**ShazamRequest.YTDL_BASE_OPTIONS}
         self._delete_path: bool = False
 
-    async def setup(self):
+    async def __aenter__(self):
         rdm_str: str = "".join(
-            [
-                random.choice(ShazamRequest.FILENAME_CHARS)
-                for _ in range(ShazamRequest.FILENAME_LENGHT)
-            ]
+            [random.choice(ShazamRequest.FILENAME_CHARS) for _ in range(ShazamRequest.FILENAME_LENGHT)]
         )
         self._path = Path(tempfile.gettempdir(), "jukebot", rdm_str)
         self._params.update({"outtmpl": f"{self._path}"})
 
         logger.opt(lazy=True).debug(f"Generated path {self._path} with parameters {self._params}")
 
-    async def execute(self):
+        return self
+
+    async def __call__(self):
         with yt_dlp.YoutubeDL(params=self._params) as ytdl:
             loop = asyncio.get_event_loop()
             try:
@@ -105,7 +104,7 @@ class ShazamRequest(AbstractRequest):
 
         logger.opt(lazy=True).debug(f"Query data {self._result}")
 
-    async def terminate(self):
+    async def __aexit__(self, exc_type, exc_value, traceback):
         if self._delete_path:
             loop = asyncio.get_event_loop()
             try:

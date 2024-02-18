@@ -134,32 +134,37 @@ class Player:
     def _after(self, error):
         if error:
             logger.opt(lazy=True).error(error)
+            self.state = Player.State.STOPPED
             return
+
         if self.state.is_leaving:
             return
+
         if self._loop.is_song_loop and not self.state.is_skipping:
             func = self.play(self.song, replay=True)
             coro.run_threadsafe(func, loop=self.bot.loop)
             return
+
         if self._loop.is_queue_loop:
-            with AddService(self.bot) as ad:
-                func = ad(interaction=self.interaction, query=self.song.web_url, silent=True)
+            with AddService(self.bot, self.interaction) as add:
+                func = add(query=self.song.web_url, silent=True)
             asyncio.ensure_future(func, loop=self.bot.loop)
 
         self._stream = None
         self._song = None
 
-        if not self._queue.is_empty():
-            with PlayService(self.bot) as ps:
-                func = ps(interaction=self.interaction, query="")
-            coro.run_threadsafe(func, self.bot.loop)
-        else:
+        if self._queue.is_empty():
             self.state = Player.State.IDLE
+            return
+
+        with PlayService(self.bot, self.interaction) as play:
+            func = play(query="")
+        coro.run_threadsafe(func, self.bot.loop)
 
     def _idle_callback(self) -> None:
         if not self._idle_task.cancelled():
-            with LeaveService(self.bot) as ls:
-                func = ls(interaction=self.interaction)
+            with LeaveService(self.bot, self.interaction) as leave:
+                func = leave()
             asyncio.ensure_future(func, loop=self.bot.loop)
 
     def _set_idle_task(self) -> None:
@@ -226,9 +231,9 @@ class Player:
         self._set_idle_task()
 
     @property
-    def loop(self) -> "Player.Loop":
+    def loop(self) -> Player.Loop:
         return self._loop
 
     @loop.setter
-    def loop(self, lp: "Player.Loop") -> None:
+    def loop(self, lp: Player.Loop) -> None:
         self._loop = lp

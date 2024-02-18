@@ -31,7 +31,6 @@ class Queue(commands.Cog):
         inter : CommandInteraction
             The interaction
         """
-        pass
 
     @queue.sub_command()
     @commands.cooldown(1, 3.0, BucketType.user)
@@ -68,8 +67,8 @@ class Queue(commands.Cog):
         query: the URL or query to play
         top: Whether or not to put music at the top of the queue
         """
-        with AddService(self.bot) as asr:
-            await asr(interaction=inter, query=query, top=top)
+        async with AddService(self.bot, inter) as add:
+            await add(query=query, top=top)
 
     @queue.sub_command()
     @commands.cooldown(1, 5.0, BucketType.user)
@@ -85,8 +84,8 @@ class Queue(commands.Cog):
         inter: The interaction
         song: The name of the music to remove. The bot auto completes the answer
         """
-        with RemoveService(self.bot) as rs:
-            await rs(interaction=inter, song=song)  # type:ignore
+        async with RemoveService(self.bot, inter) as remove:
+            await remove(song=song)
 
     @remove.autocomplete("song")
     async def remove_autocomplete(self, inter: CommandInteraction, data: str):
@@ -108,8 +107,8 @@ class Queue(commands.Cog):
         inter : CommandInteraction
             The interaction
         """
-        with ClearService(self.bot) as cs:
-            await cs(interaction=inter)
+        async with ClearService(self.bot, inter) as clear:
+            await clear()
 
     @queue.sub_command()
     @commands.check(checks.bot_queue_is_not_empty)
@@ -125,8 +124,8 @@ class Queue(commands.Cog):
         inter : CommandInteraction
             The interaction
         """
-        with ShuffleService(self.bot) as ss:
-            await ss(interaction=inter)
+        async with ShuffleService(self.bot, inter) as shuffle:
+            await shuffle()
 
 
 def setup(bot):
