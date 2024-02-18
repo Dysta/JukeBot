@@ -12,9 +12,7 @@ from loguru import logger
 from jukebot.utils import Extensions, converter, embed
 
 ADMIN_GUILD_IDS = (
-    list(map(int, os.environ["BOT_ADMIN_GUILD_IDS"].split(",")))
-    if "BOT_ADMIN_GUILD_IDS" in os.environ
-    else []
+    list(map(int, os.environ["BOT_ADMIN_GUILD_IDS"].split(","))) if "BOT_ADMIN_GUILD_IDS" in os.environ else []
 )
 
 

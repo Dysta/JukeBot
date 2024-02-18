@@ -23,9 +23,7 @@ def set_logging(
     logger.info(f"Jukebot log messages with level {plogging.getLevelName(jukebot_loglevel)}.")
 
     if intercept_disnake_log:
-        logger.info(
-            f"Intercepting disnake log messages with level {plogging.getLevelName(disnake_loglevel)}."
-        )
+        logger.info(f"Intercepting disnake log messages with level {plogging.getLevelName(disnake_loglevel)}.")
         logging.basicConfig(handlers=[InterceptHandler()], level=disnake_loglevel)
 
     if not os.environ["ENVIRONMENT"] in list(Environment):

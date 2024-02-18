@@ -58,32 +58,18 @@ class PlayService(AbstractService):
         song: Song = components.Song(req.result)
         song.requester = author
 
-        async def inner(attempt: int) -> bool:
-            logger.opt(lazy=True).info(
-                f"Attempt {attempt} to play in guild {interaction.guild.name} ({interaction.guild.id})"
-            )
-            try:
-                await player.play(song)
-            except:
-                logger.opt(lazy=True).error(
-                    f"Server {interaction.guild.name} ({interaction.guild.id}) can't play in its player at attempt {attempt}."
-                )
-                return False
-            return True
-
         for i in range(2):
-            if not await inner(i):
-                with ResetService(self.bot) as rs, JoinService(self.bot) as js:
-                    await rs(interaction=interaction, silent=True)
-                    logger.opt(lazy=True).info(
-                        f"Server {interaction.guild.name} ({interaction.guild.id}) player reset."
-                    )
-                    await js(interaction=interaction, silent=True)
-                    logger.opt(lazy=True).info(
-                        f"Server {interaction.guild.name} ({interaction.guild.id}) player connected."
-                    )
-            else:
+            if await self._try_to_play(interaction, player, song, i):
                 break
+
+            with ResetService(self.bot) as rs, JoinService(self.bot) as js:
+                await rs(interaction=interaction, silent=True)
+                logger.opt(lazy=True).info(f"Server {interaction.guild.name} ({interaction.guild.id}) player reset.")
+                await js(interaction=interaction, silent=True)
+                logger.opt(lazy=True).info(
+                    f"Server {interaction.guild.name} ({interaction.guild.id}) player connected."
+                )
+
         else:
             with ResetService(self.bot) as rs:
                 await rs(interaction=interaction, silent=True)
@@ -104,4 +90,36 @@ class PlayService(AbstractService):
         )
         e: Embed = embed.music_message(song)
         await interaction.edit_original_message(embed=e)
+        return True
+
+    async def _try_to_play(self, interaction: CommandInteraction, player: Player, song: Song, attempt: int) -> bool:
+        """
+        An asynchronous function to attempt to play a song in a Discord guild.
+
+        Parameters
+        ----------
+        interaction : CommandInteraction
+            The command interaction triggering the play attempt.
+        player : Player
+            The player responsible for playing the song.
+        song : Song
+            The song to be played.
+        attempt : int
+            The attempt number for playing the song.
+
+        Returns
+        -------
+        bool
+            True if the song was played successfully, False otherwise.
+        """
+        logger.opt(lazy=True).info(
+            f"Attempt {attempt} to play in guild {interaction.guild.name} ({interaction.guild.id})"
+        )
+        try:
+            await player.play(song)
+        except Exception as e:
+            logger.opt(lazy=True).error(
+                f"Server {interaction.guild.name} ({interaction.guild.id}) can't play in its player at attempt {attempt}. Err {e}"
+            )
+            return False
         return True

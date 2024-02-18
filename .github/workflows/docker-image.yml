@@ -10,7 +10,7 @@ jobs:
       repo_name: 'dysta/jukebot'
 
     steps:
-      - name: Checkout 
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Login to Docker Hub

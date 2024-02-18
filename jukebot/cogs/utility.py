@@ -49,9 +49,7 @@ class Utility(commands.Cog):
             value=f"┕`/`",
             inline=True,
         )
-        e.set_image(
-            url="https://cdn.discordapp.com/attachments/829356508696412231/948936347752747038/juke-banner.png"
-        )
+        e.set_image(url="https://cdn.discordapp.com/attachments/829356508696412231/948936347752747038/juke-banner.png")
         await inter.send(embed=e, ephemeral=True)
 
     @commands.slash_command()

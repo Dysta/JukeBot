@@ -25,9 +25,7 @@ class Song:
         self.title = info.get("title", "Unknown")
         self.live = info.get("is_live", False)
         self.duration = round(info.get("duration") or 0)
-        self.fmt_duration = (
-            "ထ" if self.live else converter.seconds_to_youtube_format(self.duration)
-        )
+        self.fmt_duration = "ထ" if self.live else converter.seconds_to_youtube_format(self.duration)
         self.thumbnail = info.get("thumbnail", None)
         self.channel = info.get("channel") or info.get("uploader") or "Unknown"
         self.web_url = info.get("webpage_url", "")

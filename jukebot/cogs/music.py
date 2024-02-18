@@ -252,15 +252,10 @@ class Music(commands.Cog):
             raise commands.UserInputError("The URL didn't return anything")
 
         content = " | ".join(
-            f"[{k.capitalize()}]({v['url']})"
-            for k, v in sorted(data["linksByPlatform"].items(), key=lambda x: x)
+            f"[{k.capitalize()}]({v['url']})" for k, v in sorted(data["linksByPlatform"].items(), key=lambda x: x)
         )
-        title: str = data["entitiesByUniqueId"][data["entityUniqueId"]].get(
-            "title", "Unknown title"
-        )
-        artist: str = data["entitiesByUniqueId"][data["entityUniqueId"]].get(
-            "artistName", "Unknown artist"
-        )
+        title: str = data["entitiesByUniqueId"][data["entityUniqueId"]].get("title", "Unknown title")
+        artist: str = data["entitiesByUniqueId"][data["entityUniqueId"]].get("artistName", "Unknown artist")
         img: str = data["entitiesByUniqueId"][data["entityUniqueId"]].get("thumbnailUrl", "")
         e: Embed = embed.share_message(
             inter.author,

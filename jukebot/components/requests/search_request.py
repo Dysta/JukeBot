@@ -82,17 +82,13 @@ class SearchRequest(AbstractRequest):
         if not "entries" in self._result:
             # ? SearchRequest have to retrieved a playlist,
             # ? this shouldn't happen so we delete the result
-            logger.warning(
-                f"Query {self._query} don't retrieve a playlist. Deleleting the result."
-            )
+            logger.warning(f"Query {self._query} don't retrieve a playlist. Deleleting the result.")
             self._result = None
             return
 
         self._result = list(self._result.pop("entries"))
         if not len(self._result):
-            logger.warning(
-                f"Query {self._query} don't retrieve any results. Deleleting the result."
-            )
+            logger.warning(f"Query {self._query} don't retrieve any results. Deleleting the result.")
             self._result = None
             return
 

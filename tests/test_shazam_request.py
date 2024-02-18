@@ -8,9 +8,7 @@ class TestShazamRequestComponent(unittest.IsolatedAsyncioTestCase):
     @unittest.skip("not working on CI due to ffprobe not found")
     async def test_shazam_request_success(self):
         with disable_logging():
-            async with ShazamRequest(
-                "https://twitter.com/LaCienegaBlvdss/status/1501975048202166283"
-            ) as req:
+            async with ShazamRequest("https://twitter.com/LaCienegaBlvdss/status/1501975048202166283") as req:
                 await req.execute()
 
         self.assertTrue(req.success)
@@ -18,9 +16,7 @@ class TestShazamRequestComponent(unittest.IsolatedAsyncioTestCase):
 
         self.assertEqual(result.get("title"), "Enya - The Humming (Official Lyric Video)")
         self.assertEqual(result.get("url"), "https://youtu.be/FOP_PPavoLA?autoplay=1")
-        self.assertEqual(
-            result.get("image_url"), "https://i.ytimg.com/vi/FOP_PPavoLA/maxresdefault.jpg"
-        )
+        self.assertEqual(result.get("image_url"), "https://i.ytimg.com/vi/FOP_PPavoLA/maxresdefault.jpg")
 
     @unittest.skip("not working on CI due to ffprobe not found")
     async def test_shazam_request_failed(self):

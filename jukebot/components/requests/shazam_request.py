@@ -62,10 +62,7 @@ class ShazamRequest(AbstractRequest):
 
     async def setup(self):
         rdm_str: str = "".join(
-            [
-                random.choice(ShazamRequest.FILENAME_CHARS)
-                for _ in range(ShazamRequest.FILENAME_LENGHT)
-            ]
+            [random.choice(ShazamRequest.FILENAME_CHARS) for _ in range(ShazamRequest.FILENAME_LENGHT)]
         )
         self._path = Path(tempfile.gettempdir(), "jukebot", rdm_str)
         self._params.update({"outtmpl": f"{self._path}"})

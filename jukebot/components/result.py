@@ -24,9 +24,7 @@ class Result:
         self.channel = info.get("channel") or info.get("uploader") or "Unknown"
         self.duration = round(info.get("duration") or 0)
         self.live = info.get("duration") is None
-        self.fmt_duration = (
-            "ထ" if self.live else converter.seconds_to_youtube_format(self.duration)
-        )
+        self.fmt_duration = "ထ" if self.live else converter.seconds_to_youtube_format(self.duration)
 
         if self.title == "Unknown" or self.channel == "Unknwon":
             self._define_complementary_info_from_url()

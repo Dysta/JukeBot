@@ -61,9 +61,7 @@ class Search(commands.Cog):
         logger.opt(lazy=True).debug(f"Results of the query is {results}")
 
         if not results:
-            raise QueryFailed(
-                f"Nothing found for {query}", query=query, full_query=f"{source}{query}"
-            )
+            raise QueryFailed(f"Nothing found for {query}", query=query, full_query=f"{source}{query}")
 
         e = embed.search_result_message(playlist=results, title=f"Result for {query}")
 
