@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import asyncio
-import pprint
 from enum import Enum, auto
 
 import yt_dlp

@@ -1,6 +1,4 @@
-import asyncio
 import unittest
-from typing import Tuple
 
 from jukebot.components.requests import MusicRequest
 from jukebot.utils import converter

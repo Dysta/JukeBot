@@ -1,9 +1,8 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Optional
 
-from disnake import CommandInteraction, InviteTarget, Member
+from disnake import CommandInteraction, InviteTarget
 from disnake.ext import commands
 from disnake.ext.commands import Bot, BucketType
 

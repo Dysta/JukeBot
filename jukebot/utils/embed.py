@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import itertools
 import random
-from typing import TYPE_CHECKING, Union
+from typing import TYPE_CHECKING
 
 import disnake
 from disnake import Member

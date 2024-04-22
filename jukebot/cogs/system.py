@@ -3,9 +3,9 @@ from __future__ import annotations
 import io
 import os
 from datetime import datetime
-from typing import Optional, Set
+from typing import Optional
 
-from disnake import APISlashCommand, CommandInteraction, File
+from disnake import CommandInteraction, File
 from disnake.ext import commands
 from loguru import logger
 

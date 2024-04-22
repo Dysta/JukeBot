@@ -3,7 +3,7 @@ from __future__ import annotations
 import asyncio
 import os
 from asyncio import Task
-from enum import IntEnum
+from enum import IntEnum, auto
 from typing import Optional
 
 from disnake import CommandInteraction, VoiceChannel, VoiceClient
@@ -21,12 +21,12 @@ from jukebot.utils import coro
 
 class Player:
     class State(IntEnum):
-        IDLE = 0
-        PLAYING = 1
-        PAUSED = 2
-        STOPPED = 3
-        SKIPPING = 4
-        DISCONNECTING = 5
+        IDLE = auto()
+        PLAYING = auto()
+        PAUSED = auto()
+        STOPPED = auto()
+        SKIPPING = auto()
+        DISCONNECTING = auto()
 
         @property
         def is_playing(self) -> bool:
@@ -96,7 +96,6 @@ class Player:
             song.requester = author
 
         stream = AudioStream(song.stream_url)
-        stream.read()
 
         if self._voice and self._voice.is_playing():
             self._voice.stop()
@@ -134,13 +133,17 @@ class Player:
     def _after(self, error):
         if error:
             logger.opt(lazy=True).error(error)
+            self.state = Player.State.IDLE
             return
+
         if self.state.is_leaving:
             return
+
         if self._loop.is_song_loop and not self.state.is_skipping:
             func = self.play(self.song, replay=True)
             coro.run_threadsafe(func, loop=self.bot.loop)
             return
+
         if self._loop.is_queue_loop:
             with AddService(self.bot) as ad:
                 func = ad(interaction=self.interaction, query=self.song.web_url, silent=True)
@@ -153,8 +156,9 @@ class Player:
             with PlayService(self.bot) as ps:
                 func = ps(interaction=self.interaction, query="")
             coro.run_threadsafe(func, self.bot.loop)
-        else:
-            self.state = Player.State.IDLE
+            return
+
+        self.state = Player.State.IDLE
 
     def _idle_callback(self) -> None:
         if not self._idle_task.cancelled():
@@ -226,9 +230,9 @@ class Player:
         self._set_idle_task()
 
     @property
-    def loop(self) -> "Player.Loop":
+    def loop(self) -> Player.Loop:
         return self._loop
 
     @loop.setter
-    def loop(self, lp: "Player.Loop") -> None:
+    def loop(self, lp: Player.Loop) -> None:
         self._loop = lp

@@ -31,7 +31,6 @@ class Queue(commands.Cog):
         inter : CommandInteraction
             The interaction
         """
-        pass
 
     @queue.sub_command()
     @commands.cooldown(1, 3.0, BucketType.user)

@@ -8,10 +8,10 @@ from jukebot import components
 from jukebot.abstract_components import AbstractService
 from jukebot.components.requests.music_request import MusicRequest
 from jukebot.exceptions import QueryFailed
-from jukebot.utils import embed, regex
+from jukebot.utils import embed
 
 if TYPE_CHECKING:
-    from jukebot.components import Player, Query, Result, ResultSet
+    from jukebot.components import Player, Result, ResultSet
 
 
 class AddService(AbstractService):
