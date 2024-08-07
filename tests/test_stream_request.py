@@ -29,7 +29,9 @@ class TestStreamRequestComponent(unittest.IsolatedAsyncioTestCase):
 
     async def test_stream_request_success_soundcloud(self):
         with disable_logging():
-            async with StreamRequest("https://soundcloud.com/gee_baller/playboi-carti-cult-classic") as req:
+            async with StreamRequest(
+                "https://soundcloud.com/wstd7331/skychaser-1045-sky-fm-2nd-part-slowed-and-reverb"
+            ) as req:
                 await req.execute()
 
         self.assertTrue(req.success)
@@ -38,13 +40,13 @@ class TestStreamRequestComponent(unittest.IsolatedAsyncioTestCase):
 
         result: dict = req.result
 
-        self.assertEqual(result.get("title"), "Playboi Carti – Cult Classic")
-        self.assertEqual(result.get("uploader"), "Gee Baller")
+        self.assertEqual(result.get("title"), "Skychaser - 104.5 Sky FM (2nd Part, Slowed And Reverb)")
+        self.assertEqual(result.get("uploader"), "[wstd7331]")
         self.assertEqual(
             result.get("webpage_url"),
-            "https://soundcloud.com/gee_baller/playboi-carti-cult-classic",
+            "https://soundcloud.com/wstd7331/skychaser-1045-sky-fm-2nd-part-slowed-and-reverb",
         )
-        self.assertEqual(round(result.get("duration")), 118)
+        self.assertEqual(round(result.get("duration")), 201)
 
         self.assertIsNotNone(result.get("thumbnail", None))
         self.assertIsNotNone(result.get("url", None))
@@ -118,7 +120,9 @@ class TestStreamRequestComponent(unittest.IsolatedAsyncioTestCase):
 
     async def test_stream_request_success_soundcloud_convert_to_song(self):
         with disable_logging():
-            async with StreamRequest("https://soundcloud.com/gee_baller/playboi-carti-cult-classic") as req:
+            async with StreamRequest(
+                "https://soundcloud.com/wstd7331/skychaser-1045-sky-fm-2nd-part-slowed-and-reverb"
+            ) as req:
                 await req.execute()
 
         self.assertTrue(req.success)
@@ -127,14 +131,14 @@ class TestStreamRequestComponent(unittest.IsolatedAsyncioTestCase):
 
         result: Song = Song(req.result)
 
-        self.assertEqual(result.title, "Playboi Carti – Cult Classic")
-        self.assertEqual(result.channel, "Gee Baller")
+        self.assertEqual(result.title, "Skychaser - 104.5 Sky FM (2nd Part, Slowed And Reverb)")
+        self.assertEqual(result.channel, "[wstd7331]")
         self.assertEqual(
             result.web_url,
-            "https://soundcloud.com/gee_baller/playboi-carti-cult-classic",
+            "https://soundcloud.com/wstd7331/skychaser-1045-sky-fm-2nd-part-slowed-and-reverb",
         )
-        self.assertEqual(result.duration, 118)
-        self.assertEqual(result.fmt_duration, "1:58")
+        self.assertEqual(result.duration, 201)
+        self.assertEqual(result.fmt_duration, "3:21")
 
         self.assertIsNotNone(result.thumbnail)
         self.assertIsNotNone(result.stream_url)
