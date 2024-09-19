@@ -35,7 +35,7 @@ class TestMusicRequestComponent(unittest.IsolatedAsyncioTestCase):
 
         result: dict = req.result
 
-        self.assertIn("synthwave radio 🌌 - beats to chill/game to", result.get("title"))
+        self.assertIn("synthwave radio 🌌 beats to chill/game to", result.get("title"))
         self.assertEqual(result.get("uploader"), "Lofi Girl")
         self.assertEqual(result.get("webpage_url"), "https://www.youtube.com/watch?v=4xDzrJKXOOY")
         self.assertIsNone(result.get("duration"))
@@ -321,7 +321,7 @@ class TestMusicRequestComponent(unittest.IsolatedAsyncioTestCase):
 
         result: Result = Result(req.result)
 
-        self.assertIn("synthwave radio 🌌 - beats to chill/game to", result.title)
+        self.assertIn("synthwave radio 🌌 beats to chill/game to", result.title)
         self.assertEqual(result.channel, "Lofi Girl")
         self.assertEqual(result.web_url, "https://www.youtube.com/watch?v=4xDzrJKXOOY")
         self.assertEqual(result.duration, 0)

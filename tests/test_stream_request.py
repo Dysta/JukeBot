@@ -107,7 +107,7 @@ class TestStreamRequestComponent(unittest.IsolatedAsyncioTestCase):
 
         result: Song = Song(req.result)
 
-        self.assertIn("synthwave radio 🌌 - beats to chill/game to", result.title)
+        self.assertIn("synthwave radio 🌌 beats to chill/game to", result.title)
         self.assertEqual(result.channel, "Lofi Girl")
         self.assertEqual(result.web_url, "https://www.youtube.com/watch?v=4xDzrJKXOOY")
         self.assertEqual(result.duration, 0)
