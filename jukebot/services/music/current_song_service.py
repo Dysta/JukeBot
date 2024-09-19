@@ -17,7 +17,7 @@ class CurrentSongService(AbstractService):
         stream: AudioStream = player.stream
         song: Song = player.song
         if stream and song:
-            e = embed.music_message(song, stream.progress)
+            e = embed.music_message(song, player.loop, stream.progress)
         else:
             e = embed.basic_message(title="Nothing is currently playing", content=f"Try `/play` to add a music !")
         await interaction.send(embed=e)
