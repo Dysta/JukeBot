@@ -42,6 +42,7 @@ class PlayService(AbstractService):
                 ok = await asr(
                     interaction=interaction,
                     query=query,
+                    top=top,
                     silent=silent or not player.is_playing,
                 )
                 if not ok:
