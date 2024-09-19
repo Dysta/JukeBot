@@ -83,6 +83,7 @@ class Player:
 
     async def join(self, channel: VoiceChannel):
         self._voice = await channel.connect(timeout=2.0)
+        self.state = Player.State.IDLE
 
     async def play(self, song: Song, replay: bool = False):
         if replay:
@@ -95,10 +96,10 @@ class Player:
             song: Song = Song(req.result)
             song.requester = author
 
-        stream = AudioStream(song.stream_url)
-
         if self._voice and self._voice.is_playing():
             self._voice.stop()
+
+        stream = AudioStream(song.stream_url)
 
         self._voice.play(stream, after=self._after)
         self._stream = stream
