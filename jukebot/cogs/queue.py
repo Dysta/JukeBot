@@ -45,7 +45,7 @@ class Queue(commands.Cog):
             The interaction
         """
         queue: ResultSet = self.bot.players[inter.guild.id].queue
-        e: Embed = embed.queue_message(queue, title=f"Queue for {inter.guild.name}")
+        e: Embed = embed.queue_message(queue, self.bot, title=f"Queue for {inter.guild.name}")
         await inter.send(embed=e)
 
     @queue.sub_command()

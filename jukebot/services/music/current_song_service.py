@@ -19,5 +19,8 @@ class CurrentSongService(AbstractService):
         if stream and song:
             e = embed.music_message(song, player.loop, stream.progress)
         else:
-            e = embed.basic_message(title="Nothing is currently playing", content=f"Try `/play` to add a music !")
+            cmd: APISlashCommand = self.bot.get_global_command_named("play")
+            e = embed.basic_message(
+                title="Nothing is currently playing", content=f"Try </play:{cmd.id}> to add a music !"
+            )
         await interaction.send(embed=e)

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Optional
 
-from disnake import CommandInteraction
+from disnake import APISlashCommand, CommandInteraction
 
 from jukebot.abstract_components import AbstractService
 from jukebot.utils import embed
@@ -21,9 +21,14 @@ class ResumeService(AbstractService):
             if not silent:
                 e = embed.basic_message(title="Player resumed")
                 await interaction.send(embed=e)
-        elif player.state.is_stopped and not player.queue.is_empty():
+
+            return
+
+        if player.state.is_stopped and not player.queue.is_empty():
             with PlayService(self.bot) as play:
                 await play(interaction=interaction, query="")
-        else:
-            e = embed.basic_message(title="Nothing to play", content=f"Try `/play` to add a music !")
-            await interaction.send(embed=e)
+            return
+
+        cmd: APISlashCommand = self.bot.get_global_command_named("play")
+        e = embed.basic_message(title="Nothing is currently playing", content=f"Try </play:{cmd.id}> to add a music !")
+        await interaction.send(embed=e)

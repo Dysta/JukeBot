@@ -5,7 +5,8 @@ import random
 from typing import TYPE_CHECKING
 
 import disnake
-from disnake import Member
+from disnake import APISlashCommand, Member
+from disnake.ext.commands import Bot, Command
 
 from jukebot.utils import converter
 
@@ -142,7 +143,7 @@ def basic_queue_message(title="", content=""):
     return embed
 
 
-def queue_message(playlist: ResultSet, title=""):
+def queue_message(playlist: ResultSet, bot: Bot, title=""):
     playlist_slice = itertools.islice(playlist, 10)
     content = "\n\n".join(
         [
@@ -155,9 +156,11 @@ def queue_message(playlist: ResultSet, title=""):
     total_time: int = sum([e.duration for e in playlist if not e.live])
     total_time_fmt: str = converter.seconds_to_youtube_format(total_time)
     embed.add_field(name="Total duration", value=f"`{total_time_fmt}`")
+
+    cmd: APISlashCommand = bot.get_global_command_named("queue")
     embed.add_field(
         name=VOID_TOKEN,
-        value=f"Use command `add` or `remove` to add or remove a song.",
+        value=f"Use command </queue add:{cmd.id}> or </queue remove:{cmd.id}> to add or remove a song.",
         inline=False,
     )
     return embed
