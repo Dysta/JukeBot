@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import random
 from dataclasses import dataclass
-from typing import List, Optional
+from typing import List, Optional, Union
 
 from disnake import Member
 
@@ -29,15 +29,22 @@ class ResultSet(AbstractCollection[Result]):
     def get(self) -> Result:
         return self.set.pop(0)
 
-    def put(self, result: Result) -> None:
-        self.set.append(result)
+    def put(self, result: Union[Result, ResultSet]) -> None:
+        if isinstance(result, ResultSet):
+            self.set += result
+        else:
+            self.set.append(result)
 
-    def add(self, result: Result) -> None:
-        self.set.insert(0, result)
+    def add(self, result: Union[Result, ResultSet]) -> None:
+        if isinstance(result, ResultSet):
+            self.set[0:0] = result[::-1]
+        else:
+            self.set.insert(0, result)
 
     def remove(self, elem: str) -> Optional[Result]:
+        elem = elem.lower()
         for i, e in enumerate(self.set):
-            if e.title.lower() == elem.lower():
+            if e.title.lower() == elem:
                 return self.set.pop(i)
         return None
 

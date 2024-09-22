@@ -2,16 +2,16 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Optional
 
-from disnake import CommandInteraction, Embed
+from disnake import CommandInteraction
 from loguru import logger
 
 from jukebot import components
 from jukebot.abstract_components import AbstractService
 from jukebot.components.requests import StreamRequest
+from jukebot.exceptions.player_exception import PlayerConnexionException
 from jukebot.services import ResetService
 from jukebot.services.music.join_service import JoinService
 from jukebot.services.queue.add_service import AddService
-from jukebot.utils import embed
 
 if TYPE_CHECKING:
     from jukebot.components import Player, Result, Song
@@ -24,32 +24,26 @@ class PlayService(AbstractService):
         interaction: CommandInteraction,
         query: str,
         top: Optional[bool] = False,
-        silent: Optional[bool] = False,
     ):
-        if not interaction.response.is_done():
-            await interaction.response.defer()
-
         # PlayerContainer create bot if needed
         player: Player = self.bot.players[interaction.guild.id]
 
         if not player.is_connected:
-            with JoinService(self.bot) as js:
-                if not await js(interaction=interaction, silent=True):
-                    return False
+            with JoinService(self.bot) as join:
+                await join(interaction=interaction)
 
         if query:
-            with AddService(self.bot) as asr:
-                ok = await asr(
-                    interaction=interaction,
+            with AddService(self.bot) as add:
+                await add(
+                    guild_id=interaction.guild.id,
+                    author=interaction.user,
                     query=query,
                     top=top,
-                    silent=silent or not player.is_playing,
                 )
-                if not ok:
-                    return False
 
         if player.is_playing:
-            return True  # return True bc everything is ok
+            # ? stop here cause it mean that we used play command as queue add command
+            return True
 
         rqs: Result = player.queue.get()
         author = rqs.requester
@@ -63,35 +57,33 @@ class PlayService(AbstractService):
             if await self._try_to_play(interaction, player, song, i):
                 break
 
-            with ResetService(self.bot) as rs, JoinService(self.bot) as js:
-                await rs(interaction=interaction, silent=True)
+            with ResetService(self.bot) as reset, JoinService(self.bot) as join:
+                await reset(guild=interaction.guild)
                 logger.opt(lazy=True).info(f"Server {interaction.guild.name} ({interaction.guild.id}) player reset.")
-                await js(interaction=interaction, silent=True)
+
+                await join(interaction=interaction)
                 logger.opt(lazy=True).info(
                     f"Server {interaction.guild.name} ({interaction.guild.id}) player connected."
                 )
 
         else:
-            with ResetService(self.bot) as rs:
-                await rs(interaction=interaction, silent=True)
+            with ResetService(self.bot) as reset:
+                await reset(guild=interaction.guild)
             logger.opt(lazy=True).error(
                 f"Server {interaction.guild.name} ({interaction.guild.id}) can't play in its player after 2 attempts. "
                 f"Shouldn't happen."
             )
-            e: Embed = embed.error_message(
-                content="The player cannot play on the voice channel. This is because he's not connected to a voice channel or he's already playing something.\n"
+            raise PlayerConnexionException(
+                "The player cannot play on the voice channel. This is because he's not connected to a voice channel or he's already playing something.\n"
                 "This situation can happen when the player has been abruptly disconnected by Discord or a user. "
-                "Use the `reset` command to reset the player in this case.",
+                "Use the `reset` command to reset the player in this case."
             )
-            await interaction.edit_original_message(embed=e)
-            return False
 
         logger.opt(lazy=True).success(
             f"Server {interaction.guild.name} ({interaction.guild.id}) can play in its player."
         )
-        e: Embed = embed.music_message(song, player.loop)
-        await interaction.edit_original_message(embed=e)
-        return True
+
+        return song, player.loop
 
     async def _try_to_play(self, interaction: CommandInteraction, player: Player, song: Song, attempt: int) -> bool:
         """

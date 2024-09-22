@@ -2,21 +2,18 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from disnake import CommandInteraction, Embed
 from disnake.ext import commands
 
 from jukebot.abstract_components import AbstractService
-from jukebot.utils import embed
 
 if TYPE_CHECKING:
     from jukebot.components import ResultSet
 
 
 class RemoveService(AbstractService):
-    async def __call__(self, /, interaction: CommandInteraction, song: str):
-        queue: ResultSet = self.bot.players[interaction.guild.id].queue
+    async def __call__(self, /, guild_id: int, song: str):
+        queue: ResultSet = self.bot.players[guild_id].queue
         if not (elem := queue.remove(song)):
-            raise commands.UserInputError(f"Can't delete item `{song}`")
+            raise commands.UserInputError(f"Can't delete song `{song}`. Not in playlist.")
 
-        e: Embed = embed.basic_message(content=f"`{elem.title}` have been removed from the queue")
-        await interaction.send(embed=e)
+        return elem
