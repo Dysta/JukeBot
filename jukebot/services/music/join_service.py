@@ -1,13 +1,12 @@
 from __future__ import annotations
 
 import copy
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from disnake import CommandInteraction
 
 from jukebot.abstract_components import AbstractService
 from jukebot.exceptions import PlayerConnexionException
-from jukebot.utils import embed
 
 if TYPE_CHECKING:
     from jukebot.components import Player
@@ -18,7 +17,6 @@ class JoinService(AbstractService):
         self,
         /,
         interaction: CommandInteraction,
-        silent: Optional[bool] = False,
     ):
         player: Player = self.bot.players[interaction.guild.id]
         try:
@@ -31,13 +29,6 @@ class JoinService(AbstractService):
                 f"Check both __bot__ and __channel__ permissions."
             )
 
-        if not silent:
-            e = embed.basic_message(
-                content=f"Connected to <#{interaction.author.voice.channel.id}>\n"
-                f"Bound to <#{interaction.channel.id}>\n",
-            )
-            await interaction.send(embed=e)
-
         cpy_inter = copy.copy(interaction)
         # time to trick the copied interaction
         # used to display bot as invoker
@@ -47,4 +38,3 @@ class JoinService(AbstractService):
         cpy_inter.send = cpy_inter.edit_original_message = cpy_inter.channel.send
 
         player.interaction = cpy_inter
-        return True

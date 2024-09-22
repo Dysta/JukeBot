@@ -1,38 +1,27 @@
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
-from disnake import CommandInteraction, Embed
+from disnake import Guild
 from loguru import logger
 
 from jukebot.abstract_components import AbstractService
-from jukebot.utils import embed
+from jukebot.exceptions.player_exception import PlayerDontExistException
 
 if TYPE_CHECKING:
     from jukebot.components import Player
 
 
 class ResetService(AbstractService):
-    async def __call__(self, /, interaction: CommandInteraction, silent: Optional[bool] = False):
-        if not interaction.guild.id in self.bot.players:
-            logger.opt(lazy=True).debug(
-                f"Server {interaction.guild.name} ({interaction.guild.id}) try to kill a player that don't exist."
-            )
-            if not silent:
-                e: Embed = embed.error_message(content="No player detected in this server.")
-                await interaction.send(embed=e, ephemeral=True)
-            return
+    async def __call__(self, /, guild: Guild):
+        if not guild.id in self.bot.players:
+            logger.opt(lazy=True).debug(f"Server {guild.name} ({guild.id}) try to kill a player that don't exist.")
+            raise PlayerDontExistException("No player detected in this server.")
 
-        player: Player = self.bot.players.pop(interaction.guild.id)
+        player: Player = self.bot.players.pop(guild.id)
         try:
             await player.disconnect(force=True)
         except Exception as e:
             logger.opt(lazy=True).error(
-                f"Error when force disconnecting the player of the guild {interaction.guild.name} ({interaction.guild.id}). "
-                f"Error: {e}"
+                f"Error when force disconnecting the player of the guild {guild.name} ({guild.id}). " f"Error: {e}"
             )
 
-        logger.opt(lazy=True).success(
-            f"Server {interaction.guild.name} ({interaction.guild.id}) has successfully reset his player."
-        )
-        if not silent:
-            e: Embed = embed.info_message(content="The player has been reset.")
-            await interaction.send(embed=e)
+        logger.opt(lazy=True).success(f"Server {guild.name} ({guild.id}) has successfully reset his player.")

@@ -14,7 +14,6 @@ from jukebot.components.audio_stream import AudioStream
 from jukebot.components.requests import StreamRequest
 from jukebot.components.resultset import ResultSet
 from jukebot.components.song import Song
-from jukebot.services.music import LeaveService, PlayService
 from jukebot.services.queue import AddService
 from jukebot.utils import coro
 
@@ -69,8 +68,9 @@ class Player:
         def is_queue_loop(self) -> bool:
             return self == Player.Loop.QUEUE
 
-    def __init__(self, bot: Bot):
+    def __init__(self, bot: Bot, guild_id: int):
         self.bot: Bot = bot
+        self._guild_id: int = guild_id
 
         self._voice: Optional[VoiceClient] = None
         self._stream: Optional[AudioStream] = None
@@ -146,16 +146,15 @@ class Player:
             return
 
         if self._loop.is_queue_loop:
-            with AddService(self.bot) as ad:
-                func = ad(interaction=self.interaction, query=self.song.web_url, silent=True)
+            with AddService(self.bot) as add:
+                func = add(guild_id=self._guild_id, author=self.song.requester, query=self.song.web_url)
             asyncio.ensure_future(func, loop=self.bot.loop)
 
         self._stream = None
         self._song = None
 
         if not self._queue.is_empty():
-            with PlayService(self.bot) as ps:
-                func = ps(interaction=self.interaction, query="")
+            func = self.bot.get_slash_command("play").callback(self, self.interaction, query="")
             coro.run_threadsafe(func, self.bot.loop)
             return
 
@@ -163,8 +162,7 @@ class Player:
 
     def _idle_callback(self) -> None:
         if not self._idle_task.cancelled():
-            with LeaveService(self.bot) as ls:
-                func = ls(interaction=self.interaction)
+            func = self.bot.get_slash_command("leave").callback(self, self.interaction)
             asyncio.ensure_future(func, loop=self.bot.loop)
 
     def _set_idle_task(self) -> None:

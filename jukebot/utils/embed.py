@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 
 import disnake
 from disnake import APISlashCommand, Member
-from disnake.ext.commands import Bot, Command
+from disnake.ext.commands import Bot
 
 from jukebot.utils import converter
 

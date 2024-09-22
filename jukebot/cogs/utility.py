@@ -99,8 +99,11 @@ class Utility(commands.Cog):
         inter : CommandInteraction
             The interaction
         """
-        with ResetService(self.bot) as rs:
-            await rs(interaction=inter)
+        with ResetService(self.bot) as reset:
+            await reset(guild=inter.guild)
+
+        e = embed.info_message(content="The player has been reset.")
+        await inter.send(embed=e)
 
 
 def setup(bot):
