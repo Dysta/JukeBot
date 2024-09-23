@@ -8,3 +8,7 @@ class PlayerException(CommandError):
 
 class PlayerConnexionException(PlayerException):
     pass
+
+
+class PlayerDontExistException(PlayerException):
+    pass

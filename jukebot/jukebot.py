@@ -53,7 +53,7 @@ class PlayerCollection(AbstractMap[int, Player]):
 
     def __getitem__(self, key):
         if not key in self._collection:
-            self._collection[key] = Player(self.bot)
+            self._collection[key] = Player(self.bot, guild_id=key)
         return self._collection[key]
 
     def playing(self) -> List[Player]:
