@@ -25,7 +25,6 @@ class PlayService(AbstractService):
         query: str,
         top: Optional[bool] = False,
     ):
-        # PlayerContainer create bot if needed
         player: Player = self.bot.players[interaction.guild.id]
 
         if not player.is_connected:
@@ -43,7 +42,7 @@ class PlayService(AbstractService):
 
         if player.is_playing:
             # ? stop here cause it mean that we used play command as queue add command
-            return True
+            return
 
         rqs: Result = player.queue.get()
         author = rqs.requester
@@ -53,30 +52,18 @@ class PlayService(AbstractService):
         song: Song = components.Song(req.result)
         song.requester = author
 
-        for i in range(2):
-            if await self._try_to_play(interaction, player, song, i):
-                break
-
-            with ResetService(self.bot) as reset, JoinService(self.bot) as join:
-                await reset(guild=interaction.guild)
-                logger.opt(lazy=True).info(f"Server {interaction.guild.name} ({interaction.guild.id}) player reset.")
-
-                await join(interaction=interaction)
-                logger.opt(lazy=True).info(
-                    f"Server {interaction.guild.name} ({interaction.guild.id}) player connected."
-                )
-
-        else:
-            with ResetService(self.bot) as reset:
-                await reset(guild=interaction.guild)
+        try:
+            await player.play(song)
+        except Exception as e:
             logger.opt(lazy=True).error(
-                f"Server {interaction.guild.name} ({interaction.guild.id}) can't play in its player after 2 attempts. "
-                f"Shouldn't happen."
+                f"Server {interaction.guild.name} ({interaction.guild.id}) can't play in its player. Err {e}"
             )
+
+            cmd = self.bot.get_global_command_named("reset")
             raise PlayerConnexionException(
                 "The player cannot play on the voice channel. This is because he's not connected to a voice channel or he's already playing something.\n"
-                "This situation can happen when the player has been abruptly disconnected by Discord or a user. "
-                "Use the `reset` command to reset the player in this case."
+                "This situation can happen when the player has been abruptly disconnected by Discord or a user (kicked from a voice channel). "
+                f"Use the </reset:{cmd.id}> command to reset the player in this case."
             )
 
         logger.opt(lazy=True).success(
@@ -84,35 +71,3 @@ class PlayService(AbstractService):
         )
 
         return song, player.loop
-
-    async def _try_to_play(self, interaction: CommandInteraction, player: Player, song: Song, attempt: int) -> bool:
-        """
-        An asynchronous function to attempt to play a song in a Discord guild.
-
-        Parameters
-        ----------
-        interaction : CommandInteraction
-            The command interaction triggering the play attempt.
-        player : Player
-            The player responsible for playing the song.
-        song : Song
-            The song to be played.
-        attempt : int
-            The attempt number for playing the song.
-
-        Returns
-        -------
-        bool
-            True if the song was played successfully, False otherwise.
-        """
-        logger.opt(lazy=True).info(
-            f"Attempt {attempt} to play in guild {interaction.guild.name} ({interaction.guild.id})"
-        )
-        try:
-            await player.play(song)
-        except Exception as e:
-            logger.opt(lazy=True).error(
-                f"Server {interaction.guild.name} ({interaction.guild.id}) can't play in its player at attempt {attempt}. Err {e}"
-            )
-            return False
-        return True

@@ -24,9 +24,12 @@ class JoinService(AbstractService):
         except:
             # we remove the created player
             self.bot.players.pop(interaction.guild.id)
+
+            cmd = self.bot.get_global_command_named("reset")
             raise PlayerConnexionException(
                 f"Can't connect to **{interaction.author.voice.channel.name}**. "
-                f"Check both __bot__ and __channel__ permissions."
+                f"Check both __bot__ and __channel__ permissions.\n"
+                f"If the issue persists, try to reset your player with </reset:{cmd.id}>."
             )
 
         cpy_inter = copy.copy(interaction)
