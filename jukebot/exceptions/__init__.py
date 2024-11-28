@@ -1,2 +1,6 @@
-from .player_exception import PlayerConnexionException, PlayerException
+from .player_exception import (
+    PlayerConnexionException,
+    PlayerDontExistException,
+    PlayerException,
+)
 from .query_exceptions import QueryCanceled, QueryException, QueryFailed

@@ -1,14 +1,10 @@
 from __future__ import annotations
 
-from disnake import CommandInteraction
 
 from jukebot.abstract_components import AbstractService
-from jukebot.utils import embed
 
 
 class LeaveService(AbstractService):
-    async def __call__(self, /, interaction: CommandInteraction):
+    async def __call__(self, /, guild_id: int):
         # once the bot leave, we destroy is instance from the container
-        await self.bot.players.pop(interaction.guild.id).disconnect()
-        e = embed.basic_message(title="Player disconnected")
-        await interaction.send(embed=e)
+        await self.bot.players.pop(guild_id).disconnect()
