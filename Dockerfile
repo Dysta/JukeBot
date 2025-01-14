@@ -11,7 +11,7 @@ RUN pip install --no-cache-dir -U poetry
 COPY poetry.lock pyproject.toml ./
 
 RUN poetry config virtualenvs.create false \
-    && poetry install --no-dev --no-interaction --no-ansi -E speed
+    && poetry install --no-root --no-interaction --no-ansi --compile --without dev -E speed
 
 COPY . ./
 
