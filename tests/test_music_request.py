@@ -546,6 +546,7 @@ class TestMusicRequestComponent(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(result.live)
         self.assertIsNone(result.requester)
 
+    @unittest.skip("not working due to soundcloud private link update")
     async def test_music_request_success_soundcloud_shorted_private_url_convert_to_result(self):
         async with MusicRequest("https://on.soundcloud.com/gA4Ca") as req:
             await req.execute()
