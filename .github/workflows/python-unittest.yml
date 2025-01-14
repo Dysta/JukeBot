@@ -41,7 +41,7 @@ jobs:
         restore-keys: ${{ runner.os }}-poetry-${{ hashFiles('poetry.lock') }}
 
     - name: Install dependencies
-      run: poetry install --no-dev
+      run: poetry install --without dev
 
     - name: Launch unit test
       run: poetry run task tests
