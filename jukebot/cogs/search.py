@@ -5,13 +5,12 @@ from typing import TYPE_CHECKING
 
 from disnake import CommandInteraction
 from disnake.ext import commands
-from disnake.ext.commands import Bot, BucketType
+from disnake.ext.commands import BucketType
 from loguru import logger
 
-from jukebot import components
+from jukebot import JukeBot, components
 from jukebot.components.requests import SearchRequest
 from jukebot.exceptions import QueryCanceled, QueryFailed
-from jukebot.services.music import PlayService
 from jukebot.utils import checks, embed
 from jukebot.views import SearchDropdownView, SearchInteraction
 
@@ -21,7 +20,7 @@ if TYPE_CHECKING:
 
 class Search(commands.Cog):
     def __init__(self, bot):
-        self.bot: Bot = bot
+        self.bot: JukeBot = bot
 
     @commands.slash_command()
     @commands.max_concurrency(1, BucketType.user)
@@ -32,6 +31,7 @@ class Search(commands.Cog):
         inter: CommandInteraction,
         query: str,
         source: SearchRequest.Engine = SearchRequest.Engine.Youtube.value,
+        top: bool = False,
     ):
         """
         Allows you to search the first 10 results for the desired music.
@@ -41,6 +41,7 @@ class Search(commands.Cog):
         inter: The interaction
         query: The query to search
         source: The website to use to search for the query
+        top: Whether or not put the result in top of the queue
         """
         await inter.response.defer()
         logger.opt(lazy=True).debug(
@@ -68,7 +69,9 @@ class Search(commands.Cog):
         v = SearchDropdownView(inter.author, results)
         await inter.edit_original_message(embed=e, view=v)
         await v.wait()
-        await inter.edit_original_message(view=None)
+
+        await inter.edit_original_message(embed=e, view=None)
+
         result: str = v.result
         if result == SearchInteraction.CANCEL_TEXT:
             raise QueryCanceled("Search Canceled", query=query, full_query=f"{source}{query}")
@@ -77,10 +80,10 @@ class Search(commands.Cog):
             f"Query '{source}{query}' successful for guild '{inter.guild.name} (ID: {inter.guild.id})'."
         )
 
-        with PlayService(self.bot) as ps:
-            func = ps(interaction=inter, query=result)
+        # ? we call play cause search is barely a shortcut for play with a search before
+        func = self.bot.get_slash_command("play").callback(self, inter, result, top)
         asyncio.ensure_future(func, loop=self.bot.loop)
 
 
-def setup(bot):
+def setup(bot: JukeBot):
     bot.add_cog(Search(bot))

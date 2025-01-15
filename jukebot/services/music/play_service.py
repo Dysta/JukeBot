@@ -9,9 +9,6 @@ from jukebot import components
 from jukebot.abstract_components import AbstractService
 from jukebot.components.requests import StreamRequest
 from jukebot.exceptions.player_exception import PlayerConnexionException
-from jukebot.services import ResetService
-from jukebot.services.music.join_service import JoinService
-from jukebot.services.queue.add_service import AddService
 
 if TYPE_CHECKING:
     from jukebot.components import Player, Result, Song
@@ -28,17 +25,15 @@ class PlayService(AbstractService):
         player: Player = self.bot.players[interaction.guild.id]
 
         if not player.is_connected:
-            with JoinService(self.bot) as join:
-                await join(interaction=interaction)
+            await self.bot.services.join(interaction=interaction)
 
         if query:
-            with AddService(self.bot) as add:
-                await add(
-                    guild_id=interaction.guild.id,
-                    author=interaction.user,
-                    query=query,
-                    top=top,
-                )
+            await self.bot.services.add(
+                guild_id=interaction.guild.id,
+                author=interaction.user,
+                query=query,
+                top=top,
+            )
 
         if player.is_playing:
             # ? stop here cause it mean that we used play command as queue add command

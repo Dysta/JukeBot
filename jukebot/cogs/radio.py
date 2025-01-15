@@ -8,17 +8,16 @@ from disnake.ext import commands
 from disnake.ext.commands import BucketType
 from loguru import logger
 
-from jukebot.services.music import PlayService
+from jukebot import JukeBot
 from jukebot.utils import checks, converter, embed
 
 if TYPE_CHECKING:
     from disnake import Embed
-    from disnake.ext.commands import Bot
 
 
 class Radio(commands.Cog):
     def __init__(self, bot):
-        self.bot: Bot = bot
+        self.bot: JukeBot = bot
         self._radios: dict = {}
 
     async def cog_load(self) -> None:
@@ -27,8 +26,7 @@ class Radio(commands.Cog):
     async def _radio_process(self, inter: CommandInteraction, choices: list):
         query: str = random.choice(choices)
         logger.opt(lazy=True).debug(f"Choice is {query}")
-        with PlayService(self.bot) as ps:
-            await ps(interaction=inter, query=query, top=True)
+        await self.bot.services.play(interaction=inter, query=query, top=True)
 
     @commands.slash_command(description="Launch a random radio")
     @commands.cooldown(1, 5.0, BucketType.user)
@@ -47,5 +45,5 @@ class Radio(commands.Cog):
         return [e for e in self._radios.keys() if query in e.lower()][:25]
 
 
-def setup(bot):
+def setup(bot: JukeBot):
     bot.add_cog(Radio(bot))

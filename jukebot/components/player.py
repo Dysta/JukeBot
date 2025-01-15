@@ -14,7 +14,6 @@ from jukebot.components.audio_stream import AudioStream
 from jukebot.components.requests import StreamRequest
 from jukebot.components.resultset import ResultSet
 from jukebot.components.song import Song
-from jukebot.services.queue import AddService
 from jukebot.utils import coro
 
 
@@ -146,8 +145,7 @@ class Player:
             return
 
         if self._loop.is_queue_loop:
-            with AddService(self.bot) as add:
-                func = add(guild_id=self._guild_id, author=self.song.requester, query=self.song.web_url)
+            func = self.bot.add_service(guild_id=self._guild_id, author=self.song.requester, query=self.song.web_url)
             asyncio.ensure_future(func, loop=self.bot.loop)
 
         self._stream = None

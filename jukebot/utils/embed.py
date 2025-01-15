@@ -138,7 +138,7 @@ def basic_queue_message(title="", content=""):
     embed: disnake.Embed = _base_embed(content=content, color=c)
     embed.set_author(
         name="Information" if title == "" else title,
-        icon_url="https://icons.iconarchive.com/icons/papirus-team/papirus-apps/512/logisim-icon-icon.png",
+        icon_url="https://cdn.icon-icons.com/icons2/1381/PNG/512/xt7playermpv_94294.png",
     )
     return embed
 
@@ -173,7 +173,7 @@ def result_enqueued(res: Result):
     embed.set_author(
         name=f"Enqueued : {res.title}",
         url=res.web_url,
-        icon_url="https://icons.iconarchive.com/icons/papirus-team/papirus-apps/512/logisim-icon-icon.png",
+        icon_url="https://cdn.icon-icons.com/icons2/1381/PNG/512/xt7playermpv_94294.png",
     )
     embed.add_field(name="Channel", value=res.channel, inline=True)
     embed.add_field(name="Duration", value=res.fmt_duration)
