@@ -4,8 +4,9 @@ from datetime import datetime
 
 from disnake import CommandInteraction, InviteTarget
 from disnake.ext import commands
-from disnake.ext.commands import Bot, BucketType
+from disnake.ext.commands import BucketType
 
+from jukebot import JukeBot
 from jukebot.services import ResetService
 from jukebot.utils import applications, checks, converter, embed
 from jukebot.views import ActivityView, PromoteView
@@ -13,7 +14,7 @@ from jukebot.views import ActivityView, PromoteView
 
 class Utility(commands.Cog):
     def __init__(self, bot):
-        self.bot: Bot = bot
+        self.bot: JukeBot = bot
 
     @commands.slash_command(
         description="Get information about the bot like the ping and the uptime.",
@@ -99,9 +100,13 @@ class Utility(commands.Cog):
         inter : CommandInteraction
             The interaction
         """
-        with ResetService(self.bot) as rs:
-            await rs(interaction=inter)
+        await self.bot.services.reset(guild=inter.guild)
+
+        e = embed.info_message(content="The player has been reset.")
+        await inter.send(embed=e)
 
 
-def setup(bot):
+def setup(bot: JukeBot):
     bot.add_cog(Utility(bot))
+
+    bot.add_service(ResetService(bot))

@@ -9,6 +9,7 @@ from disnake import CommandInteraction, File
 from disnake.ext import commands
 from loguru import logger
 
+from jukebot import JukeBot
 from jukebot.utils import Extensions, converter, embed
 
 ADMIN_GUILD_IDS = (
@@ -18,7 +19,7 @@ ADMIN_GUILD_IDS = (
 
 class System(commands.Cog):
     def __init__(self, bot):
-        self.bot = bot
+        self.bot: JukeBot = bot
 
     def _reload_all_cogs(self):
         logger.opt(lazy=True).info("Reloading all extensions.")
@@ -145,5 +146,5 @@ class System(commands.Cog):
         await inter.send(file=File(data, "cmds.yaml"), ephemeral=True)
 
 
-def setup(bot):
+def setup(bot: JukeBot):
     bot.add_cog(System(bot))

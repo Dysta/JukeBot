@@ -6,7 +6,6 @@ from disnake import Member, VoiceChannel, VoiceState
 from disnake.ext import commands
 from disnake.ext.commands import Bot
 
-from jukebot.services.music import PauseService, ResumeService
 
 if TYPE_CHECKING:
     from jukebot.components import Player
@@ -35,16 +34,14 @@ class VoiceHandler(commands.Cog):
         if self.bot.user in channel.members:
             player: Player = self.bot.players[channel.guild.id]
             if player.is_paused:
-                with ResumeService(self.bot) as rs:
-                    await rs(interaction=player.interaction, silent=True)
+                await self.bot.services.resume(guild_id=channel.guild.id)
 
     @commands.Cog.listener()
     async def on_voice_channel_alone(self, member: Member, channel: VoiceChannel):
         if channel.members[0].id == self.bot.user.id:
             player: Player = self.bot.players[channel.guild.id]
             if player.is_playing:
-                with PauseService(self.bot) as rs:
-                    await rs(interaction=player.interaction, silent=True)
+                await self.bot.services.pause(guild_id=channel.guild.id)
 
 
 def setup(bot):
