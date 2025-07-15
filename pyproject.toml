@@ -5,16 +5,16 @@ description = "A music bot for Discord using Disnake"
 authors = ["Dysta <xav4098@gmail.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.11"
 disnake = {extras = ["speed", "voice"], version = "^2.4.0"}
-loguru = "^0.5.3"
-uvloop = {version = "^0.16.0", optional = true}
-taskipy = "^1.10.1"
-python-dotenv = "^0.19.2"
-shazamio = "^0.1.0"
-asyncstdlib = "^3.10.4"
-yt-dlp = "^2024.7.1"
-pyyaml = "^6.0.1"
+loguru = "^0.7.3"
+uvloop = "^0.21.0"
+taskipy = "^1.14.1"
+python-dotenv = "^1.1.1"
+shazamio = "^0.8.1"
+asyncstdlib = "^3.13.1"
+yt-dlp = "^2025.6.30"
+pyyaml = "^6.0.2"
 
 [tool.poetry.extras]
 speed = ["uvloop"]

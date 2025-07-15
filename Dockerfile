@@ -1,4 +1,4 @@
-FROM python:3.10-slim-bookworm
+FROM python:3.11-slim-bookworm
 
 WORKDIR /app
 
@@ -14,5 +14,7 @@ RUN poetry config virtualenvs.create false \
     && poetry install --no-root --no-interaction --no-ansi --compile --without dev -E speed
 
 COPY . ./
+
+WORKDIR /app
 
 CMD ["poetry", "run", "task", "start"]
