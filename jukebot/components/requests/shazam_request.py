@@ -9,9 +9,6 @@ import yt_dlp
 from loguru import logger
 from shazamio import Serialize, Shazam
 
-# Silence useless bug reports messages
-yt_dlp.utils.bug_reports_message = lambda: ""
-
 from jukebot.abstract_components import AbstractRequest
 
 
