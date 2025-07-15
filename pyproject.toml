@@ -6,15 +6,14 @@ authors = ["Dysta <xav4098@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.11"
-disnake = {extras = ["speed", "voice"], version = "^2.4.0"}
+disnake = {git = "https://github.com/DisnakeDev/disnake.git", extras = ["speed", "voice"]}
 loguru = "^0.7.3"
-uvloop = "^0.21.0"
 taskipy = "^1.14.1"
 python-dotenv = "^1.1.1"
-shazamio = "0.8.1"
 asyncstdlib = "^3.13.1"
 yt-dlp = "^2025.6.30"
 pyyaml = "^6.0.2"
+shazamio = "^0.8.1"
 
 [tool.poetry.extras]
 speed = ["uvloop"]
