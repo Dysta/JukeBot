@@ -145,7 +145,22 @@ propcache = ">=0.2.0"
 yarl = ">=1.17.0,<2.0"
 
 [package.extras]
-speedups = ["Brotli", "aiodns (>=3.2.0)", "brotlicffi"]
+speedups = ["Brotli ; platform_python_implementation == \"CPython\"", "aiodns (>=3.3.0)", "brotlicffi ; platform_python_implementation != \"CPython\""]
+
+[[package]]
+name = "aiohttp-retry"
+version = "2.9.1"
+description = "Simple retry client for aiohttp"
+optional = false
+python-versions = ">=3.7"
+groups = ["main"]
+files = [
+    {file = "aiohttp_retry-2.9.1-py3-none-any.whl", hash = "sha256:66d2759d1921838256a05a3f80ad7e724936f083e35be5abb5e16eed6be6dc54"},
+    {file = "aiohttp_retry-2.9.1.tar.gz", hash = "sha256:8eb75e904ed4ee5c2ec242fefe85bf04240f685391c4879d8f541d6028ff01f1"},
+]
+
+[package.dependencies]
+aiohttp = "*"
 
 [[package]]
 name = "aiosignal"
@@ -227,12 +242,12 @@ files = [
 ]
 
 [package.extras]
-benchmark = ["cloudpickle", "hypothesis", "mypy (>=1.11.1)", "pympler", "pytest (>=4.3.0)", "pytest-codspeed", "pytest-mypy-plugins", "pytest-xdist[psutil]"]
-cov = ["cloudpickle", "coverage[toml] (>=5.3)", "hypothesis", "mypy (>=1.11.1)", "pympler", "pytest (>=4.3.0)", "pytest-mypy-plugins", "pytest-xdist[psutil]"]
-dev = ["cloudpickle", "hypothesis", "mypy (>=1.11.1)", "pre-commit-uv", "pympler", "pytest (>=4.3.0)", "pytest-mypy-plugins", "pytest-xdist[psutil]"]
-docs = ["cogapp", "furo", "myst-parser", "sphinx", "sphinx-notfound-page", "sphinxcontrib-towncrier", "towncrier (<24.7)"]
-tests = ["cloudpickle", "hypothesis", "mypy (>=1.11.1)", "pympler", "pytest (>=4.3.0)", "pytest-mypy-plugins", "pytest-xdist[psutil]"]
-tests-mypy = ["mypy (>=1.11.1)", "pytest-mypy-plugins"]
+benchmark = ["cloudpickle ; platform_python_implementation == \"CPython\"", "hypothesis", "mypy (>=1.11.1) ; platform_python_implementation == \"CPython\" and python_version >= \"3.10\"", "pympler", "pytest (>=4.3.0)", "pytest-codspeed", "pytest-mypy-plugins ; platform_python_implementation == \"CPython\" and python_version >= \"3.10\"", "pytest-xdist[psutil]"]
+cov = ["cloudpickle ; platform_python_implementation == \"CPython\"", "coverage[toml] (>=5.3)", "hypothesis", "mypy (>=1.11.1) ; platform_python_implementation == \"CPython\" and python_version >= \"3.10\"", "pympler", "pytest (>=4.3.0)", "pytest-mypy-plugins ; platform_python_implementation == \"CPython\" and python_version >= \"3.10\"", "pytest-xdist[psutil]"]
+dev = ["cloudpickle ; platform_python_implementation == \"CPython\"", "hypothesis", "mypy (>=1.11.1) ; platform_python_implementation == \"CPython\" and python_version >= \"3.10\"", "pre-commit-uv", "pympler", "pytest (>=4.3.0)", "pytest-mypy-plugins ; platform_python_implementation == \"CPython\" and python_version >= \"3.10\"", "pytest-xdist[psutil]"]
+docs = ["cogapp", "furo", "myst-parser", "sphinx", "sphinx-notfound-page", "sphinxcontrib-towncrier", "towncrier"]
+tests = ["cloudpickle ; platform_python_implementation == \"CPython\"", "hypothesis", "mypy (>=1.11.1) ; platform_python_implementation == \"CPython\" and python_version >= \"3.10\"", "pympler", "pytest (>=4.3.0)", "pytest-mypy-plugins ; platform_python_implementation == \"CPython\" and python_version >= \"3.10\"", "pytest-xdist[psutil]"]
+tests-mypy = ["mypy (>=1.11.1) ; platform_python_implementation == \"CPython\" and python_version >= \"3.10\"", "pytest-mypy-plugins ; platform_python_implementation == \"CPython\" and python_version >= \"3.10\""]
 
 [[package]]
 name = "audioop-lts"
@@ -334,7 +349,7 @@ platformdirs = ">=2"
 
 [package.extras]
 colorama = ["colorama (>=0.4.3)"]
-d = ["aiohttp (>=3.7.4)", "aiohttp (>=3.7.4,!=3.9.0)"]
+d = ["aiohttp (>=3.10)"]
 jupyter = ["ipython (>=7.8.0)", "tokenize-rt (>=3.2.0)"]
 uvloop = ["uvloop (>=0.15.2)"]
 
@@ -778,7 +793,7 @@ colorama = {version = ">=0.3.4", markers = "sys_platform == \"win32\""}
 win32-setctime = {version = ">=1.0.0", markers = "sys_platform == \"win32\""}
 
 [package.extras]
-dev = ["Sphinx (>=2.2.1)", "black (>=19.10b0)", "codecov (>=2.0.15)", "colorama (>=0.3.4)", "flake8 (>=3.7.7)", "isort (>=5.1.1)", "pytest (>=4.6.2)", "pytest-cov (>=2.7.1)", "sphinx-autobuild (>=0.7.1)", "sphinx-rtd-theme (>=0.4.3)", "tox (>=3.9.0)", "tox-travis (>=0.12)"]
+dev = ["Sphinx (==8.1.3) ; python_version >= \"3.11\"", "build (==1.2.2) ; python_version >= \"3.11\"", "colorama (==0.4.5) ; python_version < \"3.8\"", "colorama (==0.4.6) ; python_version >= \"3.8\"", "exceptiongroup (==1.1.3) ; python_version >= \"3.7\" and python_version < \"3.11\"", "freezegun (==1.1.0) ; python_version < \"3.8\"", "freezegun (==1.5.0) ; python_version >= \"3.8\"", "mypy (==v0.910) ; python_version < \"3.6\"", "mypy (==v0.971) ; python_version == \"3.6\"", "mypy (==v1.13.0) ; python_version >= \"3.8\"", "mypy (==v1.4.1) ; python_version == \"3.7\"", "myst-parser (==4.0.0) ; python_version >= \"3.11\"", "pre-commit (==4.0.1) ; python_version >= \"3.9\"", "pytest (==6.1.2) ; python_version < \"3.8\"", "pytest (==8.3.2) ; python_version >= \"3.8\"", "pytest-cov (==2.12.1) ; python_version < \"3.8\"", "pytest-cov (==5.0.0) ; python_version == \"3.8\"", "pytest-cov (==6.0.0) ; python_version >= \"3.9\"", "pytest-mypy-plugins (==1.9.3) ; python_version >= \"3.6\" and python_version < \"3.8\"", "pytest-mypy-plugins (==3.1.0) ; python_version >= \"3.8\"", "sphinx-rtd-theme (==3.0.2) ; python_version >= \"3.11\"", "tox (==3.27.1) ; python_version < \"3.8\"", "tox (==4.23.2) ; python_version >= \"3.8\"", "twine (==6.0.1) ; python_version >= \"3.11\""]
 
 [[package]]
 name = "mslex"
@@ -1616,26 +1631,66 @@ files = [
 ]
 
 [[package]]
-name = "requests"
-version = "2.32.3"
-description = "Python HTTP for Humans."
+name = "shazamio"
+version = "0.8.1"
+description = "Is a asynchronous framework from reverse engineered Shazam API written in Python 3.8+ with asyncio and aiohttp."
 optional = false
 python-versions = "<4.0,>=3.10"
 groups = ["main"]
 files = [
-    {file = "requests-2.32.3-py3-none-any.whl", hash = "sha256:70761cfe03c773ceb22aa2f671b4757976145175cdfca038c02654d061d6dcc6"},
-    {file = "requests-2.32.3.tar.gz", hash = "sha256:55365417734eb18255590a9ff9eb97e9e1da868d4ccd6402399eaf68af20a760"},
+    {file = "shazamio-0.8.1-py3-none-any.whl", hash = "sha256:ac4823dc9a8abd0b57455a3b29340c1fc090286bab0d8cc06eb862d7626691d0"},
+    {file = "shazamio-0.8.1.tar.gz", hash = "sha256:5d60222735ccda4d792fd7dfe3faafaa65d15fa15b6a63de87115fb1a155b5fc"},
 ]
 
 [package.dependencies]
-certifi = ">=2017.4.17"
-charset-normalizer = ">=2,<4"
-idna = ">=2.5,<4"
-urllib3 = ">=1.21.1,<3"
+aiofiles = ">=23.2.1,<24.0.0"
+aiohttp = ">=3.8.3,<4.0.0"
+aiohttp-retry = ">=2.8.3,<3.0.0"
+anyio = ">=4.3.0,<5.0.0"
+dataclass-factory = ">=2.16,<3.0"
+numpy = ">=2.2.2,<3.0.0"
+pydantic = ">=2.9.2,<3.0.0"
+pydub = ">=0.25.1,<0.26.0"
+shazamio-core = "1.1.2"
 
-[package.extras]
-socks = ["PySocks (>=1.5.6,!=1.5.7)"]
-use-chardet-on-py3 = ["chardet (>=3.0.2,<6)"]
+[[package]]
+name = "shazamio-core"
+version = "1.1.2"
+description = ""
+optional = false
+python-versions = ">=3.9"
+groups = ["main"]
+files = [
+    {file = "shazamio_core-1.1.2-cp310-cp310-macosx_10_12_x86_64.whl", hash = "sha256:428075dfe65f798708a315130cab213db5f2b3f68268c103cc14e88eb9f29d15"},
+    {file = "shazamio_core-1.1.2-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:d49f0dbc020f5ef9c19fb9907f2d9e7c247c527bf26adf84267a54ba5c116183"},
+    {file = "shazamio_core-1.1.2-cp310-cp310-manylinux_2_28_aarch64.whl", hash = "sha256:e6741b721ae24649b35187e521e6a1bba51014b1ef68960ff6d8a61f2e656e99"},
+    {file = "shazamio_core-1.1.2-cp310-cp310-manylinux_2_28_x86_64.whl", hash = "sha256:02f57ef68e4b08eb3aba31716479bf46af524e27c7c93de971dd2bfc72a0e469"},
+    {file = "shazamio_core-1.1.2-cp310-cp310-win32.whl", hash = "sha256:110e1e21cf447a8b5d350c8cd130edc4c45b7bc9f4c5988ba3e2d84bc44278a4"},
+    {file = "shazamio_core-1.1.2-cp310-cp310-win_amd64.whl", hash = "sha256:863887f3d5663dc562ee6e89e66d373bc5bbac7bd2f76403cf89ffa8f30bd966"},
+    {file = "shazamio_core-1.1.2-cp311-cp311-macosx_10_12_x86_64.whl", hash = "sha256:2a7f1d4b35e9f59884a10d2f5308125e289f2781c0e421e8ee5cc19429499029"},
+    {file = "shazamio_core-1.1.2-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:d12f572ad3cfd2a946b3d106078b5764e9be4d923bfab08db87071aef725b7ce"},
+    {file = "shazamio_core-1.1.2-cp311-cp311-manylinux_2_28_aarch64.whl", hash = "sha256:837d66add372460850bfe46cd8aa3baa067d2eb016af73a67fcb22636bf9cd29"},
+    {file = "shazamio_core-1.1.2-cp311-cp311-manylinux_2_28_x86_64.whl", hash = "sha256:881be91021c070839cbbff4de6c726dfc1b34947f4b79a5781a3714017dbc8f7"},
+    {file = "shazamio_core-1.1.2-cp311-cp311-win32.whl", hash = "sha256:e7fda26fc2ba7d1159f7be5897a19aee9563d079e8851dc3c21cf71c962c2ae6"},
+    {file = "shazamio_core-1.1.2-cp311-cp311-win_amd64.whl", hash = "sha256:e0791a91ae60408b97fda8b564a3fd6a17b52e08f8f4848c1b81d5e5ac6ce323"},
+    {file = "shazamio_core-1.1.2-cp312-cp312-macosx_10_12_x86_64.whl", hash = "sha256:05e4b9e810c135467f89ac490b98d7dbe81e944604dd4c2efdae244414428f3d"},
+    {file = "shazamio_core-1.1.2-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:2d85467441d71d690a998528fdda9113edd08a962e79c591a5e3842ec90f1865"},
+    {file = "shazamio_core-1.1.2-cp312-cp312-manylinux_2_28_aarch64.whl", hash = "sha256:87878fd8b432fcf79859d7edbd9e16f52c599f7e76bba06e2909c8a07e47b15f"},
+    {file = "shazamio_core-1.1.2-cp312-cp312-manylinux_2_28_x86_64.whl", hash = "sha256:a900b9147d294137c07525d05051ccc7b02910838a4bc28ef804b60b42356383"},
+    {file = "shazamio_core-1.1.2-cp312-cp312-win32.whl", hash = "sha256:c1af715d173ecf2e592b8fbaf4906dfe3b54e6f2237d2de776a87eef1601523f"},
+    {file = "shazamio_core-1.1.2-cp312-cp312-win_amd64.whl", hash = "sha256:74474df5c5e1429f60d162482a4b6d3a255d60c9ceaed47370fe9369e0818347"},
+    {file = "shazamio_core-1.1.2-cp313-cp313-manylinux_2_28_aarch64.whl", hash = "sha256:78e37b1cca701296f842f9069a05c71ae970dbebe28f9650469126912e77d5e7"},
+    {file = "shazamio_core-1.1.2-cp313-cp313-manylinux_2_28_x86_64.whl", hash = "sha256:da3a5ebaae69da6d898be42a39919049ee99825ec49bfb29ca35b9c3af5ab36d"},
+    {file = "shazamio_core-1.1.2-cp39-cp39-macosx_10_12_x86_64.whl", hash = "sha256:97e739792c6411f6e4314842e855320b30b566b7890425335179f1f34d3ee873"},
+    {file = "shazamio_core-1.1.2-cp39-cp39-macosx_11_0_arm64.whl", hash = "sha256:d7f873cd7adb7f7d2083d316cc850056c1ba4f141a1e10a0fb77df2fccdc77d4"},
+    {file = "shazamio_core-1.1.2-cp39-cp39-manylinux_2_28_aarch64.whl", hash = "sha256:03b6ec136bcd271692052883eae6e33287ef6d11ed9c9b4f80be854e78d08609"},
+    {file = "shazamio_core-1.1.2-cp39-cp39-manylinux_2_28_x86_64.whl", hash = "sha256:9a570dd3a34f8d4179ead4269a1e205cd3fc837e5ee771d19a76e4e046bed9c2"},
+    {file = "shazamio_core-1.1.2-cp39-cp39-win32.whl", hash = "sha256:e65a27c37d373ab33d3496999c2bb83305894aa4291ede6e1738d1f23f8adbeb"},
+    {file = "shazamio_core-1.1.2-cp39-cp39-win_amd64.whl", hash = "sha256:ee2e1b11017b03d5ac9168743cd9d931e8de701fc9f6e3cd3dfbee8bbf8720b5"},
+    {file = "shazamio_core-1.1.2-pp310-pypy310_pp73-manylinux_2_28_aarch64.whl", hash = "sha256:2daaddc6c222fa680cd69fa7017576cc1c87668a93fb1ce0274f35251b406945"},
+    {file = "shazamio_core-1.1.2-pp310-pypy310_pp73-manylinux_2_28_x86_64.whl", hash = "sha256:c045987d6a0b496a7fa01f136b6418487aab46f248791a6973674b3def231d0d"},
+    {file = "shazamio_core-1.1.2.tar.gz", hash = "sha256:e26e6b967286eca82e3fb90a20695d5e13f163e30c57e2543fe2ca98ec6dfa51"},
+]
 
 [[package]]
 name = "sniffio"
@@ -1733,11 +1788,8 @@ files = [
     {file = "typing_inspection-0.4.1.tar.gz", hash = "sha256:6ae134cc0203c33377d43188d4064e9b357dba58cff3185f22924610e70a9d28"},
 ]
 
-[package.extras]
-brotli = ["brotli (>=1.0.9)", "brotlicffi (>=0.8.0)"]
-h2 = ["h2 (>=4,<5)"]
-socks = ["pysocks (>=1.5.6,!=1.5.7,<2.0)"]
-zstd = ["zstandard (>=0.18.0)"]
+[package.dependencies]
+typing-extensions = ">=4.12.0"
 
 [[package]]
 name = "uvloop"
@@ -1940,10 +1992,11 @@ files = [
 ]
 
 [package.extras]
-build = ["build", "hatchling", "pip", "setuptools (>=71.0.2)", "wheel"]
-curl-cffi = ["curl-cffi (==0.5.10)", "curl-cffi (>=0.5.10,!=0.6.*,<0.7.2)"]
-dev = ["autopep8 (>=2.0,<3.0)", "pre-commit", "pytest (>=8.1,<9.0)", "pytest-rerunfailures (>=14.0,<15.0)", "ruff (>=0.6.0,<0.7.0)"]
-pyinstaller = ["pyinstaller (>=6.10.0)"]
+build = ["build", "hatchling", "pip", "setuptools (>=71.0.2,<81)", "wheel"]
+curl-cffi = ["curl-cffi (>=0.5.10,<0.6.dev0 || ==0.10.*) ; implementation_name == \"cpython\""]
+default = ["brotli ; implementation_name == \"cpython\"", "brotlicffi ; implementation_name != \"cpython\"", "certifi", "mutagen", "pycryptodomex", "requests (>=2.32.2,<3)", "urllib3 (>=1.26.17,<3)", "websockets (>=13.0)"]
+dev = ["autopep8 (>=2.0,<3.0)", "pre-commit", "pytest (>=8.1,<9.0)", "pytest-rerunfailures (>=14.0,<15.0)", "ruff (>=0.11.0,<0.12.0)"]
+pyinstaller = ["pyinstaller (>=6.13.0)"]
 secretstorage = ["cffi", "secretstorage"]
 static-analysis = ["autopep8 (>=2.0,<3.0)", "ruff (>=0.11.0,<0.12.0)"]
 test = ["pytest (>=8.1,<9.0)", "pytest-rerunfailures (>=14.0,<15.0)"]
@@ -1954,4 +2007,4 @@ speed = ["uvloop"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.11"
-content-hash = "df26c901b2a78f3166b1b5ad775182ff59b44c47c24e061e22958c52dd20260d"
+content-hash = "c8ce9be9fd2037e532b5f87ebb6a8fd9971be25065564ff0e1cd9a097b11a8ce"
