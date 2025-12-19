@@ -1,8 +1,3 @@
-<div align="center">
-
-[![juke-banner](https://cdn.discordapp.com/attachments/829356508696412231/948936347752747038/juke-banner.png)](#readme)
-</div>
-
 # JukeBot
 [![Powered by Disnake](https://custom-icon-badges.herokuapp.com/badge/-Powered%20by%20Disnake-0d1620?logo=nextcord)](https://github.com/DisnakeDev/disnake "Powered by Disnake")
 [![Powered by Poetry](https://custom-icon-badges.herokuapp.com/badge/-Powered%20by%20Poetry-0d1620?logo=poetry)](https://python-poetry.org "Powered by Poetry") \
