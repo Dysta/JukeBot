@@ -10,7 +10,7 @@ loguru = "^0.7.3"
 taskipy = "^1.14.1"
 python-dotenv = "^1.1.1"
 asyncstdlib = "^3.13.1"
-yt-dlp = "^2025.6.30"
+yt-dlp = "^2025.12.8"
 pyyaml = "^6.0.2"
 shazamio = "^0.8.1"
 disnake = {version = "^2.11.0", extras = ["speed", "voice"]}

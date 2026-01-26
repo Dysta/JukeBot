@@ -567,3 +567,21 @@ class TestMusicRequestComponent(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(result.fmt_duration, "ထ")
         self.assertTrue(result.live)
         self.assertIsNone(result.requester)
+
+    async def test_music_request_success_youtube_url_1_hour_duration(self):
+        with disable_logging():
+            async with MusicRequest("https://www.youtube.com/watch?v=uvpfTw0_CRI") as req:
+                await req.execute()
+
+        self.assertTrue(req.success)
+        self.assertIsNotNone(req.result)
+        self.assertEqual(req.type, MusicRequest.ResultType.TRACK)
+
+        result: dict = req.result
+
+        self.assertEqual(result.get("title"), "Where have you been - Tiktok Remix / 1 hour version")
+        self.assertEqual(result.get("uploader"), "szagers")
+        self.assertEqual(result.get("webpage_url"), "https://www.youtube.com/watch?v=uvpfTw0_CRI")
+        self.assertEqual(result.get("duration"), 3722)
+        self.assertEqual(result.get("live_status"), "not_live")
+        self.assertIsNotNone(result.get("thumbnail"))

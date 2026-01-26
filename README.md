@@ -4,7 +4,7 @@
 Discord music bot written in Python 3 
 ___
 
-## 🧩 Installation
+## 🧩 Deployment without Docker
 ```
 git clone https://github.com/Dysta/JukeBot 
 cd JukeBot
@@ -30,15 +30,9 @@ Use **brew**, run `brew install ffmpeg`.
 
 ___
 
-## 🌐 Deployment
-Clone the repos. \
-Rename `.env.example` to `.env` and fill in the values. \
-Run `docker-compose up -d`.
-
-**OR**
-
-C/C the file `.env.example` in local, fill in the values. \
-Run `docker run --env-file <YOUR_LOCAL_ENV_FILE> dysta/jukebot`.
+## 🌐 Deployment with Docker
+Download and rename `.env.example` to `.env` and fill in the values. \
+Run `docker run --name jukebot --restart on-failure:3 --env-file .env dysta/jukebot`.
 
 ___
 
