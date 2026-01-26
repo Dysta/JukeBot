@@ -6,6 +6,8 @@ RUN apt-get update && \
     apt-get install --no-install-recommends -y ffmpeg && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
+RUN curl -fsSL https://bun.sh/install | bash
+
 RUN pip install --no-cache-dir -U poetry
 
 COPY poetry.lock pyproject.toml ./
@@ -15,4 +17,4 @@ RUN poetry config virtualenvs.create false \
 
 COPY . ./
 
-CMD ["poetry", "run", "task", "start"]
+CMD ["/bin/sh", "run.sh"]

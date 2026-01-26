@@ -13,6 +13,7 @@
 !/poetry.lock
 !/pyproject.toml
 !/.env.example
+!/run.sh
 !/README.md
 !/LICENSE.md
 
