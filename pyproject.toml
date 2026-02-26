@@ -8,12 +8,11 @@ authors = ["Dysta <xav4098@gmail.com>"]
 python = "^3.11"
 loguru = "^0.7.3"
 taskipy = "^1.14.1"
-python-dotenv = "^1.1.1"
+python-dotenv = "^1.2.1"
 asyncstdlib = "^3.13.1"
-yt-dlp = {extras = ["bun", "default"], version = "^2025.12.8"}
-pyyaml = "^6.0.2"
+yt-dlp = "^2026.2.21"
 shazamio = "^0.8.1"
-disnake = {version = "^2.11.0", extras = ["speed", "voice"]}
+disnake = {extras = ["speed", "voice"], version = "^2.12.0"}
 
 [tool.poetry.extras]
 speed = ["uvloop"]
