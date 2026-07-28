@@ -2510,24 +2510,24 @@ propcache = ">=0.2.1"
 
 [[package]]
 name = "yt-dlp"
-version = "2026.6.9"
+version = "2026.7.4"
 description = "A feature-rich command-line audio/video downloader"
 optional = false
 python-versions = ">=3.10"
 groups = ["main"]
 files = [
-    {file = "yt_dlp-2026.6.9-py3-none-any.whl", hash = "sha256:442ba4c75724b9496144c8434b617962ee08d0ee7c26ec663848fe9b78d5a3e4"},
-    {file = "yt_dlp-2026.6.9.tar.gz", hash = "sha256:d50fcb95f48d61bedde33e408c1881d4c279e51c31354a599ce09e96ba0f4b86"},
+    {file = "yt_dlp-2026.7.4-py3-none-any.whl", hash = "sha256:f11f2b11d5a8ac4059f9bdf29fa4407dc7c6bb00c5097e95ca22a7a9db518266"},
+    {file = "yt_dlp-2026.7.4.tar.gz", hash = "sha256:b094813404f87a9dd2186f00815231df32e5fd8a5403be0f807b3bb2d21a4432"},
 ]
 
 [package.extras]
 curl-cffi = ["curl-cffi (>=0.5.10,<0.6.dev0 || >=0.10.dev0,<0.16) ; implementation_name == \"cpython\""]
 default = ["brotli ; implementation_name == \"cpython\" and sys_platform != \"ios\"", "brotlicffi ; implementation_name != \"cpython\"", "certifi", "mutagen", "pycryptodomex", "requests (>=2.32.2,<3)", "urllib3 (>=2.0.2,<3)", "websockets (>=13.0)", "yt-dlp-ejs (==0.8.0)"]
 deno = ["deno (>=2.6.6)"]
-pin = ["brotli (==1.2.0) ; implementation_name == \"cpython\" and sys_platform != \"ios\"", "brotlicffi (==1.2.0.1) ; implementation_name != \"cpython\"", "certifi (==2026.5.20)", "charset-normalizer (==3.4.7)", "idna (==3.17)", "mutagen (==1.47.0)", "pycryptodomex (==3.23.0)", "requests (==2.34.2)", "urllib3 (==2.7.0)", "websockets (==16.0)", "yt-dlp-ejs (==0.8.0)"]
-pin-curl-cffi = ["certifi (==2026.5.20) ; implementation_name == \"cpython\"", "cffi (==2.0.0) ; implementation_name == \"cpython\"", "curl-cffi (==0.15.0) ; implementation_name == \"cpython\"", "markdown-it-py (==4.2.0) ; implementation_name == \"cpython\"", "mdurl (==0.1.2) ; implementation_name == \"cpython\"", "pycparser (==3.0) ; implementation_name == \"cpython\"", "pygments (==2.20.0) ; implementation_name == \"cpython\"", "rich (==15.0.0) ; implementation_name == \"cpython\""]
-pin-deno = ["deno (==2.8.1)"]
-pin-secretstorage = ["cffi (==2.0.0) ; platform_python_implementation != \"PyPy\"", "cryptography (==48.0.0)", "jeepney (==0.9.0)", "pycparser (==3.0) ; implementation_name != \"PyPy\" and platform_python_implementation != \"PyPy\"", "secretstorage (==3.5.0)", "typing-extensions (==4.15.0) ; python_full_version < \"3.11.0\""]
+pin = ["brotli (==1.2.0) ; implementation_name == \"cpython\" and sys_platform != \"ios\"", "brotlicffi (==1.2.0.1) ; implementation_name != \"cpython\"", "certifi (==2026.6.17)", "charset-normalizer (==3.4.7)", "idna (==3.18)", "mutagen (==1.48.1)", "pycryptodomex (==3.23.0)", "requests (==2.34.2)", "urllib3 (==2.7.0)", "websockets (==16.0)", "yt-dlp-ejs (==0.8.0)"]
+pin-curl-cffi = ["certifi (==2026.6.17) ; implementation_name == \"cpython\"", "cffi (==2.0.0) ; implementation_name == \"cpython\"", "curl-cffi (==0.15.0) ; implementation_name == \"cpython\"", "markdown-it-py (==4.2.0) ; implementation_name == \"cpython\"", "mdurl (==0.1.2) ; implementation_name == \"cpython\"", "pycparser (==3.0) ; implementation_name == \"cpython\"", "pygments (==2.20.0) ; implementation_name == \"cpython\"", "rich (==15.0.0) ; implementation_name == \"cpython\""]
+pin-deno = ["deno (==2.8.3)"]
+pin-secretstorage = ["cffi (==2.0.0) ; platform_python_implementation != \"PyPy\"", "cryptography (==49.0.0)", "jeepney (==0.9.0)", "pycparser (==3.0) ; implementation_name != \"PyPy\" and platform_python_implementation != \"PyPy\"", "secretstorage (==3.5.0)", "typing-extensions (==4.15.0) ; python_full_version < \"3.11.0\""]
 secretstorage = ["secretstorage"]
 
 [extras]
