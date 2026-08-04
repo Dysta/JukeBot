@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from disnake import CommandInteraction, Embed
 from disnake.ext import commands
@@ -61,7 +61,7 @@ class Queue(commands.Cog):
         self,
         inter: CommandInteraction,
         query: str,
-        top: Optional[bool] = False,
+        top: bool | None = False,
     ):
         """Add a song to the current queue
 

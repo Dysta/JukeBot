@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import random
 from dataclasses import dataclass
-from typing import List, Optional, Union
 
 from disnake import Member
 
@@ -13,8 +12,8 @@ from jukebot.components.result import Result
 @dataclass
 class ResultSet(AbstractCollection[Result]):
     @classmethod
-    def from_result(cls, results: list, requester: Optional[Member] = None) -> ResultSet:
-        result_set: List[Result] = []
+    def from_result(cls, results: list, requester: Member | None = None) -> ResultSet:
+        result_set: list[Result] = []
         for r in results:
             tmp: Result = Result(r)
             tmp.requester = requester
@@ -29,19 +28,19 @@ class ResultSet(AbstractCollection[Result]):
     def get(self) -> Result:
         return self.set.pop(0)
 
-    def put(self, result: Union[Result, ResultSet]) -> None:
+    def put(self, result: Result | ResultSet) -> None:
         if isinstance(result, ResultSet):
             self.set += result
         else:
             self.set.append(result)
 
-    def add(self, result: Union[Result, ResultSet]) -> None:
+    def add(self, result: Result | ResultSet) -> None:
         if isinstance(result, ResultSet):
             self.set[0:0] = result[::-1]
         else:
             self.set.insert(0, result)
 
-    def remove(self, elem: str) -> Optional[Result]:
+    def remove(self, elem: str) -> Result | None:
         elem = elem.lower()
         for i, e in enumerate(self.set):
             if e.title.lower() == elem:

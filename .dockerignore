@@ -10,10 +10,9 @@
 !/docker-compose.yml
 !/Dockerfile
 !/.dockerignore
-!/poetry.lock
 !/pyproject.toml
+!/uv.lock
 !/.env.example
-!/run.sh
 !/README.md
 !/LICENSE.md
 

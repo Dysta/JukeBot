@@ -50,7 +50,7 @@ class SearchRequest(AbstractRequest):
 
     def __init__(self, query: str, engine: str) -> None:
         if regex.is_url(query):
-            raise ValueError(f"query must be words, not direct url")
+            raise ValueError("query must be words, not direct url")
 
         self._engine: SearchRequest.Engine = SearchRequest.Engine.value_of(engine)
         self._params: dict = {**SearchRequest.YTDL_OPTIONS}

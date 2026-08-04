@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Optional
 
 from disnake import Member
 
@@ -16,7 +15,7 @@ class Result:
     duration: int = 0
     fmt_duration: str = "0:00"
     live: bool = False
-    requester: Optional[Member] = None
+    requester: Member | None = None
 
     def __init__(self, info: dict):
         self.web_url = info.get("url") or info.get("original_url")

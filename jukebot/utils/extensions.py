@@ -20,8 +20,7 @@ class Extensions:
         for e in Extensions.__list__:
             if e["name"] == name:
                 return e
-        else:
-            return None
+        return None
 
     def __repr__(self):
         return self.__list__.__repr__()

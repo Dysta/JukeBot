@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from disnake import CommandInteraction
 from loguru import logger
@@ -20,7 +20,7 @@ class PlayService(AbstractService):
         /,
         interaction: CommandInteraction,
         query: str,
-        top: Optional[bool] = False,
+        top: bool | None = False,
     ):
         player: Player = self.bot.players[interaction.guild.id]
 

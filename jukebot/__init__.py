@@ -1,2 +1,2 @@
 __version__ = "0.1.0"
-from .jukebot import JukeBot
+from .jukebot import JukeBot as JukeBot

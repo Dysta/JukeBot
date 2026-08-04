@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from typing import Optional
 from urllib import parse
 
 from disnake import APISlashCommand, CommandInteraction, Embed, Forbidden
@@ -33,7 +32,7 @@ class Music(commands.Cog):
     @commands.slash_command()
     @commands.cooldown(1, 5.0, BucketType.user)
     @commands.check(checks.user_is_connected)
-    async def play(self, inter: CommandInteraction, query: str, top: Optional[bool] = False):
+    async def play(self, inter: CommandInteraction, query: str, top: bool | None = False):
         """Play music from URL or search
 
         Parameters
@@ -186,7 +185,7 @@ class Music(commands.Cog):
         await self.bot.services.join(interaction=inter)
 
         e = embed.basic_message(
-            content=f"Connected to <#{inter.author.voice.channel.id}>\n" f"Bound to <#{inter.channel.id}>\n",
+            content=f"Connected to <#{inter.author.voice.channel.id}>\nBound to <#{inter.channel.id}>\n",
         )
         await inter.send(embed=e)
 
@@ -283,7 +282,7 @@ class Music(commands.Cog):
             await req.execute()
 
         if not req.success:
-            raise QueryFailed(f"No music found for this media..", query="", full_query=url)
+            raise QueryFailed("No music found for this media..", query="", full_query=url)
 
         e: Embed = embed.music_found_message(req.result)
         await inter.edit_original_message(embed=e)

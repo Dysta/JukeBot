@@ -11,5 +11,5 @@ class _JoinActivityButton(disnake.ui.Button):
 
 class ActivityView(disnake.ui.View):
     def __init__(self, code):
-        super(ActivityView, self).__init__()
+        super().__init__()
         self.add_item(_JoinActivityButton(code))

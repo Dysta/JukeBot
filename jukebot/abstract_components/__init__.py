@@ -1,5 +1,5 @@
-from .abstract_cache import AbstractCache
-from .abstract_collection import AbstractCollection
-from .abstract_map import AbstractMap
-from .abstract_request import AbstractRequest
-from .abstract_service import AbstractService
+from .abstract_cache import AbstractCache as AbstractCache
+from .abstract_collection import AbstractCollection as AbstractCollection
+from .abstract_map import AbstractMap as AbstractMap
+from .abstract_request import AbstractRequest as AbstractRequest
+from .abstract_service import AbstractService as AbstractService

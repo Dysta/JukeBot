@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-
 from jukebot.abstract_components import AbstractService
 
 

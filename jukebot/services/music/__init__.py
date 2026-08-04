@@ -1,10 +1,10 @@
-from .current_song_service import CurrentSongService
-from .grab_service import GrabService
-from .join_service import JoinService
-from .leave_service import LeaveService
-from .loop_service import LoopService
-from .pause_service import PauseService
-from .play_service import PlayService
-from .resume_service import ResumeService
-from .skip_service import SkipService
-from .stop_service import StopService
+from .current_song_service import CurrentSongService as CurrentSongService
+from .grab_service import GrabService as GrabService
+from .join_service import JoinService as JoinService
+from .leave_service import LeaveService as LeaveService
+from .loop_service import LoopService as LoopService
+from .pause_service import PauseService as PauseService
+from .play_service import PlayService as PlayService
+from .resume_service import ResumeService as ResumeService
+from .skip_service import SkipService as SkipService
+from .stop_service import StopService as StopService

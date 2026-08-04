@@ -3,7 +3,6 @@ from __future__ import annotations
 import io
 import os
 from datetime import datetime
-from typing import Optional
 
 from disnake import CommandInteraction, File
 from disnake.ext import commands
@@ -41,7 +40,7 @@ class System(commands.Cog):
         guild_ids=ADMIN_GUILD_IDS,
     )
     @commands.is_owner()
-    async def reload(self, inter: CommandInteraction, cog_name: Optional[str] = None):
+    async def reload(self, inter: CommandInteraction, cog_name: str | None = None):
         """Reload the given cog. If no cog is given, reload all cogs.
 
         Parameters

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from disnake import CommandInteraction, VoiceClient
 from disnake.ext.commands import CheckFailure
@@ -9,7 +9,7 @@ if TYPE_CHECKING:
     from jukebot.components import Player
 
 
-def _get_player(inter: CommandInteraction) -> Optional[Player]:
+def _get_player(inter: CommandInteraction) -> Player | None:
     """
     Avoid creating a player if the player does't exist
     Parameters

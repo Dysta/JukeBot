@@ -1,15 +1,13 @@
 from __future__ import annotations
 
-from typing import Optional
-
 from disnake.ext.commands import CommandError
 
 
 class QueryException(CommandError):
-    def __init__(self, message: str, *, query: Optional[str] = None, full_query: Optional[str] = None) -> None:
+    def __init__(self, message: str, *, query: str | None = None, full_query: str | None = None) -> None:
         super().__init__(message)
-        self.query: Optional[str] = query
-        self.full_query: Optional[str] = full_query
+        self.query: str | None = query
+        self.full_query: str | None = full_query
 
 
 class QueryFailed(QueryException):

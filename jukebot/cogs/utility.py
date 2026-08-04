@@ -46,7 +46,7 @@ class Utility(commands.Cog):
         )
         e.add_field(
             name="🪄 Prefix",
-            value=f"┕`/`",
+            value="┕`/`",
             inline=True,
         )
         e.set_image(url="https://cdn.discordapp.com/attachments/829356508696412231/948936347752747038/juke-banner.png")

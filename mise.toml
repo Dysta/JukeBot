@@ -1,0 +1,58 @@
+[tools]
+uv = "latest"
+
+[env]
+FFMPEG_VERSION = "b6.1.1"
+_.path = ".tools/bin"
+
+[tasks.install]
+description = "Install dependencies, ffmpeg, and ffprobe"
+depends = ["install:deps", "install:ffmpeg", "install:ffprobe"]
+
+[tasks."install:deps"]
+description = "Install the python dependencies for the project"
+run = "uv sync"
+
+[tasks."install:ffmpeg"]
+description = "Install a local ffmpeg binary"
+run = '''
+if [ -x .tools/bin/ffmpeg ]; then
+  echo "FFmpeg already downloaded, nothing to do."
+  exit 0
+fi
+
+case "$(uname -s)-$(uname -m)" in
+  Darwin-arm64) target=darwin-arm64 ;;
+  Darwin-x86_64) target=darwin-x64 ;;
+  Linux-aarch64) target=linux-arm64 ;;
+  Linux-x86_64) target=linux-x64 ;;
+  *) echo "Unsupported platform: $(uname -s)-$(uname -m)" >&2; exit 1 ;;
+esac
+
+mkdir -p .tools/bin
+curl -fsSL "https://github.com/eugeneware/ffmpeg-static/releases/download/${FFMPEG_VERSION}/ffmpeg-${target}.gz" \
+  | gzip -dc > .tools/bin/ffmpeg
+chmod +x .tools/bin/ffmpeg
+'''
+
+[tasks."install:ffprobe"]
+description = "Install a local ffprobe binary"
+run = '''
+if [ -x .tools/bin/ffprobe ]; then
+  echo "FFprobe already downloaded, nothing to do."
+  exit 0
+fi
+
+case "$(uname -s)-$(uname -m)" in
+  Darwin-arm64) target=darwin-arm64 ;;
+  Darwin-x86_64) target=darwin-x64 ;;
+  Linux-aarch64) target=linux-arm64 ;;
+  Linux-x86_64) target=linux-x64 ;;
+  *) echo "Unsupported platform: $(uname -s)-$(uname -m)" >&2; exit 1 ;;
+esac
+
+mkdir -p .tools/bin
+curl -fsSL "https://github.com/eugeneware/ffmpeg-static/releases/download/${FFMPEG_VERSION}/ffprobe-${target}.gz" \
+  | gzip -dc > .tools/bin/ffprobe
+chmod +x .tools/bin/ffprobe
+'''

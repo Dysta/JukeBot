@@ -1,25 +1,26 @@
-FROM debian AS deno-dl
-
-RUN apt-get update && apt-get install -y curl unzip \
-    && curl -fsSL https://deno.land/install.sh | sh
-
+# syntax=docker/dockerfile:1.7
 FROM python:3.12-slim
 
 WORKDIR /app
 
-COPY --from=deno-dl /root/.deno/bin/deno /usr/local/bin/deno
+COPY --from=ghcr.io/astral-sh/uv:0.11 /uv /uvx /bin/
+COPY --from=denoland/deno:bin-2.9.4 /deno /usr/local/bin/deno
+
+ENV UV_COMPILE_BYTECODE=1 \
+    UV_LINK_MODE=copy
 
 RUN apt-get update && \
     apt-get install --no-install-recommends -y ffmpeg && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
-RUN pip install --no-cache-dir -U poetry
+COPY pyproject.toml uv.lock ./
 
-COPY poetry.lock pyproject.toml ./
-
-RUN poetry config virtualenvs.create false \
-    && poetry install --no-root --no-interaction --no-ansi --compile --without dev -E speed
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --locked --no-dev --extra speed --no-install-project
 
 COPY . ./
 
-CMD ["/bin/sh", "run.sh"]
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --locked --no-dev --extra speed
+
+CMD ["uv", "run", "--no-sync", "python", "-m", "jukebot"]

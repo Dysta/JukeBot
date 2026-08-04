@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from jukebot.components import Result, ResultSet, Song
     from jukebot.components.player import Player
 
-VOID_TOKEN = "\u200B"
+VOID_TOKEN = "\u200b"
 
 
 def _base_embed(content="", color=0x38383D):

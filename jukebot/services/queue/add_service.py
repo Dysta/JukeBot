@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from disnake import Member
 
@@ -20,7 +20,7 @@ class AddService(AbstractService):
         guild_id: int,
         author: Member,
         query: str,
-        top: Optional[bool] = False,
+        top: bool | None = False,
     ):
         async with MusicRequest(query) as req:
             await req.execute()

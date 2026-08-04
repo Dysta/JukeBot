@@ -1,9 +1,9 @@
-**/__pycache__
-
 .env
+.tools/
 
+**/__pycache__
 **/.mypy_cache
-
+**/.ruff_cache
 **/.idea
-
 **/logs/*
+.devcontainer/devcontainer-lock.json

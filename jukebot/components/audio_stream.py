@@ -3,7 +3,7 @@ from disnake import FFmpegOpusAudio
 
 class AudioStream(FFmpegOpusAudio):
     def __init__(self, source: str):
-        super(AudioStream, self).__init__(
+        super().__init__(
             source,
             before_options=_PlayerOption.FFMPEG_BEFORE_OPTIONS,  # "-nostdin",
             options=_PlayerOption.FFMPEG_OPTIONS,
@@ -23,14 +23,6 @@ class AudioStream(FFmpegOpusAudio):
 
 
 class _PlayerOption:
-    FFMPEG_BEFORE_OPTIONS = " ".join(
-        [
-            "-vn",
-            "-reconnect 1",
-            "-reconnect_streamed 1",
-            "-reconnect_delay_max 3",
-            "-nostdin",
-        ]
-    )
+    FFMPEG_BEFORE_OPTIONS = "-vn -reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 3 -nostdin"
 
     FFMPEG_OPTIONS = ""

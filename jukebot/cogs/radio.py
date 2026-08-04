@@ -42,7 +42,7 @@ class Radio(commands.Cog):
 
     @radio.autocomplete("radio")
     async def radio_autocomplete(self, inter: CommandInteraction, query: str):
-        return [e for e in self._radios.keys() if query in e.lower()][:25]
+        return [e for e in self._radios if query in e.lower()][:25]
 
 
 def setup(bot: JukeBot):

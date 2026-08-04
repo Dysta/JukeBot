@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-
 from jukebot import components
 from jukebot.abstract_components import AbstractService
 
