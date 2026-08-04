@@ -29,16 +29,19 @@ jobs:
         uses: astral-sh/setup-uv@v9.0.0
         with:
           python-version: ${{ matrix.python-version }}
+          enable-cache: true
 
-      - name: Cache dependencies
-        uses: actions/cache@v6
-        with:
-          path: ~/.cache/uv/virtualenvs
-          key: ${{ runner.os }}-uv-${{ hashFiles('uv.lock') }}
-          restore-keys: ${{ runner.os }}-uv-${{ hashFiles('uv.lock') }}
+      # - name: Cache dependencies
+      #   uses: actions/cache@v6
+      #   with:
+      #     path: ~/.cache/uv/virtualenvs
+      #     key: ${{ runner.os }}-uv-${{ hashFiles('uv.lock') }}
+      #     restore-keys: ${{ runner.os }}-uv-${{ hashFiles('uv.lock') }}
 
       - name: Install dependencies
-        run: uv sync --locked --all-extras --dev
+        run: uv sync --frozen --no-dev
 
       - name: Launch unit test
         run: uv run task tests
+        env:
+          CI: true

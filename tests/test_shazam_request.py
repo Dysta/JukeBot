@@ -1,3 +1,4 @@
+import os
 import subprocess
 import unittest
 from types import SimpleNamespace
@@ -8,7 +9,7 @@ from jukebot.utils.logging import disable_logging
 
 
 class TestShazamRequestComponent(unittest.IsolatedAsyncioTestCase):
-    # @unittest.skip("not working on CI due to ffprobe not found")
+    @unittest.skipIf(os.getenv("CI"),"requires ffprobe and network access")
     async def test_shazam_request_live_is_limited_to_30_seconds(self):
         duration: float | None = None
 
@@ -49,7 +50,7 @@ class TestShazamRequestComponent(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(31.0 >= duration >= 29.0)
         self.assertFalse(req.success)
 
-    # @unittest.skip("not working on CI due to ffprobe not found")
+    @unittest.skipIf(os.getenv("CI"),"requires ffprobe and network access")
     async def test_shazam_request_success(self):
         # with disable_logging():
         async with ShazamRequest("https://twitter.com/LaCienegaBlvdss/status/1501975048202166283") as req:
@@ -65,7 +66,7 @@ class TestShazamRequestComponent(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(result.get("url"), "https://youtu.be/FOP_PPavoLA?autoplay=1")
         self.assertEqual(result.get("image_url"), "https://i.ytimg.com/vi/FOP_PPavoLA/maxresdefault.jpg")
 
-    # @unittest.skip("not working on CI due to ffprobe not found")
+    @unittest.skipIf(os.getenv("CI"), "requires ffprobe and network access")
     async def test_shazam_request_failed(self):
         with disable_logging():
             async with ShazamRequest("https://www.instagram.com/p/Cqk4Vh0MVYo/") as req:
