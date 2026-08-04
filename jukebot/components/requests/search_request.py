@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 from enum import Enum
+from typing import ClassVar
 
 import yt_dlp
 from loguru import logger
@@ -29,7 +30,7 @@ class SearchRequest(AbstractRequest):
                     return v
             raise ValueError(f"'{cls.__name__}' enum not found for '{value}'")
 
-    YTDL_OPTIONS: dict = {
+    YTDL_OPTIONS: ClassVar[dict] = {
         "format": "bestaudio/best",
         "outtmpl": "%(extractor)s-%(id)s-%(title)s.%(ext)s",
         "restrictfilenames": True,
@@ -53,7 +54,6 @@ class SearchRequest(AbstractRequest):
             raise ValueError("query must be words, not direct url")
 
         self._engine: SearchRequest.Engine = SearchRequest.Engine.value_of(engine)
-        self._params: dict = {**SearchRequest.YTDL_OPTIONS}
 
         super().__init__(f"{self._engine.value}{query}")
 
@@ -62,7 +62,7 @@ class SearchRequest(AbstractRequest):
         pass
 
     async def execute(self):
-        with yt_dlp.YoutubeDL(params=self._params) as ytdl:
+        with yt_dlp.YoutubeDL(params=SearchRequest.YTDL_OPTIONS) as ytdl:
             loop = asyncio.get_event_loop()
             try:
                 data = await loop.run_in_executor(

@@ -1,4 +1,5 @@
 import asyncio
+from typing import ClassVar
 
 import yt_dlp
 from loguru import logger
@@ -13,7 +14,7 @@ class StreamRequest(AbstractRequest):
     Stream request can retrive only one track, not playlist or sets.
     """
 
-    YTDL_OPTIONS: dict = {
+    YTDL_OPTIONS: ClassVar[dict] = {
         "format": "bestaudio/best",
         "outtmpl": "%(extractor)s-%(id)s-%(title)s.%(ext)s",
         "restrictfilenames": True,
@@ -34,14 +35,13 @@ class StreamRequest(AbstractRequest):
 
     def __init__(self, query: str) -> None:
         super().__init__(query)
-        self._params: dict = {**StreamRequest.YTDL_OPTIONS}
 
     async def setup(self):
         # * nothing to do
         pass
 
     async def execute(self):
-        with yt_dlp.YoutubeDL(params=self._params) as ytdl:
+        with yt_dlp.YoutubeDL(params=StreamRequest.YTDL_OPTIONS) as ytdl:
             loop = asyncio.get_event_loop()
             try:
                 data = await loop.run_in_executor(

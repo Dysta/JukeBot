@@ -1,14 +1,14 @@
 from __future__ import annotations
 
 from collections import abc
-from typing import TypeVar
+from typing import ClassVar, TypeVar
 
 _T = TypeVar("_T")
 _V = TypeVar("_V")
 
 
 class AbstractCache[T, V](abc.MutableSequence):
-    _cache: dict = {}
+    _cache: ClassVar[dict] = {}
 
     def __setitem__(self, k: _T, v: _V) -> None:
         self._cache[k] = v

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 from enum import Enum, auto
+from typing import ClassVar
 
 import yt_dlp
 from loguru import logger
@@ -31,7 +32,7 @@ class MusicRequest(AbstractRequest):
         PLAYLIST = auto()
         UNKNOWN = auto()
 
-    YTDL_OPTIONS: dict = {
+    YTDL_OPTIONS: ClassVar[dict] = {
         "format": "bestaudio/best",
         "outtmpl": "%(extractor)s-%(id)s-%(title)s.%(ext)s",
         "restrictfilenames": True,
@@ -52,7 +53,6 @@ class MusicRequest(AbstractRequest):
 
     def __init__(self, query: str) -> None:
         super().__init__(query)
-        self._params: dict = {**MusicRequest.YTDL_OPTIONS}
         self._type: MusicRequest.ResultType = MusicRequest.ResultType.UNKNOWN
         self._single_search: bool = False
 
@@ -62,7 +62,7 @@ class MusicRequest(AbstractRequest):
             self._single_search = True
 
     async def execute(self):
-        with yt_dlp.YoutubeDL(params=self._params) as ytdl:
+        with yt_dlp.YoutubeDL(params=MusicRequest.YTDL_OPTIONS) as ytdl:
             loop = asyncio.get_event_loop()
             try:
                 data = await loop.run_in_executor(

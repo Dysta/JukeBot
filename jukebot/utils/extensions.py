@@ -1,5 +1,5 @@
 class Extensions:
-    __list__ = [
+    exts = (
         {"package": "jukebot.listeners", "name": "logger_handler"},
         {"package": "jukebot.listeners", "name": "error_handler"},
         {"package": "jukebot.listeners", "name": "voice_handler"},
@@ -9,18 +9,18 @@ class Extensions:
         {"package": "jukebot.cogs", "name": "search"},
         {"package": "jukebot.cogs", "name": "queue"},
         {"package": "jukebot.cogs", "name": "radio"},
-    ]
+    )
 
     @staticmethod
     def all():
-        return Extensions.__list__
+        return Extensions.exts
 
     @staticmethod
     def get(name):
-        for e in Extensions.__list__:
+        for e in Extensions.exts:
             if e["name"] == name:
                 return e
         return None
 
     def __repr__(self):
-        return self.__list__.__repr__()
+        return self.exts.__repr__()

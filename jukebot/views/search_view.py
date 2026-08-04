@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 class SearchInteraction:
     CANCEL_REACTION = "❌"
     CANCEL_TEXT = "Cancel"
-    NUMBER_REACTION = [
+    NUMBER_REACTION = (
         "1️⃣",
         "2️⃣",
         "3️⃣",
@@ -24,7 +24,7 @@ class SearchInteraction:
         "8️⃣",
         "9️⃣",
         "🔟",
-    ]
+    )
 
 
 class _SearchDropdown(disnake.ui.Select):
