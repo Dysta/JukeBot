@@ -1,40 +1,56 @@
-[tool.poetry]
+[project]
 name = "JukeBot"
 version = "0.1.0"
 description = "A music bot for Discord using Disnake"
-authors = ["Dysta <xav4098@gmail.com>"]
+requires-python = ">=3.12,<4"
+authors = [{ name = "Dysta", email = "xav4098@gmail.com" }]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+]
+dependencies = [
+  "asyncstdlib>=3.13.1,<4",
+  "disnake[speed, voice]>=2.12.0,<3",
+  "loguru>=0.7.3,<0.8",
+  "pyaml>=26.2.1,<27",
+  "python-dotenv>=1.2.1,<2",
+  "shazamio>=0.8.1,<0.9",
+  "taskipy>=1.14.1,<2",
+  "yt-dlp>=2026.2.21,<2027",
+]
 
-[tool.poetry.dependencies]
-python = "^3.11"
-loguru = "^0.7.3"
-taskipy = "^1.14.1"
-python-dotenv = "^1.2.1"
-asyncstdlib = "^3.13.1"
-yt-dlp = "^2026.2.21"
-shazamio = "^0.8.1"
-disnake = {extras = ["speed", "voice"], version = "^2.12.0"}
-pyaml = "^26.2.1"
+[project.optional-dependencies]
+speed = [
+  "uvloop>=0.22.1",
+]
 
-[tool.poetry.extras]
-speed = ["uvloop"]
-
-[tool.poetry.group.dev.dependencies]
-black = "^26.3.1"
-autoflake = "^2.3.1"
-isort = "^5.10.1"
-
-[tool.taskipy.tasks]
-start = { cmd = "python -m jukebot", help = "run the bot" }
-black = { cmd = "python -m black .", help = "blackify the code" }
-clean = { cmd = "python -m autoflake . -r -i -v --ignore-init-module-imports --remove-all-unused-imports --remove-unused-variables", help = "remove unused code/import/variable" }
-tests = { cmd = "python -m unittest -v", help = "run all the tests" }
-
-[tool.black]
-line-length = 120
-
-[tool.isort]
-profile = "black"
+[dependency-groups]
+dev = [
+  "ruff>=0.16.1",
+]
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["uv_build>=0.12.1,<0.13.0"]
+build-backend = "uv_build"
+
+[tool.ruff]
+extend-exclude = ["tests", ".tools"]
+line-length = 120
+
+[tool.ruff.lint]
+extend-select = ["I"]
+
+[tool.taskipy.tasks]
+clean = { cmd = "ruff check . --fix --unsafe-fixes", help = "remove unused code/imports and sort imports" }
+format = { cmd = "ruff format .", help = "format code" }
+start = { cmd = "python -m jukebot", help = "run the bot" }
+tests = { cmd = "python -m unittest -v", help = "run all the tests" }
+
+[tool.uv]
+default-groups = "all"
+
+[tool.uv.build-backend]
+module-root = ""

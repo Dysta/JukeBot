@@ -21,7 +21,7 @@ class ResetService(AbstractService):
             await player.disconnect(force=True)
         except Exception as e:
             logger.opt(lazy=True).error(
-                f"Error when force disconnecting the player of the guild {guild.name} ({guild.id}). " f"Error: {e}"
+                f"Error when force disconnecting the player of the guild {guild.name} ({guild.id}). Error: {e}"
             )
 
         logger.opt(lazy=True).success(f"Server {guild.name} ({guild.id}) has successfully reset his player.")

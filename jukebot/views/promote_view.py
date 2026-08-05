@@ -41,7 +41,7 @@ class _ServerButton(disnake.ui.Button):
 
 class PromoteView(disnake.ui.View):
     def __init__(self):
-        super(PromoteView, self).__init__()
+        super().__init__()
         self.add_item(_InviteButton())
         self.add_item(_VoteButton())
         self.add_item(_ServerButton())

@@ -1,3 +1,4 @@
+import os
 import unittest
 
 from jukebot.components.requests import MusicRequest
@@ -10,7 +11,7 @@ class TestRadios(unittest.IsolatedAsyncioTestCase):
     def setUpClass(cls):
         cls._radios: dict = converter.radios_yaml_to_dict()
 
-    @unittest.skip("not working even if links are correct")
+    @unittest.skipIf(os.getenv("CI"),("not working even if links are correct"))
     async def test_radio_available(self):
         with disable_logging():
             for k, v in self._radios.items():

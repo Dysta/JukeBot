@@ -23,14 +23,13 @@ async def uncached_query(url, enquote_url: bool = False) -> (int, str):
 async def _get(url, enquote) -> (int, str):
     url = url if not enquote else parse.quote(url)
 
-    async with aiohttp.ClientSession(headers=_MOZ_HEADER) as session:
-        async with session.get(url) as rep:
-            logger.opt(lazy=True).info(f"Get url {url}")
-            logger.opt(lazy=True).info(f"URL {url} status: {rep.status}")
-            logger.opt(lazy=True).debug(f"URL {url} content-type: {rep.headers['content-type']}")
-            if rep.status != 200:
-                return rep.status, ""
+    async with aiohttp.ClientSession(headers=_MOZ_HEADER) as session, session.get(url) as rep:
+        logger.opt(lazy=True).info(f"Get url {url}")
+        logger.opt(lazy=True).info(f"URL {url} status: {rep.status}")
+        logger.opt(lazy=True).debug(f"URL {url} content-type: {rep.headers['content-type']}")
+        if rep.status != 200:
+            return rep.status, ""
 
-            if "application/json" in rep.headers["content-type"]:
-                return rep.status, await rep.json()
-            return rep.status, await rep.text()
+        if "application/json" in rep.headers["content-type"]:
+            return rep.status, await rep.json()
+        return rep.status, await rep.text()

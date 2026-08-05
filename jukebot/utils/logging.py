@@ -4,6 +4,7 @@ import datetime
 import logging
 import logging as plogging
 import os
+import sys
 from contextlib import contextmanager
 
 from loguru import logger
@@ -28,7 +29,7 @@ def set_logging(
 
     if not os.environ["ENVIRONMENT"] in list(Environment):
         logger.critical(f"Unknown environment {os.environ['ENVIRONMENT']}.")
-        exit(1)
+        sys.exit(1)
 
     if os.environ["ENVIRONMENT"] == Environment.PRODUCTION:
         logger.remove()
@@ -46,7 +47,7 @@ def set_logging(
 
 
 @contextmanager
-def disable_logging(name: str | None = None) -> None:
+def disable_logging(name: str | None = None):
     """Temporary disable logging for a given module
 
     Parameters

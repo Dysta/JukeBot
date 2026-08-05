@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Optional
 
 from disnake import Member
 
@@ -11,14 +10,14 @@ from jukebot.utils import converter
 @dataclass
 class Song:
     title: str = "Unknown"
-    stream_url: Optional[str] = None
+    stream_url: str | None = None
     web_url: str = ""
-    thumbnail: Optional[str] = None
+    thumbnail: str | None = None
     channel: str = "Unknown"
     duration: int = 0
     fmt_duration: str = "0:00"
     live: bool = False
-    requester: Optional[Member] = None
+    requester: Member | None = None
 
     def __init__(self, info: dict):
         self.stream_url = info["url"]

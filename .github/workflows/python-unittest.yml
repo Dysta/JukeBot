@@ -6,10 +6,10 @@ name: JukeBot CI Full
 on:
   push:
     branches:
-      - 'main'
+      - "main"
   pull_request:
     branches:
-      - '**'
+      - "**"
 
 jobs:
   unit-tests:
@@ -19,29 +19,29 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ['3.10', '3.11', '3.12', '3.13', '3.14']
+        python-version: ["3.12", "3.13", "3.14"]
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v5
+      - name: Checkout
+        uses: actions/checkout@v7
 
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v6
-      with:
-        python-version: ${{ matrix.python-version }}
+      - name: Install uv and set the Python version
+        uses: astral-sh/setup-uv@v9.0.0
+        with:
+          python-version: ${{ matrix.python-version }}
+          enable-cache: true
 
-    - name: Set up Poetry
-      uses: Gr1N/setup-poetry@v9
+      # - name: Cache dependencies
+      #   uses: actions/cache@v6
+      #   with:
+      #     path: ~/.cache/uv/virtualenvs
+      #     key: ${{ runner.os }}-uv-${{ hashFiles('uv.lock') }}
+      #     restore-keys: ${{ runner.os }}-uv-${{ hashFiles('uv.lock') }}
 
-    - name: Cache dependencies
-      uses: actions/cache@v4
-      with:
-        path: ~/.cache/pypoetry/virtualenvs
-        key: ${{ runner.os }}-poetry-${{ hashFiles('poetry.lock') }}
-        restore-keys: ${{ runner.os }}-poetry-${{ hashFiles('poetry.lock') }}
+      - name: Install dependencies
+        run: uv sync --frozen --no-dev
 
-    - name: Install dependencies
-      run: poetry install --without dev
-
-    - name: Launch unit test
-      run: poetry run task tests
+      - name: Launch unit test
+        run: uv run task tests
+        env:
+          CI: true

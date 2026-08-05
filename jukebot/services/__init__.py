@@ -1,1 +1,1 @@
-from .reset_service import ResetService
+from .reset_service import ResetService as ResetService

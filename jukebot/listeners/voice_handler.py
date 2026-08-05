@@ -6,7 +6,6 @@ from disnake import Member, VoiceChannel, VoiceState
 from disnake.ext import commands
 from disnake.ext.commands import Bot
 
-
 if TYPE_CHECKING:
     from jukebot.components import Player
 

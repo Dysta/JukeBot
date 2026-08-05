@@ -4,7 +4,6 @@ import asyncio
 import os
 from asyncio import Task
 from enum import IntEnum, auto
-from typing import Optional
 
 from disnake import CommandInteraction, VoiceChannel, VoiceClient
 from disnake.ext.commands import Bot
@@ -71,13 +70,13 @@ class Player:
         self.bot: Bot = bot
         self._guild_id: int = guild_id
 
-        self._voice: Optional[VoiceClient] = None
-        self._stream: Optional[AudioStream] = None
-        self._inter: Optional[CommandInteraction] = None
-        self._song: Optional[Song] = None
+        self._voice: VoiceClient | None = None
+        self._stream: AudioStream | None = None
+        self._inter: CommandInteraction | None = None
+        self._song: Song | None = None
         self._queue: ResultSet = ResultSet.empty()
         self._state: Player.State = Player.State.IDLE
-        self._idle_task: Optional[Task] = None
+        self._idle_task: Task | None = None
         self._loop: Player.Loop = Player.Loop.DISABLED
 
     async def join(self, channel: VoiceChannel):
@@ -190,15 +189,15 @@ class Player:
         return bool(self._voice)
 
     @property
-    def stream(self) -> Optional[AudioStream]:
+    def stream(self) -> AudioStream | None:
         return self._stream
 
     @property
-    def voice(self) -> Optional[VoiceClient]:
+    def voice(self) -> VoiceClient | None:
         return self._voice
 
     @property
-    def song(self) -> Optional[Song]:
+    def song(self) -> Song | None:
         return self._song
 
     @property
@@ -210,7 +209,7 @@ class Player:
         self._queue = q
 
     @property
-    def interaction(self) -> Optional[CommandInteraction]:
+    def interaction(self) -> CommandInteraction | None:
         return self._inter
 
     @interaction.setter

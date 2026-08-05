@@ -1,9 +1,9 @@
 import asyncio
-import os
 import random
 import string
 import tempfile
 from pathlib import Path
+from typing import ClassVar
 
 import yt_dlp
 from loguru import logger
@@ -37,15 +37,9 @@ class ShazamRequest(AbstractRequest):
     Shazam request can retrive only one media, not playlist or sets
     """
 
-    FILENAME_CHARS: str = string.ascii_letters + string.digits
-    FILENAME_LENGHT: int = 8
-    YTDL_BASE_OPTIONS: dict = {
+    YTDL_BASE_OPTIONS: ClassVar[dict] = {
         "format": "bestaudio/best",
-        "external_downloader": "ffmpeg",
-        "external_downloader_args": {
-            "ffmpeg_i": ["-vn", "-ss", "00:00", "-to", "00:30"],
-            "ffmpeg": ["-t", "20"],
-        },
+        "download_ranges": lambda _info, _ydl: ({"start_time": 0, "end_time": 30},),
         "nopart": True,
         "cachedir": False,
         "logger": _QueryLogger(),
@@ -53,16 +47,13 @@ class ShazamRequest(AbstractRequest):
 
     def __init__(self, query: str):
         super().__init__(query=query)
-        self._path: str = ""
         self._params: dict = {**ShazamRequest.YTDL_BASE_OPTIONS}
-        self._delete_path: bool = False
+        self._path: Path | None = None
 
     async def setup(self):
-        rdm_str: str = "".join(
-            [random.choice(ShazamRequest.FILENAME_CHARS) for _ in range(ShazamRequest.FILENAME_LENGHT)]
-        )
-        self._path = Path(tempfile.gettempdir(), "jukebot", rdm_str)
-        self._params.update({"outtmpl": f"{self._path}"})
+        rdm_str: str = "".join(random.choices(string.hexdigits, k=12))
+        self._path = Path(tempfile.mkdtemp(prefix="jukebot-"), rdm_str)
+        self._params.update({"outtmpl": self._path.as_posix()})
 
         logger.opt(lazy=True).debug(f"Generated path {self._path} with parameters {self._params}")
 
@@ -78,20 +69,47 @@ class ShazamRequest(AbstractRequest):
                 logger.error(e)
                 return
 
-        self._delete_path = True
         logger.opt(lazy=True).debug(f"Query {self._query} saved at {self._path}")
         shazam = Shazam()
-        out = await shazam.recognize_song(data=self._path)
+        out = await shazam.recognize(data=str(self._path))
         result = Serialize.full_track(data=out)
         logger.debug(result.track)
         if not result.track:
             return
 
-        youtube_data = await shazam.get_youtube_data(link=result.track.youtube_link)
+        image_url = result.track.photo_url or next(
+            (
+                page.image
+                for section in result.track.sections
+                for page in reversed(getattr(section, "meta_pages", []))
+                if page.image
+            ),
+            None,
+        )
+        spotify_url = result.track.spotify_url
+        if spotify_url and spotify_url.startswith("spotify:search:"):
+            spotify_url = spotify_url.replace("spotify:search:", "https://open.spotify.com/search/", 1)
+
+        apple_music_url = result.track.apple_music_url
+        if apple_music_url and apple_music_url.startswith("intent://"):
+            apple_music_url = f"https://{apple_music_url.removeprefix('intent://').split('#', 1)[0]}"
+
+        links = {
+            name: url
+            for name, url in {
+                "Apple Music": apple_music_url,
+                "Spotify": spotify_url,
+                "YouTube": result.track.youtube_link,
+            }.items()
+            if url
+        }
+
         data: dict = {
-            "title": youtube_data["caption"],
-            "url": youtube_data["actions"][0]["uri"],
-            "image_url": youtube_data["image"]["url"],
+            "title": result.track.title,
+            "author": result.track.subtitle,
+            "url": next(iter(links.values()), None),
+            "image_url": image_url,
+            "links": links,
         }
 
         self._result = data
@@ -100,10 +118,14 @@ class ShazamRequest(AbstractRequest):
         logger.opt(lazy=True).debug(f"Query data {self._result}")
 
     async def terminate(self):
-        if self._delete_path:
+        def _clean(path: Path):
+            path.unlink(missing_ok=True)
+            path.parent.rmdir()
+
+        if self._path:
             loop = asyncio.get_event_loop()
             try:
-                await loop.run_in_executor(None, lambda: os.remove(self._path))
-                logger.opt(lazy=True).info(f"Query {self._query} deleted at {self._path}")
+                await loop.run_in_executor(None, _clean, self._path)
+                logger.opt(lazy=True).info(f"Temp folder for query {self._query} deleted at {self._path}")
             except Exception as e:
                 logger.error(e)

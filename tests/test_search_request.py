@@ -7,39 +7,35 @@ from jukebot.utils.logging import disable_logging
 
 class TestSearchRequestComponent(unittest.IsolatedAsyncioTestCase):
     async def test_search_request_url_song_youtube_raise_exception(self):
-        with disable_logging():
-            with self.assertRaises(ValueError):
-                async with SearchRequest(
-                    "https://www.youtube.com/watch?v=YZ2WJ1krQss",
-                    SearchRequest.Engine.Youtube,
-                ) as req:
-                    await req.execute()
+        with disable_logging(), self.assertRaises(ValueError):
+            async with SearchRequest(
+                "https://www.youtube.com/watch?v=YZ2WJ1krQss",
+                SearchRequest.Engine.Youtube,
+            ) as req:
+                await req.execute()
 
     async def test_search_request_url_song_Soundcloud_raise_exception(self):
-        with disable_logging():
-            with self.assertRaises(ValueError):
-                async with SearchRequest(
-                    "https://SoundCloud.com/gee_baller/playboi-carti-cult-classic",
-                    SearchRequest.Engine.SoundCloud,
-                ) as req:
-                    await req.execute()
+        with disable_logging(), self.assertRaises(ValueError):
+            async with SearchRequest(
+                "https://SoundCloud.com/gee_baller/playboi-carti-cult-classic",
+                SearchRequest.Engine.SoundCloud,
+            ) as req:
+                await req.execute()
 
     async def test_search_request_url_playlist_youtube_raise_exception(self):
-        with disable_logging():
-            with self.assertRaises(ValueError):
-                async with SearchRequest(
-                    "https://www.youtube.com/playlist?list=PLjnOFoOKDEU9rzMtOaKGLABN7QhG19Nl0",
-                    SearchRequest.Engine.Youtube,
-                ) as req:
-                    await req.execute()
+        with disable_logging(), self.assertRaises(ValueError):
+            async with SearchRequest(
+                "https://www.youtube.com/playlist?list=PLjnOFoOKDEU9rzMtOaKGLABN7QhG19Nl0",
+                SearchRequest.Engine.Youtube,
+            ) as req:
+                await req.execute()
 
     async def test_search_request_url_playlist_Soundcloud_raise_exception(self):
-        with disable_logging():
-            with self.assertRaises(ValueError):
-                async with SearchRequest(
-                    "https://SoundCloud.com/dysta/sets/breakcore", SearchRequest.Engine.SoundCloud
-                ) as req:
-                    await req.execute()
+        with disable_logging(), self.assertRaises(ValueError):
+            async with SearchRequest(
+                "https://SoundCloud.com/dysta/sets/breakcore", SearchRequest.Engine.SoundCloud
+            ) as req:
+                await req.execute()
 
     async def test_search_request_query_song_youtube_success_using_engine(self):
         with disable_logging():
