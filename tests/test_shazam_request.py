@@ -34,7 +34,7 @@ class TestShazamRequestComponent(unittest.IsolatedAsyncioTestCase):
 
         with (
             patch(
-                "jukebot.components.requests.shazam_request.Shazam.recognize_song",
+                "jukebot.components.requests.shazam_request.Shazam.recognize",
                 side_effect=recognize_song_patched,
             ) as shazam,
             patch(

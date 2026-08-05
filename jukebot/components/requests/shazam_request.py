@@ -48,8 +48,7 @@ class ShazamRequest(AbstractRequest):
     def __init__(self, query: str):
         super().__init__(query=query)
         self._params: dict = {**ShazamRequest.YTDL_BASE_OPTIONS}
-        self._delete_path: bool = False
-        self._path: Path
+        self._path: Path | None = None
 
     async def setup(self):
         rdm_str: str = "".join(random.choices(string.hexdigits, k=12))
@@ -70,7 +69,6 @@ class ShazamRequest(AbstractRequest):
                 logger.error(e)
                 return
 
-        self._delete_path = True
         logger.opt(lazy=True).debug(f"Query {self._query} saved at {self._path}")
         shazam = Shazam()
         out = await shazam.recognize(data=str(self._path))
@@ -109,11 +107,14 @@ class ShazamRequest(AbstractRequest):
         logger.opt(lazy=True).debug(f"Query data {self._result}")
 
     async def terminate(self):
-        if self._delete_path:
+        def _clean(path: Path):
+            path.unlink(missing_ok=True)
+            path.parent.rmdir()
+
+        if self._path:
             loop = asyncio.get_event_loop()
             try:
-                await loop.run_in_executor(None, lambda: self._path.unlink())
-                await loop.run_in_executor(None, lambda: self._path.parent.rmdir())
+                await loop.run_in_executor(None, _clean, self._path)
                 logger.opt(lazy=True).info(f"Temp folder for query {self._query} deleted at {self._path}")
             except Exception as e:
                 logger.error(e)
