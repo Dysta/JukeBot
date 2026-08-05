@@ -11,7 +11,7 @@ depends = ["install:deps", "install:ffmpeg", "install:ffprobe"]
 
 [tasks."install:deps"]
 description = "Install the python dependencies for the project"
-run = "uv sync"
+run = "uv sync --locked"
 
 [tasks."install:ffmpeg"]
 description = "Install a local ffmpeg binary"
