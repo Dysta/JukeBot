@@ -1,6 +1,6 @@
 # JukeBot
 [![Powered by Disnake](https://custom-icon-badges.herokuapp.com/badge/-Powered%20by%20Disnake-0d1620?logo=nextcord)](https://github.com/DisnakeDev/disnake "Powered by Disnake")
-[![Powered by Poetry](https://custom-icon-badges.herokuapp.com/badge/-Powered%20by%20Poetry-0d1620?logo=poetry)](https://python-poetry.org "Powered by Poetry") \
+[![Powered by Poetry](https://custom-icon-badges.herokuapp.com/badge/-Powered%20by%20uv-0d1620?logo=uv)](https://docs.astral.sh/uv/ "Powered by uv") \
 Discord music bot written in Python 3 
 ___
 
@@ -8,17 +8,18 @@ ___
 ```
 git clone https://github.com/Dysta/JukeBot 
 cd JukeBot
-poetry install
+uv sync --locked
 ```
 
 ## ⚙ Configuration
 Rename `.env.example` to `.env` and fill in the values.
 
 ## 🚀 Launch
-Run `poetry run task start`.
+Run `uv run task start`.
 
 ## ⁉ Other
-The bot needs [ffmpeg](https://ffmpeg.org/) to work.
+The bot needs [ffmpeg](https://ffmpeg.org/) and [ffprobe](https://ffmpeg.org/) to work.
+
 ### Install on Windows
 Use the package manager [Chocolatey](https://community.chocolatey.org/) and run in an **admin shell** `choco install ffmpeg`.
 
@@ -36,9 +37,8 @@ Run `docker run --name jukebot --restart on-failure:3 --env-file .env dysta/juke
 
 ___
 
-## 🔮 Devcontainer
-Clone the project then open it in `vscode`. If you have the `devcontainer` extension, it will ask you to reopen the project in a devcontainer. If not, open the commands prompt then search for **reopen in container**. \
-All the needs will be automatically installed.
+## 🧰 Mise
+Clone the project then in your terminal type `mise install` then `mise run install`. It will download both `ffmpeg` and `ffprobe` binary, add in the path and your good to go !
 
 ___
 
