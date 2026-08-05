@@ -3,6 +3,7 @@ uv = "latest"
 
 [env]
 FFMPEG_VERSION = "b6.1.1"
+PYTHON_VERSION = "3.12"
 _.path = ".tools/bin"
 
 [tasks.install]
@@ -10,8 +11,11 @@ description = "Install dependencies, ffmpeg, and ffprobe"
 depends = ["install:deps", "install:ffmpeg", "install:ffprobe"]
 
 [tasks."install:deps"]
-description = "Install the python dependencies for the project"
-run = "uv sync --locked"
+description = "Install python and the dependencies for the project"
+run = '''
+uv python install ${PYTHON_VERSION}
+uv sync --locked
+'''
 
 [tasks."install:ffmpeg"]
 description = "Install a local ffmpeg binary"

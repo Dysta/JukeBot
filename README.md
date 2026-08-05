@@ -2,26 +2,27 @@
 [![Powered by Disnake](https://custom-icon-badges.herokuapp.com/badge/-Powered%20by%20Disnake-0d1620?logo=nextcord)](https://github.com/DisnakeDev/disnake "Powered by Disnake")
 [![Powered by Poetry](https://custom-icon-badges.herokuapp.com/badge/-Powered%20by%20uv-0d1620?logo=uv)](https://docs.astral.sh/uv/ "Powered by uv") \
 Discord music bot written in Python 3 
-___
 
-## 🧩 Deployment without Docker
+___
+## 💻 Developping the bot
+If you want to contribute to the developpement :
 ```
 git clone https://github.com/Dysta/JukeBot 
 cd JukeBot
 uv sync --locked
 ```
 
-## ⚙ Configuration
+### ⚙ Configuration
 Rename `.env.example` to `.env` and fill in the values.
 
-## 🚀 Launch
+### 🚀 Launch
 Run `uv run task start`.
 
-## ⁉ Other
-The bot needs [ffmpeg](https://ffmpeg.org/) and [ffprobe](https://ffmpeg.org/) to work.
+## ➕ Other
+The bot needs [FFmpeg](https://ffmpeg.org/) and [FFprobe](https://ffmpeg.org/) to work. It also require a [Deno](https://deno.com/) backend to correctly bypass Youtube bot protection.
 
 ### Install on Windows
-Use the package manager [Chocolatey](https://community.chocolatey.org/) and run in an **admin shell** `choco install ffmpeg`.
+Use [Chocolatey](https://community.chocolatey.org/), run `choco install ffmpeg`.
 
 ### Install on Linux
 Use **apt**, run `sudo apt install ffmpeg`.
@@ -29,24 +30,38 @@ Use **apt**, run `sudo apt install ffmpeg`.
 ### Install on MacOS
 Use **brew**, run `brew install ffmpeg`.
 
-___
-
-## 🌐 Deployment with Docker
-Download and rename `.env.example` to `.env` and fill in the values. \
-Run `docker run --name jukebot --restart on-failure:3 --env-file .env dysta/jukebot`.
-
-___
+### Install Deno
+Follow the [Deno guide](https://docs.deno.com/runtime/getting_started/installation/)
 
 ## 🧰 Mise
-Clone the project then in your terminal type `mise install` then `mise run install`. It will download both `ffmpeg` and `ffprobe` binary, add in the path and your good to go !
+The project include a [mise](https://mise.jdx.dev/) configuration to quickly setup the local environment, I recommend to use this method.
+
+In your terminal type `mise install` then `mise run install`. \
+It will download `uv`, `python`, install the dependencies and setup both `ffmpeg` and `ffprobe` binary in your path.
+
+> [!NOTE]
+> **All** the scripts in `mise` aren't compatible with **Windows** since it use the `bash` syntaxe. \
+> It also didn't install Deno since the bot detection from Youtube isn't triggered with a customer IP. \
+> **The docker image does include Deno since this is this one that is supposed to run on a production environment.**
 
 ___
 
-<details>
-  <summary><h2>🗨 Features & Commands</h2></summary>
-  <br>
-    
-  ### Music
+## 🌐 Running with Docker
+If you just want to run the bot for your personnal use without dealing with any installation :
+```bash
+mkdir -p jukebot
+cd jukebot
+curl -fsSLo .env https://raw.githubusercontent.com/Dysta/JukeBot/main/.env.example
+# edit .env to fill in the values
+docker run --name jukebot --restart on-failure:3 --env-file .env dysta/jukebot
+```
+
+___
+
+## 🗨 Features & Commands
+A non exhaustive list of the commands supported by the bot.
+
+### Music
   - [X] **`join`**
   - [X] **`play`**
   - [X] **`playtop`**
@@ -61,7 +76,7 @@ ___
   - [ ] **`lyrics`**
   - [X] **`disconnect`**
   - [X] **`share`**
-   ### Queue
+### Queue
   - [X] **`queue`**
   - [X] **`loopqueue`**
   - [ ] **`move`**
@@ -70,21 +85,22 @@ ___
   - [X] **`remove`**
   - [X] **`clear`**
   - [ ] **`removedupes`**
-   ### Utility
+### Utility
   - [X] **`prefix`**
   - [X] **`reset`**
-   ### Effect
+### Effect
   - [ ] **`speed`**
   - [ ] **`bass`**
   - [ ] **`nightcore`**
   - [ ] **`slowed`**
-  ### Others
+### Others
   - [X] **`info`**
   - [X] **`invite`**
   - [X] **`donate`**
   - [X] **`watch`**
   - [X] **`help`**
-</details>
+
+___
 
 ## 🤝 Contributing
 
