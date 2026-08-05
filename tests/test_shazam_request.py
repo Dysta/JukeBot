@@ -9,7 +9,7 @@ from jukebot.utils.logging import disable_logging
 
 
 class TestShazamRequestComponent(unittest.IsolatedAsyncioTestCase):
-    @unittest.skipIf(os.getenv("CI"),"requires ffprobe and network access")
+    @unittest.skipIf(os.getenv("CI"), "requires ffprobe and network access")
     async def test_shazam_request_live_is_limited_to_30_seconds(self):
         duration: float | None = None
 
@@ -50,7 +50,7 @@ class TestShazamRequestComponent(unittest.IsolatedAsyncioTestCase):
         self.assertTrue(31.0 >= duration >= 29.0)
         self.assertFalse(req.success)
 
-    @unittest.skipIf(os.getenv("CI"),"requires ffprobe and network access")
+    @unittest.skipIf(os.getenv("CI"), "requires ffprobe and network access")
     async def test_shazam_request_success(self):
         # with disable_logging():
         async with ShazamRequest("https://twitter.com/LaCienegaBlvdss/status/1501975048202166283") as req:
@@ -62,9 +62,13 @@ class TestShazamRequestComponent(unittest.IsolatedAsyncioTestCase):
         self.assertFalse(tmp_path.parent.exists())
         result: dict = req.result
 
-        self.assertEqual(result.get("title"), "Enya - The Humming (Official Lyric Video)")
-        self.assertEqual(result.get("url"), "https://youtu.be/FOP_PPavoLA?autoplay=1")
-        self.assertEqual(result.get("image_url"), "https://i.ytimg.com/vi/FOP_PPavoLA/maxresdefault.jpg")
+        self.assertEqual(result.get("title"), "The Humming...")
+        self.assertEqual(result.get("author"), "Enya")
+        self.assertEqual(result.get("url"), "https://music.apple.com/gb/album/the-humming/1043622490")
+        self.assertTrue(result.get("image_url"))
+        self.assertNotIn("Shazam", result.get("links"))
+        self.assertEqual(result["links"]["Apple Music"], "https://music.apple.com/gb/album/the-humming/1043622490")
+        self.assertEqual(result["links"]["Spotify"], "https://open.spotify.com/search/The%20Humming...%20Enya")
 
     @unittest.skipIf(os.getenv("CI"), "requires ffprobe and network access")
     async def test_shazam_request_failed(self):

@@ -77,29 +77,40 @@ class ShazamRequest(AbstractRequest):
         if not result.track:
             return
 
-        if result.track.youtube_link:
-            youtube_data = await shazam.get_youtube_data(link=result.track.youtube_link)
-            data: dict = {
-                "title": youtube_data["caption"],
-                "url": youtube_data["actions"][0]["uri"],
-                "image_url": youtube_data["image"]["url"],
-            }
-        else:
-            with yt_dlp.YoutubeDL({"quiet": True, "skip_download": True}) as ytdl:
-                youtube_result = await asyncio.get_running_loop().run_in_executor(
-                    None,
-                    lambda: ytdl.extract_info(
-                        f"ytsearch1:{result.track.subtitle} {result.track.title}",
-                        download=False,
-                    ),
-                )
-            video = youtube_result["entries"][0]
-            video_id = video["id"]
-            data = {
-                "title": video["title"],
-                "url": f"https://youtu.be/{video_id}?autoplay=1",
-                "image_url": f"https://i.ytimg.com/vi/{video_id}/maxresdefault.jpg",
-            }
+        image_url = result.track.photo_url or next(
+            (
+                page.image
+                for section in result.track.sections
+                for page in reversed(getattr(section, "meta_pages", []))
+                if page.image
+            ),
+            None,
+        )
+        spotify_url = result.track.spotify_url
+        if spotify_url and spotify_url.startswith("spotify:search:"):
+            spotify_url = spotify_url.replace("spotify:search:", "https://open.spotify.com/search/", 1)
+
+        apple_music_url = result.track.apple_music_url
+        if apple_music_url and apple_music_url.startswith("intent://"):
+            apple_music_url = f"https://{apple_music_url.removeprefix('intent://').split('#', 1)[0]}"
+
+        links = {
+            name: url
+            for name, url in {
+                "Apple Music": apple_music_url,
+                "Spotify": spotify_url,
+                "YouTube": result.track.youtube_link,
+            }.items()
+            if url
+        }
+
+        data: dict = {
+            "title": result.track.title,
+            "author": result.track.subtitle,
+            "url": next(iter(links.values()), None),
+            "image_url": image_url,
+            "links": links,
+        }
 
         self._result = data
         self._success = True

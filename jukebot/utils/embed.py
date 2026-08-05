@@ -108,12 +108,19 @@ def music_not_found_message(title="", content=""):
 
 
 def music_found_message(music: dict, title=""):
-    embed: disnake.Embed = _base_embed(content=f"[{music['title']}]({music['url']})", color=0x54B23F)
+    links = " | ".join(f"[{name}]({url})" for name, url in music["links"].items())
+    embed: disnake.Embed = _base_embed(color=0x54B23F)
     embed.set_author(
         name="Music found!" if title == "" else title,
         icon_url="https://cdn.discordapp.com/attachments/573225654452092930/952197615221612594/d-feet-icon.png",
     )
-    embed.set_thumbnail(url=music["image_url"])
+    title = f"[{music['title']}]({music['url']})" if music["url"] else music["title"]
+    embed.add_field(name="Title", value=title, inline=False)
+    embed.add_field(name="Artist", value=music["author"], inline=True)
+    embed.add_field(name=VOID_TOKEN, value=VOID_TOKEN, inline=True)
+    embed.add_field(name="Links", value=links, inline=True)
+    if isinstance(music["image_url"], str) and music["image_url"].startswith(("http://", "https://")):
+        embed.set_thumbnail(url=music["image_url"])
     return embed
 
 
