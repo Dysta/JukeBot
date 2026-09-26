@@ -10,7 +10,7 @@ if TYPE_CHECKING:
 class AbstractMap[T, V](abc.MutableMapping):
     _collection: dict[T, V]
 
-    def __new__(cls):
+    def __new__(cls, *args, **kwargs):
         instance = super().__new__(cls)
         instance._collection = {}
         return instance
