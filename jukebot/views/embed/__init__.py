@@ -1,4 +1,3 @@
-from .activity import activity_message as activity_message
 from .base import VOID_TOKEN as VOID_TOKEN
 from .general import basic_message as basic_message
 from .general import error_message as error_message

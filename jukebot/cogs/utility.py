@@ -2,15 +2,15 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from disnake import CommandInteraction, InviteTarget
+from disnake import CommandInteraction
 from disnake.ext import commands
 from disnake.ext.commands import BucketType
 
 from jukebot import JukeBot
 from jukebot.services import ResetService
-from jukebot.utils import applications, checks, converter
-from jukebot.views import ActivityView, PromoteView
-from jukebot.views.embed import activity_message, info_message
+from jukebot.utils import converter
+from jukebot.views import PromoteView
+from jukebot.views.embed import info_message
 
 
 class Utility(commands.Cog):
@@ -64,32 +64,6 @@ class Utility(commands.Cog):
             The interaction
         """
         await inter.send(view=PromoteView())
-
-    @commands.slash_command()
-    @commands.cooldown(1, 15.0, BucketType.guild)
-    @commands.max_concurrency(1, BucketType.guild)
-    @commands.check(checks.user_is_connected)
-    async def watch(self, inter: CommandInteraction):
-        """Launch a Youtube Together session in the voice channel where you are currently.
-
-        Parameters
-        ----------
-        inter : CommandInteraction
-            The interaction
-        """
-        max_time = 180
-        invite = await inter.author.voice.channel.create_invite(
-            max_age=max_time,
-            reason="Watch Together",
-            target_type=InviteTarget.embedded_application,
-            target_application=applications.default["youtube"],
-        )
-        e = activity_message(
-            "Watch Together started!",
-            f"An activity started in `{inter.author.voice.channel.name}`.\n",
-        )
-
-        await inter.send(embed=e, view=ActivityView(invite.url), delete_after=float(max_time))
 
     @commands.slash_command()
     @commands.cooldown(1, 15.0, BucketType.guild)
