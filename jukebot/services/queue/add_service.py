@@ -2,14 +2,14 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from disnake import Member
-
 from jukebot import components
 from jukebot.abstract_components import AbstractService
 from jukebot.components.requests.music_request import MusicRequest
 from jukebot.exceptions import QueryFailed
 
 if TYPE_CHECKING:
+    from disnake import Member
+
     from jukebot.components import Player, Result, ResultSet
 
 

@@ -527,7 +527,7 @@ class TestMusicRequestComponent(unittest.IsolatedAsyncioTestCase):
 
     async def test_music_request_success_soundcloud_shorted_url_convert_to_result(self):
         with disable_logging():
-            async with MusicRequest("https://on.soundcloud.com/Gsdzc") as req:
+            async with MusicRequest("https://on.soundcloud.com/PfY6LKyoMb8FkogMdF") as req:
                 await req.execute()
 
         self.assertTrue(req.success)
@@ -536,11 +536,11 @@ class TestMusicRequestComponent(unittest.IsolatedAsyncioTestCase):
 
         result: Result = Result(req.result)
 
-        self.assertEqual(result.title, "Headband Andy Vito Bad Boy")
-        self.assertEqual(result.channel, "Minecraft Pukaj 009 Sk")
+        self.assertEqual(result.title, "Remember Tomorrow")
+        self.assertEqual(result.channel, "Deathbrainofficial")
         self.assertEqual(
             result.web_url,
-            "https://soundcloud.com/minecraft-pukaj-009-sk/headband-andy-vito-bad-boy",
+            "https://soundcloud.com/deathbrainofficial/remember-tomorrow",
         )
         self.assertEqual(result.duration, 0)
         self.assertEqual(result.fmt_duration, "ထ")
@@ -558,11 +558,11 @@ class TestMusicRequestComponent(unittest.IsolatedAsyncioTestCase):
 
         result: Result = Result(req.result)
 
-        self.assertEqual(result.title, "Empty")
-        self.assertEqual(result.channel, "Dysta")
+        self.assertEqual(result.title, "The Prelude 001 185")
+        self.assertEqual(result.channel, "Kbt Thomas")
         self.assertEqual(
             result.web_url,
-            "https://soundcloud.com/dysta/empty/s-wEHdWGqgDdf",
+            "https://soundcloud.com/kbt-thomas/the-prelude-001-185/s-FkBDkSV4oOB",
         )
         self.assertEqual(result.duration, 0)
         self.assertEqual(result.fmt_duration, "ထ")

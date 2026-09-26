@@ -2,11 +2,13 @@ from __future__ import annotations
 
 import random
 from dataclasses import dataclass
-
-from disnake import Member
+from typing import TYPE_CHECKING
 
 from jukebot.abstract_components import AbstractCollection
 from jukebot.components.result import Result
+
+if TYPE_CHECKING:
+    from disnake import Member
 
 
 @dataclass

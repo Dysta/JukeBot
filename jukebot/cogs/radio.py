@@ -8,11 +8,13 @@ from disnake.ext import commands
 from disnake.ext.commands import BucketType
 from loguru import logger
 
-from jukebot import JukeBot
-from jukebot.utils import checks, converter, embed
+from jukebot.utils import checks, converter
+from jukebot.views.embed import error_message
 
 if TYPE_CHECKING:
     from disnake import Embed
+
+    from jukebot import JukeBot
 
 
 class Radio(commands.Cog):
@@ -34,7 +36,7 @@ class Radio(commands.Cog):
     async def radio(self, inter: CommandInteraction, radio: str):
         choices: list = self._radios.get(radio, [])
         if not choices:
-            e: Embed = embed.error_message(content=f"No radio found with the name `{radio}`")
+            e: Embed = error_message(content=f"No radio found with the name `{radio}`")
             await inter.send(embed=e)
             return
 

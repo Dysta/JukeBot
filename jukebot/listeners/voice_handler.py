@@ -2,11 +2,12 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from disnake import Member, VoiceChannel, VoiceState
 from disnake.ext import commands
-from disnake.ext.commands import Bot
 
 if TYPE_CHECKING:
+    from disnake import Member, VoiceChannel, VoiceState
+    from disnake.ext.commands import Bot
+
     from jukebot.components import Player
 
 

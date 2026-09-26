@@ -45,7 +45,6 @@ def duration_seconds_to_progress_bar(time: int, total: int, ticks: int = 30) -> 
 def radios_yaml_to_dict() -> dict:
     radios: dict = {}
     with open("./data/radios.yaml", "r") as f:
-        data = yaml.safe_load(f)
-        for e in data:
-            radios.update(e)
+        radios = yaml.safe_load(f)
+
     return radios
