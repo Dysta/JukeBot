@@ -2,19 +2,18 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import disnake
-from disnake import Member
-
 from jukebot.utils import converter
 
 from .base import _base_embed
 
 if TYPE_CHECKING:
+    from disnake import Embed, Member
+
     from jukebot.components import Song
 
 
 def grab_message(song: Song, current_duration: int = 0):
-    embed: disnake.Embed = _base_embed(content=f"[{song.title}]({song.web_url})", color=0x366ADB)
+    embed: Embed = _base_embed(content=f"[{song.title}]({song.web_url})", color=0x366ADB)
     embed.set_author(
         name="Saved music",
         icon_url="https://icons.iconarchive.com/icons/papirus-team/papirus-apps/512/atunes-icon.png",
@@ -28,7 +27,7 @@ def grab_message(song: Song, current_duration: int = 0):
 
 
 def share_message(author: Member, content, title="", url="", img=""):
-    embed: disnake.Embed = _base_embed(content=content, color=0x366ADB)
+    embed: Embed = _base_embed(content=content, color=0x366ADB)
     embed.set_author(
         name=title if title else f"Music shared by {author}",
         icon_url="https://icons.iconarchive.com/icons/papirus-team/papirus-apps/512/atunes-icon.png",

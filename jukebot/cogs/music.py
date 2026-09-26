@@ -1,13 +1,12 @@
 from __future__ import annotations
 
-from datetime import timedelta
+from typing import TYPE_CHECKING
 from urllib import parse
 
-from disnake import APISlashCommand, CommandInteraction, Embed, Forbidden, ui
+from disnake import CommandInteraction, Forbidden
 from disnake.ext import commands
 from disnake.ext.commands import BucketType
 
-from jukebot import JukeBot
 from jukebot.components import Song
 from jukebot.components.player import Player
 from jukebot.components.requests import ShazamRequest
@@ -27,6 +26,13 @@ from jukebot.services.music import (
 from jukebot.utils import aioweb, checks, regex
 from jukebot.views.container import basic_message as c_basic_message
 from jukebot.views.embed import basic_message, grab_message, music_found_message, music_message, share_message
+
+if TYPE_CHECKING:
+    from datetime import timedelta
+
+    from disnake import APISlashCommand, Embed, ui
+
+    from jukebot import JukeBot
 
 
 class Music(commands.Cog):

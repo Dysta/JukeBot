@@ -2,11 +2,10 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from disnake import CommandInteraction, Embed
+from disnake import CommandInteraction
 from disnake.ext import commands
 from disnake.ext.commands import BucketType
 
-from jukebot import JukeBot
 from jukebot.components.requests.music_request import MusicRequest
 from jukebot.services.queue import (
     AddService,
@@ -19,6 +18,9 @@ from jukebot.utils import checks
 from jukebot.views.embed import VOID_TOKEN, basic_message, basic_queue_message, queue_message, result_enqueued
 
 if TYPE_CHECKING:
+    from disnake import Embed
+
+    from jukebot import JukeBot
     from jukebot.components import Result, ResultSet
 
 

@@ -8,7 +8,7 @@ from disnake.ext import commands
 from disnake.ext.commands import BucketType
 from loguru import logger
 
-from jukebot import JukeBot, components
+from jukebot import components
 from jukebot.components.requests import SearchRequest
 from jukebot.exceptions import QueryCanceled, QueryFailed
 from jukebot.utils import checks
@@ -16,6 +16,7 @@ from jukebot.views import SearchDropdownView, SearchInteraction
 from jukebot.views.embed import search_result_message
 
 if TYPE_CHECKING:
+    from jukebot import JukeBot
     from jukebot.components import ResultSet
 
 

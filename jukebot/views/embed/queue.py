@@ -4,20 +4,20 @@ import itertools
 import random
 from typing import TYPE_CHECKING
 
-import disnake
-
 from jukebot.utils import converter
 
 from .base import _base_embed
 
 if TYPE_CHECKING:
+    from disnake import Embed
+
     from jukebot.components import Result, ResultSet
 
 
 def basic_queue_message(title="", content=""):
     colors = [0x438F96, 0x469961, 0x3F3F3F]
-    c = colors[random.randint(0, 2)]
-    embed: disnake.Embed = _base_embed(content=content, color=c)
+    c = random.choice(colors)
+    embed: Embed = _base_embed(content=content, color=c)
     embed.set_author(
         name="Information" if title == "" else title,
         icon_url="https://cdn.icon-icons.com/icons2/1381/PNG/512/xt7playermpv_94294.png",
@@ -33,7 +33,7 @@ def queue_message(playlist: ResultSet, title=""):
             for i, s in enumerate(playlist_slice, start=1)
         ]
     )
-    embed: disnake.Embed = basic_queue_message(title=title, content=content)
+    embed: Embed = basic_queue_message(title=title, content=content)
     embed.add_field(name="Total songs", value=f"`{len(playlist)}`")
     total_time: int = sum([e.duration for e in playlist if not e.live])
     total_time_fmt: str = converter.seconds_to_youtube_format(total_time)
@@ -43,9 +43,9 @@ def queue_message(playlist: ResultSet, title=""):
 
 
 def result_enqueued(res: Result):
-    colors = [0x438F96, 0x469961, OxF3F3F]
-    c = colors[random.randint(0, 2)]
-    embed: disnake.Embed = _base_embed(content="", color=c)
+    colors = [0x438F96, 0x469961, 0xF3F3F]
+    c = random.choice(colors)
+    embed: Embed = _base_embed(content="", color=c)
     embed.set_author(
         name=f"Enqueued : {res.title}",
         url=res.web_url,

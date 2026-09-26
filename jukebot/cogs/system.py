@@ -3,14 +3,17 @@ from __future__ import annotations
 import io
 import os
 from datetime import datetime
+from typing import TYPE_CHECKING
 
 from disnake import CommandInteraction, File
 from disnake.ext import commands
 from loguru import logger
 
-from jukebot import JukeBot
 from jukebot.utils import Extensions, converter
 from jukebot.views.embed import VOID_TOKEN, info_message
+
+if TYPE_CHECKING:
+    from jukebot import JukeBot
 
 ADMIN_GUILD_IDS = (
     list(map(int, os.environ["BOT_ADMIN_GUILD_IDS"].split(","))) if "BOT_ADMIN_GUILD_IDS" in os.environ else []

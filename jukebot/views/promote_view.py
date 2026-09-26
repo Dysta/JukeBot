@@ -1,9 +1,9 @@
 import os
 
-import disnake
+from disnake import ui
 
 
-class _VoteButton(disnake.ui.Button):
+class _VoteButton(ui.Button):
     def __init__(self):
         url = os.environ["BOT_VOTE_URL"]
         label = "Vote"
@@ -12,7 +12,7 @@ class _VoteButton(disnake.ui.Button):
         super().__init__(url=url, label=label, emoji=emoji)
 
 
-class _InviteButton(disnake.ui.Button):
+class _InviteButton(ui.Button):
     def __init__(self):
         url = os.environ["BOT_INVITE_URL"]
         label = "Invite me"
@@ -21,7 +21,7 @@ class _InviteButton(disnake.ui.Button):
         super().__init__(url=url, label=label, emoji=emoji)
 
 
-class _DonateButton(disnake.ui.Button):
+class _DonateButton(ui.Button):
     def __init__(self):
         url = os.environ["BOT_DONATE_URL"]
         label = "Donate"
@@ -30,7 +30,7 @@ class _DonateButton(disnake.ui.Button):
         super().__init__(url=url, label=label, emoji=emoji)
 
 
-class _ServerButton(disnake.ui.Button):
+class _ServerButton(ui.Button):
     def __init__(self):
         url = os.environ["BOT_SERVER_URL"]
         label = "Community"
@@ -39,7 +39,7 @@ class _ServerButton(disnake.ui.Button):
         super().__init__(url=url, label=label, emoji=emoji)
 
 
-class PromoteView(disnake.ui.View):
+class PromoteView(ui.View):
     def __init__(self):
         super().__init__()
         self.add_item(_InviteButton())

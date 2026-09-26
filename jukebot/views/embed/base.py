@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-import disnake
+from disnake import Embed
 
 VOID_TOKEN = "\u200b"
 
 
-def _base_embed(content="", color=0x38383D):
-    return disnake.Embed(title="", description=content, color=color)
+def _base_embed(content="", color=0x38383D) -> Embed:
+    return Embed(title="", description=content, color=color)

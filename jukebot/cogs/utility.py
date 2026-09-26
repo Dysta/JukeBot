@@ -1,16 +1,19 @@
 from __future__ import annotations
 
 from datetime import datetime
+from typing import TYPE_CHECKING
 
 from disnake import CommandInteraction
 from disnake.ext import commands
 from disnake.ext.commands import BucketType
 
-from jukebot import JukeBot
 from jukebot.services import ResetService
 from jukebot.utils import converter
 from jukebot.views import PromoteView
 from jukebot.views.embed import info_message
+
+if TYPE_CHECKING:
+    from jukebot import JukeBot
 
 
 class Utility(commands.Cog):

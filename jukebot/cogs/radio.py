@@ -8,12 +8,13 @@ from disnake.ext import commands
 from disnake.ext.commands import BucketType
 from loguru import logger
 
-from jukebot import JukeBot
 from jukebot.utils import checks, converter
 from jukebot.views.embed import error_message
 
 if TYPE_CHECKING:
     from disnake import Embed
+
+    from jukebot import JukeBot
 
 
 class Radio(commands.Cog):

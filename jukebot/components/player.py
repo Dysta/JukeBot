@@ -2,12 +2,10 @@ from __future__ import annotations
 
 import asyncio
 import os
-from asyncio import Task
-from datetime import datetime, timedelta
+from datetime import datetime
 from enum import IntEnum, StrEnum, auto
 from typing import TYPE_CHECKING
 
-from disnake import CommandInteraction, VoiceChannel, VoiceClient
 from loguru import logger
 
 from jukebot.components.audio_stream import AudioStream
@@ -17,6 +15,11 @@ from jukebot.components.song import Song
 from jukebot.utils import coro
 
 if TYPE_CHECKING:
+    from asyncio import Task
+    from datetime import timedelta
+
+    from disnake import CommandInteraction, VoiceChannel, VoiceClient
+
     from jukebot.jukebot import JukeBot
 
 

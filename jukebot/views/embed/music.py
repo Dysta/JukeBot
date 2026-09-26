@@ -3,22 +3,22 @@ from __future__ import annotations
 import random
 from typing import TYPE_CHECKING
 
-import disnake
-
 from jukebot.utils import converter
 
 from .base import VOID_TOKEN, _base_embed
 
 if TYPE_CHECKING:
+    from disnake import Embed
+
     from jukebot.components import Song
     from jukebot.components.player import Player
 
 
 def music_message(song: Song, loop_mode: Player.Loop, current_duration: int = 0):
     colors = [0x736DAB, 0xFFBA58]
-    c = colors[random.randint(0, 1)]
+    c = random.choice(colors)
 
-    embed: disnake.Embed = _base_embed(content="", color=c)
+    embed: Embed = _base_embed(content="", color=c)
     embed.set_author(
         name=song.title,
         url=song.web_url,

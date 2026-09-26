@@ -2,18 +2,18 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import disnake
-
 from jukebot.utils import converter
 
 from .base import VOID_TOKEN, _base_embed
 
 if TYPE_CHECKING:
+    from disnake import Embed
+
     from jukebot.components import ResultSet
 
 
 def music_search_message(title="", content=""):
-    embed: disnake.Embed = _base_embed(content=content, color=0x4F4F4F)
+    embed: Embed = _base_embed(content=content, color=0x4F4F4F)
     embed.set_author(
         name="Search" if title == "" else title,
         icon_url="https://icons.iconarchive.com/icons/papirus-team/papirus-apps/512/d-feet-icon.png",
@@ -28,7 +28,7 @@ def search_result_message(playlist: ResultSet, title=""):
             for i, s in enumerate(playlist, start=1)
         ]
     )
-    embed: disnake.Embed = music_search_message(title=title, content=content)
+    embed: Embed = music_search_message(title=title, content=content)
     embed.add_field(
         name=VOID_TOKEN,
         value="Use the selector below to choose a result.",
@@ -38,7 +38,7 @@ def search_result_message(playlist: ResultSet, title=""):
 
 def music_found_message(music: dict, title=""):
     links = " | ".join(f"[{name}]({url})" for name, url in music["links"].items())
-    embed: disnake.Embed = _base_embed(color=0x54B23F)
+    embed: Embed = _base_embed(color=0x54B23F)
     embed.set_author(
         name="Music found!" if title == "" else title,
         icon_url="https://cdn.discordapp.com/attachments/573225654452092930/952197615221612594/d-feet-icon.png",
@@ -54,7 +54,7 @@ def music_found_message(music: dict, title=""):
 
 
 def music_not_found_message(title="", content=""):
-    embed: disnake.Embed = _base_embed(content=content, color=0xEBA229)
+    embed: Embed = _base_embed(content=content, color=0xEBA229)
     embed.set_author(
         name="Error" if title == "" else title,
         icon_url="https://icons.iconarchive.com/icons/papirus-team/papirus-apps/512/plasma-search-icon.png",

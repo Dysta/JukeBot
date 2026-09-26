@@ -1,27 +1,27 @@
 from __future__ import annotations
 
 from collections import abc
-from collections.abc import Iterator
 from dataclasses import dataclass
-from typing import TypeVar
+from typing import TYPE_CHECKING
 
-_T = TypeVar("_T")
+if TYPE_CHECKING:
+    from collections.abc import Iterator
 
 
 @dataclass
 class AbstractCollection[T](abc.Collection):
-    set: list[_T]
+    set: list[T]
 
     def __len__(self) -> int:
         return len(self.set)
 
-    def __iter__(self) -> Iterator[_T]:
+    def __iter__(self) -> Iterator[T]:
         yield from self.set
 
     def __contains__(self, e: object) -> bool:
         return e in self.set
 
-    def __getitem__(self, idx: int) -> _T:
+    def __getitem__(self, idx: int) -> T:
         return self.set[idx]
 
     def __str__(self) -> str:

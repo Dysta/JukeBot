@@ -1,12 +1,16 @@
 from __future__ import annotations
 
-from disnake import CommandInteraction
+from typing import TYPE_CHECKING
+
 from disnake.ext import commands
-from disnake.ext.commands import CommandError
 from loguru import logger
 
 from jukebot import exceptions
 from jukebot.views.embed import error_message, music_not_found_message
+
+if TYPE_CHECKING:
+    from disnake import CommandInteraction
+    from disnake.ext.commands import CommandError
 
 
 class ErrorHandler(commands.Cog):
