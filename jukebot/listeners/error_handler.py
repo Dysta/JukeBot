@@ -6,7 +6,7 @@ from disnake.ext.commands import CommandError
 from loguru import logger
 
 from jukebot import exceptions
-from jukebot.utils import embed
+from jukebot.views.embed import error_message, music_not_found_message
 
 
 class ErrorHandler(commands.Cog):
@@ -22,7 +22,7 @@ class ErrorHandler(commands.Cog):
             logger.opt(lazy=True).warning(
                 f"Query Exception [{error.__class__.__name__}] '{error.query}' ({error.full_query}) for guild '{inter.guild.name} (ID: {inter.guild.id})'."
             )
-            e = embed.music_not_found_message(
+            e = music_not_found_message(
                 title=error,
             )
             if inter.response.is_done():
@@ -31,7 +31,7 @@ class ErrorHandler(commands.Cog):
                 await inter.send(embed=e, ephemeral=True)
             return
 
-        e = embed.error_message(content=error)
+        e = error_message(content=error)
         if inter.response.is_done():
             await inter.edit_original_message(embed=e)
         else:

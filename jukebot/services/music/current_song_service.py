@@ -12,8 +12,8 @@ class CurrentSongService(AbstractService):
     async def __call__(self, /, guild_id: int):
         player: Player = self.bot.players[guild_id]
 
-        stream: AudioStream = player.stream
-        song: Song = player.song
+        stream: AudioStream | None = player.stream
+        song: Song | None = player.song
         loop: Player.Loop = player.loop
 
         return song, stream, loop

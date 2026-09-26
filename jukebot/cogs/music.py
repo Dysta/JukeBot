@@ -1,12 +1,14 @@
 from __future__ import annotations
 
+from datetime import timedelta
 from urllib import parse
 
-from disnake import APISlashCommand, CommandInteraction, Embed, Forbidden
+from disnake import APISlashCommand, CommandInteraction, Embed, Forbidden, ui
 from disnake.ext import commands
 from disnake.ext.commands import BucketType
 
 from jukebot import JukeBot
+from jukebot.components import Song
 from jukebot.components.player import Player
 from jukebot.components.requests import ShazamRequest
 from jukebot.exceptions import QueryFailed
@@ -22,7 +24,9 @@ from jukebot.services.music import (
     SkipService,
     StopService,
 )
-from jukebot.utils import aioweb, checks, embed, regex
+from jukebot.utils import aioweb, checks, regex
+from jukebot.views.container import basic_message as c_basic_message
+from jukebot.views.embed import basic_message, grab_message, music_found_message, music_message, share_message
 
 
 class Music(commands.Cog):
@@ -54,7 +58,7 @@ class Music(commands.Cog):
 
         song, loop = await self.bot.services.play(interaction=inter, query=query, top=top)
 
-        e: Embed = embed.music_message(song, loop)
+        e: Embed = music_message(song, loop)
         await inter.edit_original_message(embed=e)
 
     @commands.slash_command()
@@ -70,10 +74,11 @@ class Music(commands.Cog):
         inter : CommandInteraction
             The interaction
         """
-        await self.bot.services.leave(guild_id=inter.guild.id)
+        duration: timedelta = await self.bot.services.leave(guild_id=inter.guild.id)
+        d = str(duration).split(".")[0]  # ? remove the microseconds
 
-        e = embed.basic_message(title="Player disconnected")
-        await inter.send(embed=e)
+        c = c_basic_message(title="Player disconnected", content=f"Session duration : `{d}`")
+        await inter.send(components=c)
 
     @commands.slash_command()
     @commands.cooldown(1, 5.0, BucketType.user)
@@ -91,8 +96,8 @@ class Music(commands.Cog):
         """
         await self.bot.services.stop(guild_id=inter.guild.id)
 
-        e = embed.basic_message(title="Player stopped")
-        await inter.send(embed=e)
+        c = c_basic_message(title="Player stopped")
+        await inter.send(components=c)
 
     @commands.slash_command()
     @commands.cooldown(1, 5.0, BucketType.user)
@@ -110,8 +115,8 @@ class Music(commands.Cog):
         """
         await self.bot.services.pause(guild_id=inter.guild.id)
 
-        e = embed.basic_message(title="Player paused")
-        await inter.send(embed=e)
+        c = c_basic_message(title="Player paused")
+        await inter.send(components=c)
 
     @commands.slash_command()
     @commands.cooldown(1, 5.0, BucketType.user)
@@ -136,12 +141,10 @@ class Music(commands.Cog):
         ok = await self.bot.services.resume(guild_id=inter.guild.id)
 
         if ok:
-            e = embed.basic_message(title="Player resumed")
+            e = basic_message(title="Player resumed")
         else:
             cmd: APISlashCommand = self.bot.get_global_command_named("play")
-            e = embed.basic_message(
-                title="Nothing is currently playing", content=f"Try </play:{cmd.id}> to add a music !"
-            )
+            e = basic_message(title="Nothing is currently playing", content=f"Try </play:{cmd.id}> to add a music !")
 
         await inter.send(embed=e)
 
@@ -161,12 +164,10 @@ class Music(commands.Cog):
         song, stream, loop = await self.bot.services.current_song(guild_id=inter.guild.id)
 
         if stream and song:
-            e = embed.music_message(song, loop, stream.progress)
+            e = music_message(song, loop, stream.progress)
         else:
             cmd: APISlashCommand = self.bot.get_global_command_named("play")
-            e = embed.basic_message(
-                title="Nothing is currently playing", content=f"Try </play:{cmd.id}> to add a music !"
-            )
+            e = basic_message(title="Nothing is currently playing", content=f"Try </play:{cmd.id}> to add a music !")
 
         await inter.send(embed=e)
 
@@ -184,10 +185,18 @@ class Music(commands.Cog):
         """
         await self.bot.services.join(interaction=inter)
 
-        e = embed.basic_message(
-            content=f"Connected to <#{inter.author.voice.channel.id}>\nBound to <#{inter.channel.id}>\n",
+        cmd: APISlashCommand = self.bot.get_global_command_named("play")
+
+        c = c_basic_message(
+            title="Connected!",
+            content=[
+                f"Playing in <#{inter.author.voice.channel.id}>",
+                f"Bound to <#{inter.channel.id}>",
+                "",
+                f"Use </play:{cmd.id}> to start listening to something",
+            ],
         )
-        await inter.send(embed=e)
+        await inter.send(components=c)
 
     @commands.slash_command()
     @commands.cooldown(3, 10.0, BucketType.user)
@@ -204,9 +213,11 @@ class Music(commands.Cog):
             The interaction
         """
         await self.bot.services.skip(guild_id=inter.guild.id)
+        song, *_ = await self.bot.services.current_song(guild_id=inter.guild.id)
+        assert isinstance(song, Song)
 
-        e: embed = embed.basic_message(title="Skipped !")
-        await inter.send(embed=e)
+        c: ui.Container = c_basic_message(title="Skipped!", content=f"`{song.title}` has been skipped")
+        await inter.send(components=c)
 
     @commands.slash_command()
     @commands.check(checks.bot_is_playing)
@@ -224,11 +235,12 @@ class Music(commands.Cog):
         """
         song, stream = await self.bot.services.grab(guild_id=inter.guild.id)
 
-        e = embed.grab_message(song, stream.progress)
+        e = grab_message(song, stream.progress)
         e.add_field(
             name="Voice channel",
             value=f"`{inter.guild.name} — {inter.author.voice.channel.name}`",
         )
+
         try:
             await inter.author.send(embed=e)
             await inter.send("Check your DMs!", ephemeral=True)
@@ -243,7 +255,7 @@ class Music(commands.Cog):
     async def loop(
         self,
         inter: CommandInteraction,
-        mode: commands.option_enum(["song", "queue", "none"]),
+        mode: commands.option_enum(Player.Loop.values()),
     ):
         """
         Allow user to enable or disable the looping of a song or queue.
@@ -256,10 +268,14 @@ class Music(commands.Cog):
                 - queue (loop the current queue)
                 - none (disable looping)
         """
-        new_status = await self.bot.services.loop(guild_id=inter.guild.id, mode=mode)
+        old, new = await self.bot.services.loop(guild_id=inter.guild.id, mode=mode)
 
-        e: embed = embed.basic_message(title=new_status)
-        await inter.send(embed=e)
+        c: ui.Container = c_basic_message(
+            title=f"Player loop is now set to __{new}__!",
+            content=f"It was previously set to `{old}`",
+        )
+
+        await inter.send(components=c)
 
     @commands.slash_command()
     @commands.cooldown(1, 15.0, BucketType.guild)
@@ -284,7 +300,7 @@ class Music(commands.Cog):
         if not req.success:
             raise QueryFailed("No music found for this media..", query="", full_query=url)
 
-        e: Embed = embed.music_found_message(req.result)
+        e: Embed = music_found_message(req.result)
         await inter.edit_original_message(embed=e)
 
     @commands.slash_command()
@@ -316,7 +332,8 @@ class Music(commands.Cog):
         title: str = data["entitiesByUniqueId"][data["entityUniqueId"]].get("title", "Unknown title")
         artist: str = data["entitiesByUniqueId"][data["entityUniqueId"]].get("artistName", "Unknown artist")
         img: str = data["entitiesByUniqueId"][data["entityUniqueId"]].get("thumbnailUrl", "")
-        e: Embed = embed.share_message(
+
+        e: Embed = share_message(
             inter.author,
             title=f"{artist} - {title}",
             content=content,

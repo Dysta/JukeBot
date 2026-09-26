@@ -8,8 +8,9 @@ from disnake.ext.commands import BucketType
 
 from jukebot import JukeBot
 from jukebot.services import ResetService
-from jukebot.utils import applications, checks, converter, embed
+from jukebot.utils import applications, checks, converter
 from jukebot.views import ActivityView, PromoteView
+from jukebot.views.embed import activity_message, info_message
 
 
 class Utility(commands.Cog):
@@ -28,7 +29,7 @@ class Utility(commands.Cog):
         inter : CommandInteraction
             The interaction
         """
-        e = embed.info_message()
+        e = info_message()
         e.add_field(name="🤖 Name", value=f"┕`{self.bot.user.display_name}`", inline=True)
         e.add_field(name="📡 Ping", value=f"┕`{self.bot.latency * 1000:.2f}ms`", inline=True)
         uptime = datetime.now() - self.bot.start_time
@@ -83,7 +84,7 @@ class Utility(commands.Cog):
             target_type=InviteTarget.embedded_application,
             target_application=applications.default["youtube"],
         )
-        e = embed.activity_message(
+        e = activity_message(
             "Watch Together started!",
             f"An activity started in `{inter.author.voice.channel.name}`.\n",
         )
@@ -102,7 +103,7 @@ class Utility(commands.Cog):
         """
         await self.bot.services.reset(guild=inter.guild)
 
-        e = embed.info_message(content="The player has been reset.")
+        e = info_message(content="The player has been reset.")
         await inter.send(embed=e)
 
 

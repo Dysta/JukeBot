@@ -11,8 +11,9 @@ from loguru import logger
 from jukebot import JukeBot, components
 from jukebot.components.requests import SearchRequest
 from jukebot.exceptions import QueryCanceled, QueryFailed
-from jukebot.utils import checks, embed
+from jukebot.utils import checks
 from jukebot.views import SearchDropdownView, SearchInteraction
+from jukebot.views.embed import search_result_message
 
 if TYPE_CHECKING:
     from jukebot.components import ResultSet
@@ -64,7 +65,7 @@ class Search(commands.Cog):
         if not results:
             raise QueryFailed(f"Nothing found for {query}", query=query, full_query=f"{source}{query}")
 
-        e = embed.search_result_message(playlist=results, title=f"Result for {query}")
+        e = search_result_message(playlist=results, title=f"Result for {query}")
 
         v = SearchDropdownView(inter.author, results)
         await inter.edit_original_message(embed=e, view=v)

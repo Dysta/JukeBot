@@ -3,10 +3,11 @@ from __future__ import annotations
 import asyncio
 import os
 from asyncio import Task
-from enum import IntEnum, auto
+from datetime import datetime, timedelta
+from enum import IntEnum, StrEnum, auto
+from typing import TYPE_CHECKING
 
 from disnake import CommandInteraction, VoiceChannel, VoiceClient
-from disnake.ext.commands import Bot
 from loguru import logger
 
 from jukebot.components.audio_stream import AudioStream
@@ -14,6 +15,9 @@ from jukebot.components.requests import StreamRequest
 from jukebot.components.resultset import ResultSet
 from jukebot.components.song import Song
 from jukebot.utils import coro
+
+if TYPE_CHECKING:
+    from jukebot.jukebot import JukeBot
 
 
 class Player:
@@ -53,10 +57,10 @@ class Player:
         def is_leaving(self) -> bool:
             return self in [Player.State.STOPPED, Player.State.DISCONNECTING]
 
-    class Loop(IntEnum):
-        DISABLED = 0
-        SONG = 1
-        QUEUE = 2
+    class Loop(StrEnum):
+        DISABLED = "none"
+        SONG = "song"
+        QUEUE = "queue"
 
         @property
         def is_song_loop(self) -> bool:
@@ -66,8 +70,12 @@ class Player:
         def is_queue_loop(self) -> bool:
             return self == Player.Loop.QUEUE
 
-    def __init__(self, bot: Bot, guild_id: int):
-        self.bot: Bot = bot
+        @classmethod
+        def values(cls) -> list[str]:
+            return [item.value for item in cls]
+
+    def __init__(self, bot: JukeBot, guild_id: int):
+        self.bot: JukeBot = bot
         self._guild_id: int = guild_id
 
         self._voice: VoiceClient | None = None
@@ -78,6 +86,7 @@ class Player:
         self._state: Player.State = Player.State.IDLE
         self._idle_task: Task | None = None
         self._loop: Player.Loop = Player.Loop.DISABLED
+        self._session_start: datetime = datetime.now()
 
     async def join(self, channel: VoiceChannel):
         self._voice = await channel.connect(timeout=2.0)
@@ -104,10 +113,12 @@ class Player:
         self._song = song
         self.state = Player.State.PLAYING
 
-    async def disconnect(self, force=False):
+    async def disconnect(self, force=False) -> timedelta:
         if self._voice:
             self.state = Player.State.DISCONNECTING
             await self._voice.disconnect(force=force)
+
+        return datetime.now() - self._session_start
 
     def skip(self):
         if self._voice:
@@ -144,7 +155,11 @@ class Player:
             return
 
         if self._loop.is_queue_loop:
-            func = self.bot.add_service(guild_id=self._guild_id, author=self.song.requester, query=self.song.web_url)
+            func = self.bot.services.add(
+                guild_id=self._guild_id,
+                author=self.song.requester,
+                query=self.song.web_url,
+            )
             asyncio.ensure_future(func, loop=self.bot.loop)
 
         self._stream = None
