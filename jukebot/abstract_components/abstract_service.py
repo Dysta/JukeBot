@@ -1,3 +1,11 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from jukebot.jukebot import JukeBot
+
+
 class AbstractService:
     """This class allow you to implement your own service and using it from the bot.
     To implement a service, create a new file in the `services` package then implement this class.
@@ -6,7 +14,7 @@ class AbstractService:
     To use a service: `bot.services.XXX` where `XXX` is your previous named action.
     """
 
-    def __init__(self, bot):
+    def __init__(self, bot: JukeBot):
         self.bot = bot
 
     async def __call__(self, *args, **kwargs):

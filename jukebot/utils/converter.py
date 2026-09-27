@@ -2,17 +2,15 @@ from __future__ import annotations
 
 import re
 
-import yaml
 
-
-def seconds_to_time(seconds: int) -> (int, int, int, int):
+def seconds_to_time(seconds: int) -> tuple[int, int, int, int]:
     h, r = divmod(seconds, 3600)
     m, s = divmod(r, 60)
     d, h = divmod(h, 24)
     return d, h, m, s
 
 
-def time_to_youtube_format(time: (int, int, int, int)) -> str:
+def time_to_youtube_format(time: tuple[int, int, int, int]) -> str:
     return re.sub(r"^[0:]*(.+:..)$", r"\1", ":".join([f"{e:02d}" for e in time]))
 
 
@@ -40,12 +38,3 @@ def duration_seconds_to_progress_bar(time: int, total: int, ticks: int = 30) -> 
     x = int(ticks * (time / total)) if total else 0
     line = "".join(["▬" if t != x else "🔘" for t in range(ticks)])
     return line
-
-
-def radios_yaml_to_dict() -> dict:
-    radios: dict = {}
-    with open("./data/radios.yaml", "r") as f:
-        data = yaml.safe_load(f)
-        for e in data:
-            radios.update(e)
-    return radios

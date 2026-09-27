@@ -3,16 +3,20 @@ from __future__ import annotations
 import random
 from typing import TYPE_CHECKING
 
+import yaml
+from aiofiles import open as aiopen
 from disnake import CommandInteraction
 from disnake.ext import commands
 from disnake.ext.commands import BucketType
 from loguru import logger
 
-from jukebot import JukeBot
-from jukebot.utils import checks, converter, embed
+from jukebot.utils import checks
+from jukebot.views.embed import error_message
 
 if TYPE_CHECKING:
     from disnake import Embed
+
+    from jukebot import JukeBot
 
 
 class Radio(commands.Cog):
@@ -21,7 +25,8 @@ class Radio(commands.Cog):
         self._radios: dict = {}
 
     async def cog_load(self) -> None:
-        self._radios = converter.radios_yaml_to_dict()
+        with aiopen("./data/radios.yaml", "r") as f:
+            self._radios = yaml.safe_load(f)
 
     async def _radio_process(self, inter: CommandInteraction, choices: list):
         query: str = random.choice(choices)
@@ -34,7 +39,7 @@ class Radio(commands.Cog):
     async def radio(self, inter: CommandInteraction, radio: str):
         choices: list = self._radios.get(radio, [])
         if not choices:
-            e: Embed = embed.error_message(content=f"No radio found with the name `{radio}`")
+            e: Embed = error_message(content=f"No radio found with the name `{radio}`")
             await inter.send(embed=e)
             return
 

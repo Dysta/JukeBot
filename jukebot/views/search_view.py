@@ -3,10 +3,11 @@ from __future__ import annotations
 import os
 from typing import TYPE_CHECKING
 
-import disnake
-from disnake import Interaction, Member
+from disnake import SelectOption, ui
 
 if TYPE_CHECKING:
+    from disnake import Interaction, Member
+
     from jukebot.components import ResultSet
 
 
@@ -27,11 +28,11 @@ class SearchInteraction:
     )
 
 
-class _SearchDropdown(disnake.ui.Select):
+class _SearchDropdown(ui.Select):
     def __init__(self, results: ResultSet):
         self._results = results
         options = [
-            disnake.SelectOption(
+            SelectOption(
                 label=r.title,
                 value=r.web_url,
                 description=f"on {r.channel} — {r.fmt_duration}",
@@ -40,7 +41,7 @@ class _SearchDropdown(disnake.ui.Select):
             for i, r in enumerate(results)
         ]
         options.append(
-            disnake.SelectOption(
+            SelectOption(
                 label="Cancel",
                 value=SearchInteraction.CANCEL_TEXT,
                 description="Cancel the current search",
@@ -56,7 +57,7 @@ class _SearchDropdown(disnake.ui.Select):
         )
 
 
-class SearchDropdownView(disnake.ui.View):
+class SearchDropdownView(ui.View):
     def __init__(self, author: Member, results: ResultSet):
         super().__init__(timeout=float(os.environ["BOT_SEARCH_TIMEOUT"]))
         self._author = author

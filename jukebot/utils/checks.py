@@ -2,10 +2,11 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from disnake import CommandInteraction, VoiceClient
 from disnake.ext.commands import CheckFailure
 
 if TYPE_CHECKING:
+    from disnake import CommandInteraction, VoiceClient
+
     from jukebot.components import Player
 
 

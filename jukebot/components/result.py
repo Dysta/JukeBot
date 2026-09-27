@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-
-from disnake import Member
+from typing import TYPE_CHECKING
 
 from jukebot.utils import converter
+
+if TYPE_CHECKING:
+    from disnake import Member
 
 
 @dataclass

@@ -3,13 +3,17 @@ from __future__ import annotations
 import io
 import os
 from datetime import datetime
+from typing import TYPE_CHECKING
 
 from disnake import CommandInteraction, File
 from disnake.ext import commands
 from loguru import logger
 
-from jukebot import JukeBot
-from jukebot.utils import Extensions, converter, embed
+from jukebot.utils import Extensions, converter
+from jukebot.views.embed import VOID_TOKEN, info_message
+
+if TYPE_CHECKING:
+    from jukebot import JukeBot
 
 ADMIN_GUILD_IDS = (
     list(map(int, os.environ["BOT_ADMIN_GUILD_IDS"].split(","))) if "BOT_ADMIN_GUILD_IDS" in os.environ else []
@@ -92,7 +96,7 @@ class System(commands.Cog):
         inter : CommandInteraction
             The interaction
         """
-        e = embed.info_message(title=f"Stats about {self.bot.user.name}")
+        e = info_message(title=f"Stats about {self.bot.user.name}")
         e.add_field(name="📡 Ping", value=f"┕`{self.bot.latency * 1000:.2f}ms`")
         uptime = datetime.now() - self.bot.start_time
         days, hours, minutes, seconds = converter.seconds_to_time(int(uptime.total_seconds()))
@@ -100,13 +104,13 @@ class System(commands.Cog):
             name="⏱ Uptime",
             value=f"┕`{days}d, {hours}h, {minutes}m, {seconds}s`",
         )
-        e.add_field(name=embed.VOID_TOKEN, value=embed.VOID_TOKEN)
+        e.add_field(name=VOID_TOKEN, value=VOID_TOKEN)
         e.add_field(name="🏛️ Servers", value=f"┕`{len(self.bot.guilds)}`", inline=True)
         e.add_field(
             name="👥 Members",
             value=f"┕`{len(set(self.bot.get_all_members()))}`",
         )
-        e.add_field(name=embed.VOID_TOKEN, value=embed.VOID_TOKEN)
+        e.add_field(name=VOID_TOKEN, value=VOID_TOKEN)
         e.add_field(
             name="📻 Players created",
             value=f"┕`{len(self.bot.players)}`",
@@ -115,7 +119,7 @@ class System(commands.Cog):
             name="🎶 Players playing",
             value=f"┕`{len(self.bot.players.playing())}`",
         )
-        e.add_field(name=embed.VOID_TOKEN, value=embed.VOID_TOKEN)
+        e.add_field(name=VOID_TOKEN, value=VOID_TOKEN)
 
         await inter.send(embed=e, ephemeral=True)
 

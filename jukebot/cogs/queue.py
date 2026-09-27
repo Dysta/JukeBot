@@ -2,11 +2,10 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from disnake import CommandInteraction, Embed
+from disnake import CommandInteraction
 from disnake.ext import commands
 from disnake.ext.commands import BucketType
 
-from jukebot import JukeBot
 from jukebot.components.requests.music_request import MusicRequest
 from jukebot.services.queue import (
     AddService,
@@ -15,9 +14,13 @@ from jukebot.services.queue import (
     ShowService,
     ShuffleService,
 )
-from jukebot.utils import checks, embed
+from jukebot.utils import checks
+from jukebot.views.embed import VOID_TOKEN, basic_message, basic_queue_message, queue_message, result_enqueued
 
 if TYPE_CHECKING:
+    from disnake import Embed
+
+    from jukebot import JukeBot
     from jukebot.components import Result, ResultSet
 
 
@@ -48,8 +51,15 @@ class Queue(commands.Cog):
             The interaction
         """
         queue: ResultSet = await self.bot.services.show(guild_id=inter.guild.id)
+        e: Embed = queue_message(queue, title=f"Queue for {inter.guild.name}")
 
-        e: Embed = embed.queue_message(queue, self.bot, title=f"Queue for {inter.guild.name}")
+        cmd = self.bot.get_global_command_named("queue")
+        e.add_field(
+            name=VOID_TOKEN,
+            value=f"Use command </queue add:{cmd.id}> or </queue remove:{cmd.id}> to add or remove a song.",
+            inline=False,
+        )
+
         await inter.send(embed=e)
 
     @queue.sub_command()
@@ -77,9 +87,9 @@ class Queue(commands.Cog):
         type, res = await self.bot.services.add(guild_id=inter.guild.id, author=inter.author, query=query, top=top)
 
         if type == MusicRequest.ResultType.PLAYLIST:
-            e: Embed = embed.basic_queue_message(content=f"Enqueued : {len(res)} songs")
+            e: Embed = basic_queue_message(content=f"Enqueued : {len(res)} songs")
         else:
-            e: Embed = embed.result_enqueued(res)
+            e: Embed = result_enqueued(res)
         await inter.edit_original_message(embed=e)
 
     @queue.sub_command()
@@ -98,7 +108,7 @@ class Queue(commands.Cog):
         """
         await self.bot.services.clear(guild_id=inter.guild.id)
 
-        e: Embed = embed.basic_message(title="The queue have been cleared.")
+        e: Embed = basic_message(title="The queue have been cleared.")
         await inter.send(embed=e)
 
     @queue.sub_command()
@@ -117,7 +127,7 @@ class Queue(commands.Cog):
         """
         await self.bot.services.shuffle(guild_id=inter.guild.id)
 
-        e: Embed = embed.basic_message(title="Queue shuffled.")
+        e: Embed = basic_message(title="Queue shuffled.")
         await inter.send(embed=e)
 
     @queue.sub_command()
@@ -136,7 +146,7 @@ class Queue(commands.Cog):
         """
         elem: Result = await self.bot.services.remove(guild_id=inter.guild.id, song=song)
 
-        e: Embed = embed.basic_message(content=f"`{elem.title}` have been removed from the queue")
+        e: Embed = basic_message(content=f"`{elem.title}` have been removed from the queue")
         await inter.send(embed=e)
 
     @remove.autocomplete("song")

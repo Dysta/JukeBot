@@ -1,13 +1,16 @@
 from __future__ import annotations
 
 import traceback
+from typing import TYPE_CHECKING
 
-from disnake import CommandInteraction
 from disnake.ext import commands
-from disnake.ext.commands import CommandError
 from loguru import logger
 
 from jukebot import exceptions
+
+if TYPE_CHECKING:
+    from disnake import CommandInteraction
+    from disnake.ext.commands import CommandError
 
 
 def fancy_traceback(exc: Exception) -> str:

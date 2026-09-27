@@ -1,12 +1,15 @@
+from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
-from disnake import Guild
 from loguru import logger
 
 from jukebot.abstract_components import AbstractService
 from jukebot.exceptions.player_exception import PlayerDontExistException
 
 if TYPE_CHECKING:
+    from disnake import Guild
+
     from jukebot.components import Player
 
 

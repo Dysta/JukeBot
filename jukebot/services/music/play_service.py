@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from disnake import CommandInteraction
 from loguru import logger
 
 from jukebot import components
@@ -11,6 +10,8 @@ from jukebot.components.requests import StreamRequest
 from jukebot.exceptions.player_exception import PlayerConnexionException
 
 if TYPE_CHECKING:
+    from disnake import CommandInteraction
+
     from jukebot.components import Player, Result, Song
 
 

@@ -3,12 +3,12 @@ from __future__ import annotations
 import copy
 from typing import TYPE_CHECKING
 
-from disnake import CommandInteraction
-
 from jukebot.abstract_components import AbstractService
 from jukebot.exceptions import PlayerConnexionException
 
 if TYPE_CHECKING:
+    from disnake import CommandInteraction
+
     from jukebot.components import Player
 
 
