@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import asyncio
-from enum import Enum
+from enum import StrEnum
 from typing import ClassVar
 
 import yt_dlp
@@ -19,7 +19,7 @@ class SearchRequest(AbstractRequest):
     Search request can't be created with url, only a query of words.
     """
 
-    class Engine(str, Enum):
+    class Engine(StrEnum):
         Youtube = "ytsearch10:"
         SoundCloud = "scsearch10:"
 
