@@ -138,7 +138,7 @@ class System(commands.Cog):
         for c in cmds:
             opts: str = ""
             if c.body.options:
-                opts = " ".join([e.name for e in c.body.options])
+                opts = "<" + " | ".join([e.name for e in c.body.options]) + ">"
             msg += f"""
 - title: {c.name}
   icon: none
