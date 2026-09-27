@@ -24,7 +24,7 @@ class ResultSet(AbstractCollection[Result]):
         return cls(set=result_set)
 
     @classmethod
-    def empty(cls):
+    def empty(cls) -> ResultSet:
         return cls(set=[])
 
     def get(self) -> Result:

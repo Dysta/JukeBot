@@ -3,12 +3,14 @@ from __future__ import annotations
 import random
 from typing import TYPE_CHECKING
 
+import yaml
+from aiofiles import open as aiopen
 from disnake import CommandInteraction
 from disnake.ext import commands
 from disnake.ext.commands import BucketType
 from loguru import logger
 
-from jukebot.utils import checks, converter
+from jukebot.utils import checks
 from jukebot.views.embed import error_message
 
 if TYPE_CHECKING:
@@ -23,7 +25,8 @@ class Radio(commands.Cog):
         self._radios: dict = {}
 
     async def cog_load(self) -> None:
-        self._radios = converter.radios_yaml_to_dict()
+        with aiopen("./data/radios.yaml", "r") as f:
+            self._radios = yaml.safe_load(f)
 
     async def _radio_process(self, inter: CommandInteraction, choices: list):
         query: str = random.choice(choices)
