@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import asyncio
 from typing import TYPE_CHECKING
 
 from disnake import CommandInteraction
@@ -13,7 +12,7 @@ from jukebot.components.requests import SearchRequest
 from jukebot.exceptions import QueryCanceled, QueryFailed
 from jukebot.utils import checks
 from jukebot.views import SearchDropdownView, SearchInteraction
-from jukebot.views.embed import search_result_message
+from jukebot.views.embed import basic_message, search_result_message
 
 if TYPE_CHECKING:
     from jukebot import JukeBot
@@ -32,7 +31,7 @@ class Search(commands.Cog):
         self,
         inter: CommandInteraction,
         query: str,
-        source: SearchRequest.Engine = SearchRequest.Engine.Youtube.value,
+        source: SearchRequest.Engine = SearchRequest.Engine.Youtube,
         top: bool = False,
     ):
         """
@@ -72,11 +71,12 @@ class Search(commands.Cog):
         await inter.edit_original_message(embed=e, view=v)
         await v.wait()
 
-        await inter.edit_original_message(embed=e, view=None)
-
         result: str = v.result
         if result == SearchInteraction.CANCEL_TEXT:
             raise QueryCanceled("Search Canceled", query=query, full_query=f"{source}{query}")
+
+        e = basic_message("Loading music...")
+        await inter.edit_original_message(embed=e, view=None)
 
         logger.opt(lazy=True).debug(
             f"Query '{source}{query}' successful for guild '{inter.guild.name} (ID: {inter.guild.id})'."
@@ -84,7 +84,7 @@ class Search(commands.Cog):
 
         # ? we call play cause search is barely a shortcut for play with a search before
         func = self.bot.get_slash_command("play").callback(self, inter, result, top)
-        asyncio.ensure_future(func, loop=self.bot.loop)
+        await func
 
 
 def setup(bot: JukeBot):

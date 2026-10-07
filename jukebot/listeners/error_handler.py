@@ -30,14 +30,14 @@ class ErrorHandler(commands.Cog):
                 title=error,
             )
             if inter.response.is_done():
-                await inter.edit_original_message(embed=e)
+                await inter.edit_original_message(embed=e, view=None)
             else:
                 await inter.send(embed=e, ephemeral=True)
             return
 
         e = error_message(content=error)
         if inter.response.is_done():
-            await inter.edit_original_message(embed=e)
+            await inter.edit_original_message(embed=e, view=None)
         else:
             await inter.send(embed=e, ephemeral=True)
 
