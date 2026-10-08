@@ -28,7 +28,7 @@ class SearchInteraction:
     )
 
 
-class _SearchDropdown(ui.Select):
+class _SearchDropdown(ui.StringSelect):
     def __init__(self, results: ResultSet):
         self._results = results
         options = [
