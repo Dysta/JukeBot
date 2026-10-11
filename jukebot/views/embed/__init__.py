@@ -1,7 +1,7 @@
-from .base import VOID_TOKEN as VOID_TOKEN
-from .general import basic_message as basic_message
-from .general import error_message as error_message
-from .general import info_message as info_message
+from .basic import VOID_TOKEN as VOID_TOKEN
+from .basic import basic_message as basic_message
+from .basic import error_message as error_message
+from .basic import info_message as info_message
 from .music import music_message as music_message
 from .queue import basic_queue_message as basic_queue_message
 from .queue import queue_message as queue_message

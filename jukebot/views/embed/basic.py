@@ -1,11 +1,12 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from disnake import Embed
 
-from .base import _base_embed
+VOID_TOKEN = "\u200b"
 
-if TYPE_CHECKING:
-    from disnake import Embed
+
+def _base_embed(content="", color=0x38383D) -> Embed:
+    return Embed(title="", description=content, color=color)
 
 
 def basic_message(title="", content=""):

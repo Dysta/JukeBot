@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 
 from jukebot.utils import converter
 
-from .base import _base_embed
+from .basic import _base_embed
 
 if TYPE_CHECKING:
     from disnake import Embed, Member
